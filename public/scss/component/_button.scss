@@ -1,0 +1,359 @@
+@use "../abstracts/mixin";
+
+.tf-btn {
+    position: relative;
+    overflow: hidden;
+    display: block;
+    width: max-content;
+    text-decoration: none;
+
+    span {
+        font-weight: 500;
+        font-size: 16px;
+        line-height: 24px;
+        position: relative;
+        z-index: 2;
+        @include mixin.transition3();
+    }
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 50%;
+        width: 0;
+        height: 100%;
+        background-color: var(--primary);
+        z-index: 1;
+        @include mixin.transition3();
+    }
+
+    &:hover {
+        span {
+            color: var(--white);
+        }
+
+        &::before {
+            left: 0;
+            width: 100%;
+        }
+    }
+
+    &:focus-visible {
+        outline: none;
+    }
+
+    &.bg-on-suface-container {
+        background-color: var(--on-suface-container);
+        color: var(--white);
+
+        &::before {
+            height: 100%;
+            background-color: var(--primary);
+        }
+
+        &:hover {
+            span {
+                color: var(--white);
+            }
+        }
+    }
+
+    &.bg-white {
+        background-color: var(--white) !important;
+        color: var(--on-suface-container);
+
+        &::before {
+            height: 100%;
+            background-color: var(--primary);
+        }
+
+        &:hover,
+        &:focus-visible {
+            border-color: var(--primary) !important;
+            background-color: var(--primary) !important;
+            // Bootstrap link hover color would otherwise win on <a class="tf-btn">.
+            color: var(--white) !important;
+
+            span {
+                color: var(--white) !important;
+            }
+
+            &::before {
+                background-color: var(--primary);
+            }
+        }
+
+        &.bg-white-style-2 {
+            border: 1px solid transparent;
+
+            &:hover,
+            &:focus-visible {
+                border-color: var(--primary) !important;
+            }
+        }
+    }
+
+    &.bg-color-primary {
+        background-color: var(--primary);
+
+        span {
+            color: var(--white);
+        }
+
+        &::before {
+            height: 100%;
+            background-color: var(--on-suface-container);
+        }
+
+        &:hover {
+            span {
+                color: var(--white);
+            }
+        }
+    }
+
+    &.style-border {
+        border: 1px solid var(--primary);
+
+        span {
+            color: var(--on-suface-container);
+        }
+
+        &:hover {
+            span {
+                color: var(--white);
+            }
+        }
+    }
+
+    &.style-1 {
+        padding: 8px 15px;
+        border-radius: 999px;
+
+        &::before {
+            border-radius: 26px;
+        }
+    }
+
+    &.style-2 {
+        border-radius: 999px;
+        padding: 12px 0;
+
+        &::before {
+            border-radius: 26px;
+        }
+    }
+
+    &.style-3 {
+        border-radius: 999px;
+        padding: 8px 0;
+
+        &::before {
+            border-radius: 26px;
+        }
+    }
+
+    &.style-4 {
+        border-radius: 999px;
+        padding: 12px 40px;
+
+        &::before {
+            border-radius: 26px;
+        }
+    }
+
+    &.w-full {
+        width: 100%;
+    }
+
+    &.hover-bg-primary {
+        &::before {
+            height: 100%;
+            background-color: var(--primary);
+        }
+
+        &:hover {
+            background-color: var(--primary) !important;
+        }
+    }
+}
+
+.default-btn {
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 24px;
+
+    span {
+        border-bottom: 2px solid var(--on-suface-container);
+        @include mixin.transition3();
+    }
+
+    &.style-color-white {
+        span {
+            color: var(--white);
+            border-color: var(--white);
+        }
+
+        &:hover {
+            span {
+                color: var(--primary);
+                border-color: var(--primary);
+            }
+        }
+    }
+
+    &:hover {
+        span {
+            border-color: var(--primary);
+        }
+    }
+
+}
+
+.tf-btn-search {
+    @include mixin.flex(center, center);
+}
+
+.btn-load-more {
+    .tf-btn {
+        padding: 12px 40px;
+    }
+}
+
+.tf-btn-reply {
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 24px;
+    color: var(--primary);
+
+    &:hover {
+        color: var(--on-suface-container);
+    }
+}
+
+.tf-btn-arrow-t-r {
+    @include mixin.d-flex();
+    align-items: center;
+    gap: 4px;
+
+    span {
+        font-weight: 500;
+        font-size: 16px;
+        line-height: 24px;
+        color: var(--white);
+        border-bottom: 1px solid var(--white);
+        @include mixin.transition3();
+    }
+
+    .icon {
+        @include mixin.flex(center, center);
+    }
+
+    i {
+        color: var(--white);
+        @include mixin.transition3();
+    }
+
+    &:hover {
+        span {
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        i {
+            color: var(--primary);
+        }
+    }
+}
+
+.btn-arrow-item {
+    width: 60px;
+    height: 60px;
+    background-color: var(--bg-1);
+    border: 1px solid var(--bg-1);
+    border-radius: 50%;
+    backdrop-filter: blur(20px);
+    overflow: hidden;
+
+    i {
+        color: var(--white);
+        font-size: 32px;
+    }
+
+    &:hover {
+        i {
+            animation: hover-btn-arrow 0.3s linear;
+        }
+    }
+}
+
+.switch-container {
+    @include mixin.d-flex();
+    justify-content: center;
+    align-items: center;
+
+}
+
+.btn-cancel-review {
+    display: none;
+}
+
+
+.switch-container {
+    @include mixin.d-flex();
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+
+    .switch {
+        position: relative;
+        width: 80px;
+        height: 40px;
+        background-color: var(--white);
+        border-radius: 999px;
+        border: 1px solid var(--on-suface-variant-2);
+        cursor: pointer;
+        @include mixin.transition3();
+
+
+        .toggle {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        &.is-active {
+            .toggle {
+                transform: translateX(40px);
+            }
+        }
+    }
+
+    .switch-label {
+        color: var(--on-suface-variant-2);
+
+        &.is-active {
+            color: var(--on-suface-container);
+        }
+    }
+
+}
+
+.page-btn {
+    padding: 5px 10px;
+    background-color: var(--white);
+    color: var(--on-suface-container);
+    border-radius: 999px;
+    @include mixin.transition3();
+
+    &:hover {
+        background-color: var(--primary);
+        color: var(--white);
+    }
+}

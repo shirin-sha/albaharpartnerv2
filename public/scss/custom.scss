@@ -1,0 +1,272 @@
+.tf-btn.hover-white {
+  &::before {
+    display: none;
+  }
+}
+.rc-slider .rc-slider-handle {
+  border: solid 2px var(--on-suface-container);
+  opacity: 1 !important;
+  background-color: #fff !important;
+  width: 24px;
+  height: 24px;
+  margin-top: -11px;
+}
+
+.rc-slider .rc-slider-handle:hover {
+  border-color: var(--on-suface-container);
+}
+
+.rc-slider .rc-slider-handle-dragging {
+  border-color: var(--on-suface-container) !important;
+  box-shadow: none !important;
+}
+
+.rc-slider .rc-slider-track,
+.rc-slider .rc-slider-tracks {
+  background-color: var(--on-suface-container);
+}
+@media only screen and (max-width: 550px) {
+  .footer .footer-col-block .tf-collapse-content {
+    overflow-y: hidden;
+    display: block;
+    height: 0;
+    transition: 0.5s;
+  }
+}
+.tfSubscribeMsg {
+  display: none;
+  max-height: 0px;
+  // transition: 0.4s;
+  overflow: hidden;
+  &.active {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    max-height: 180px;
+    display: block;
+  }
+}
+
+.awards-list {
+  .image {
+    overflow: visible;
+  }
+}
+.rtl {
+  .tf-btn-newsletter i {
+    transform: rotate(-90deg);
+    transform-origin: center center;
+  }
+}
+.overflow-clip {
+  max-width: 100vw;
+  overflow: clip;
+}
+.flex-1 {
+  flex: 1;
+  padding-left: 10%;
+  min-width: 10px;
+}
+
+.border-bottom-none {
+  border-bottom: none;
+}
+.sidebar-categories {
+  .item {
+    &.active {
+      color: var(--primary) !important;
+      a {
+        color: var(--primary) !important;
+      }
+    }
+  }
+}
+.typeanimation {
+  transition: width 0.58s ease-out !important;
+  height: 100% !important;
+  //   margin-top: -10px;
+  padding-right: 10px;
+  b.is-visible {
+    padding-right: 10px !important;
+  }
+}
+
+#toggle-rtl span:last-child {
+  display: none;
+}
+
+.rtl #toggle-rtl,
+.style-RTL #toggle-rtl {
+  left: 15px;
+  right: auto;
+}
+
+.rtl #toggle-rtl span:first-child,
+.style-RTL #toggle-rtl span:first-child {
+  display: none;
+}
+
+.rtl #toggle-rtl span:last-child,
+.style-RTL #toggle-rtl span:last-child {
+  display: block;
+}
+.tf-btn-arrow {
+  cursor: pointer;
+}
+.rtl .wg-team-details .image {
+  flex: 1;
+}
+.rtl .newsletter-form .tf-btn-newsletter {
+  left: 8px;
+  right: auto;
+}
+.rtl .newsletter-form .tf-btn-newsletter i {
+  transform: rotateY(180deg);
+}
+.rtl .blog-right-sidebar-content .date {
+  left: unset;
+  right: 20px;
+}
+.rtl .blog-no-sidebar-slide .date {
+  left: unset !important;
+  right: 20px;
+}
+
+/* Keep featured news gradient full-width like original template */
+.blog-no-sidebar-content .tf-post-grid.news-featured-post.style-absolute .tf-post-grid-content {
+  right: 0;
+}
+
+/* Keep news detail sidebar thumbnails consistent and small */
+.news-details-sidebar .sidebar-recent-posts .tf-post-list.style-small .image {
+  width: 80px;
+  min-width: 80px;
+  height: 80px;
+}
+
+/* Light Scrollbar Styles */
+/* For Webkit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 #f1f1f1;
+}
+
+/* Public page inline-style replacements */
+.career-apply-wrapper {
+  margin-top: 40px;
+}
+
+.career-apply-card {
+  padding: 32px;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
+}
+
+.career-apply-select {
+  min-height: 56px;
+  width: 100%;
+  padding: 0 16px;
+}
+
+.career-apply-fieldset-sm {
+  margin-top: 12px;
+}
+
+.career-apply-fieldset-md {
+  margin-top: 16px;
+}
+
+.career-apply-resume-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.career-apply-feedback {
+  margin-bottom: 12px;
+}
+
+.career-apply-feedback-success {
+  color: rgb(52, 168, 83);
+}
+
+.career-apply-feedback-error {
+  color: red;
+}
+
+.services-content-spacious {
+  padding-top: 50px;
+  padding-bottom: 50px;
+}
+
+.services-image-wrap {
+  width: 100%;
+  height: 100%;
+  min-height: 500px;
+  position: relative;
+  overflow: hidden;
+}
+
+.services-image-fill {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.blogs-grid-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.case-studies-grid-layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.media-card-ratio {
+  aspect-ratio: 473 / 630;
+}
+
+.media-fill-cover {
+  object-fit: cover;
+}
+
+.hero-fallback-placeholder {
+  height: 100vh;
+  background: #f0f0f0;
+  text-align: center;
+}
+
+.hero-fallback-note {
+  padding: 50px;
+  background: #f0f0f0;
+  text-align: center;
+}
+
+.brand-marquee-img {
+  width: 280px;
+  height: 55px;
+  object-fit: contain;
+}

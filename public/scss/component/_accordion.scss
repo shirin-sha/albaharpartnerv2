@@ -1,0 +1,144 @@
+@use "../abstracts/mixin";
+
+.according-item {
+    padding: 22px 0 17px;
+    border-bottom: 1px solid var(--outline);
+
+    .title-according {
+        display: inline-block;
+        color: var(--on-suface-container);
+        position: relative;
+        width: 100%;
+        @include mixin.d-flex();
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        span {
+            position: relative;
+            @include mixin.transition3();
+            width: 18px;
+            &::before {
+                content: "";
+                position: absolute;
+                top: 50%;
+                right: 0;
+                width: 18px;
+                height: 1px;
+                background-color: var(--on-suface-container);
+                @include mixin.transition3();
+            }
+
+            &::after {
+                content: "";
+                position: absolute;
+                top: 50%;
+                right: 0;
+                width: 18px;
+                height: 1px;
+                transform: rotate(90deg);
+                background-color: var(--on-suface-container);
+                @include mixin.transition3();
+            }
+        }
+
+        &:not(.collapsed) {
+            span {
+                &::after {
+                    opacity: 0;
+                    visibility: hidden;
+                }
+            }
+        }
+    }
+
+    .according-content {
+        p {
+            padding-top: 11px;
+            padding-bottom: 3px;
+            color: var(--on-suface-variant-1);
+        }
+    }
+
+    &.style-arrow{
+        i{
+            font-size: 13px;
+            @include mixin.transition3();
+        }
+        .title-according{
+            &:not(.collapsed) {
+                i{
+                    transform: rotate(180deg);
+                }
+            }
+        }
+    }
+
+    &.bg-white{
+        background-color: var(--white);
+        padding: 27px 32px;
+        border: none;
+        margin-bottom: 20px;
+        .according-content{
+            .content{
+                @include mixin.d-flex();
+                gap: 30px;
+                padding-top: 20px;
+                border-top: 1px solid var(--outline);
+                margin-top: 20px;
+            }
+            .item-content{
+                .title-item{
+                    padding-bottom: 8px;
+                }
+                ul{
+                    li{ 
+                        list-style: disc;
+                        margin-left: 27px;
+                    }
+                }
+                .price-according{
+                    @include mixin.d-flex();
+                    align-items: center;
+                    gap: 4px;
+                }
+                .tf-btn{
+                    padding: 15px 47.5px;
+                }
+                &.item-content-1{
+                    max-width: 480px;
+                    width: 100%;
+                }
+            }
+        }
+        &:last-child{
+            margin-bottom: 0;
+        }
+    }
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+    &.style-small{
+        padding: 16px 0;
+        margin-bottom: 15px;
+        &:last-child{
+            margin-bottom: 0;
+        }
+    }
+}
+
+.wg-according {
+    &.style-border {
+        border: 2px solid var(--outline);
+        border-radius: 12px;
+        background-color: var(--white);
+        .according-item {
+            padding-left: 31px;
+            padding-right: 32px;
+            margin-bottom: 0px;
+            &:last-child{
+                border: none;
+            }
+        }
+    }
+}

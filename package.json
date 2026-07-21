@@ -1,0 +1,45 @@
+{
+  "name": "finwice-nextjs",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "seed:homepage": "node scripts/seed-homepage.js",
+    "reset:homepage": "node scripts/reset-and-seed.js",
+    "create:admin": "node scripts/create-admin.js"
+  },
+  "dependencies": {
+    "apexcharts": "^4.7.0",
+    "axios": "^1.10.0",
+    "bcryptjs": "^3.0.3",
+    "bootstrap": "^5.3.2",
+    "dotenv": "^17.2.3",
+    "drift-zoom": "^1.5.1",
+    "gsap": "^3.13.0",
+    "mongodb": "^6.21.0",
+    "next": "15.3.6",
+    "odometer": "^0.4.8",
+    "photoswipe": "^5.4.4",
+    "rc-slider": "^11.1.8",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "sass": "^1.89.2",
+    "swiper": "^11.2.10"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/bootstrap": "^5.2.10",
+    "@types/drift-zoom": "^1.5.2",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/swiper": "^5.4.3",
+    "autoprefixer": "^10.4.23",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.18",
+    "typescript": "^5"
+  }
+}

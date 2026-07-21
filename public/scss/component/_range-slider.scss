@@ -1,0 +1,101 @@
+@use "../abstracts/mixin";
+
+/*range-slider
+    ---------------------*/
+.range-slider {
+    .range-two-val {
+        height: 4px;
+        box-shadow: none;
+        border: 0;
+        background-color: var(--outline);
+
+        .noUi-connects {
+            position: relative;
+            .noUi-connect {
+                background-color: var(--on-suface-container);
+                height: 4px;
+            }
+        }
+
+        .noUi-origin {
+            .noUi-handle {
+                position: absolute;
+                cursor: pointer;
+                width: 18px;
+                height: 18px;
+                border-radius: 50%;
+                background-color: var(--white);
+                border: 4px solid var(--on-suface-container);
+                box-shadow: none;
+                top: -7px;
+                right: -9px;
+                &::after,
+                &::before {
+                    display: none;
+                }
+
+                &:active {
+                    right: -10px !important;
+                }
+            }
+        }
+    }
+
+    .bottom {
+        margin-top: 21px;
+        @include mixin.d-flex();
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .value {
+        @include mixin.d-flex();
+        align-items: center;
+        gap: 15px;
+        padding: 11px 12px;
+        border: 1px solid var(--outline);
+        width: max-content;
+        .price-max,
+        .price-min {
+            border: 1px solid var(--Line);
+            padding: 6px 12px;
+            border-radius: 8px;
+            width: 100%;
+            position: relative;
+
+        }
+
+
+        >div {
+            color: var(--color-text);
+        }
+    }
+
+    .input-container {
+        div {
+            position: absolute;
+            width: max-content;
+            padding: 5px;
+            margin: 0;
+            border: 1px solid var(--Line);
+            border-radius: 5px;
+            top: 20%;
+            background-color: var(--White);
+
+            &::before {
+                position: absolute;
+                display: block;
+                content: "";
+                bottom: -6px;
+                left: 50%;
+                width: 0;
+                height: 0;
+                margin-left: -3px;
+                overflow: hidden;
+                border: 3px solid var(--Line);
+                border-top-color: transparent;
+                border-top-color: var(--White);
+            }
+        }
+    }
+}

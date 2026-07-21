@@ -1,0 +1,890 @@
+@use "abstracts/mixin";
+@use "abstracts/variable";
+
+title
+
+/* Reset Browsers
+-------------------------------------------------------------- */
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    font: inherit;
+    vertical-align: baseline;
+    font-family: inherit;
+    font-size: 100%;
+    font-style: inherit;
+    font-weight: inherit;
+}
+
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+main,
+nav,
+section {
+    display: block;
+}
+
+html {
+    margin-right: 0 !important;
+    font-size: 62.5%;
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+}
+
+*,
+*:before,
+*:after {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--white); //change
+}
+
+body::-webkit-scrollbar {
+    display: none;
+}
+
+ol,
+ul {
+    list-style: none;
+}
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+caption,
+th,
+td {
+    font-weight: normal;
+    text-align: left;
+}
+
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+    content: "";
+}
+
+blockquote,
+q {
+    quotes: none;
+}
+
+a img {
+    border: 0;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+select {
+    max-width: 100%;
+}
+
+/* General
+-------------------------------------------------------------- */
+
+body,
+button,
+input,
+select,
+textarea {
+    font-family: variable.$font-main;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 26px;
+    color: var(--on-suface-container);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+img {
+    height: auto;
+    max-width: 100%;
+    vertical-align: middle;
+    -ms-interpolation-mode: bicubic;
+}
+
+p {
+    font-weight: 400; //change
+    font-size: 16px;
+    line-height: 26px;
+}
+
+strong,
+b,
+cite {
+    font-weight: bold;
+}
+
+dfn,
+cite,
+em,
+i,
+blockquote {
+    font-style: italic;
+}
+
+abbr,
+acronym {
+    border-bottom: 1px dotted #e0e0e0;
+    cursor: help;
+}
+
+.btn-link:focus,
+.btn-link:hover,
+mark,
+ins {
+    text-decoration: none;
+}
+
+sup,
+sub {
+    font-size: 75%;
+    height: 0;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+}
+
+small {
+    font-size: 75%;
+}
+
+big {
+    font-size: 125%;
+}
+
+address {
+    font-style: italic;
+    margin: 0 0 20px;
+}
+
+code,
+kbd,
+tt,
+var,
+samp,
+pre {
+    margin: 20px 0;
+    padding: 4px 12px;
+    background: #f5f5f5;
+    border: 1px solid #e0e0e0;
+    overflow-x: auto;
+    -webkit-hyphens: none;
+    -moz-hyphens: none;
+    hyphens: none;
+    border-radius: 0;
+    height: auto;
+}
+
+svg,
+svg path {
+    @include mixin.transition3();
+}
+
+/* Elements
+-------------------------------------------------------------- */
+
+html {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+*,
+*:before,
+*:after {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+hr {
+    margin-bottom: 20px;
+    border: dashed 1px #ccc;
+}
+
+/* List */
+
+ul,
+ol {
+    padding: 0;
+}
+
+ul {
+    list-style: disc;
+}
+
+ol {
+    list-style: decimal;
+}
+
+li>ul,
+li>ol {
+    margin-bottom: 0;
+}
+
+li {
+    list-style: none;
+}
+
+ul li,
+ol li {
+    padding: 0;
+}
+
+dl,
+dd {
+    margin: 0 0 20px;
+}
+
+dt {
+    font-weight: bold;
+}
+
+del,
+.disable {
+    text-decoration: line-through;
+    filter: alpha(opacity=50);
+    opacity: 0.5;
+}
+
+/* Table */
+
+table,
+th,
+td {
+    border: 1px solid #343444;
+}
+
+table {
+    border-collapse: separate;
+    border-spacing: 0;
+    border-width: 1px 0 0 1px;
+    margin: 0 0 30px;
+    table-layout: fixed;
+    width: 100%;
+}
+
+caption,
+th,
+td {
+    font-weight: normal;
+    text-align: left;
+}
+
+th {
+    border-width: 0 1px 1px 0;
+    font-weight: bold;
+}
+
+td {
+    border-width: 0 1px 1px 0;
+}
+
+th,
+td {
+    padding: 8px 12px;
+}
+
+/* Media */
+
+embed,
+object,
+video {
+    margin-bottom: 20px;
+    max-width: 100%;
+    vertical-align: middle;
+}
+
+p>embed,
+p>iframe,
+p>object,
+p>video {
+    margin-bottom: 0;
+}
+
+/* Forms
+-------------------------------------------------------------- */
+/* Fixes */
+button,
+input {
+    line-height: normal;
+}
+
+button,
+input,
+select,
+textarea {
+    font-size: 100%;
+    line-height: inherit;
+    margin: 0;
+    vertical-align: baseline;
+}
+
+textarea {
+    overflow: auto;
+    /* Removes default vertical scrollbar in IE6/7/8/9 */
+    vertical-align: top;
+    /* Improves readability and alignment in all browsers */
+}
+
+input[type="checkbox"] {
+    display: inline;
+}
+
+button,
+input[type="button"],
+input[type="reset"],
+input[type="submit"] {
+    line-height: 1;
+    cursor: pointer;
+    -webkit-appearance: button;
+    border: 0;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0);
+    cursor: pointer;
+    vertical-align: sub;
+    /* Addresses excess padding in IE8/9 */
+}
+
+input[type="search"] {
+    -webkit-appearance: textfield;
+    /* Addresses appearance set to searchfield in S5, Chrome */
+}
+
+input[type="search"]::-webkit-search-decoration {
+    /* Corrects inner padding displayed oddly in S5, Chrome on OSX */
+    -webkit-appearance: none;
+}
+
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+    border: 0;
+    padding: 0;
+}
+
+/* Remove chrome yellow autofill */
+input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 1000px #f7f7f7 inset;
+}
+
+/* Reset search styling */
+input[type="search"] {
+    outline: 0;
+}
+
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+    display: none;
+}
+
+/* Placeholder color */
+::-webkit-input-placeholder {
+    color: #171412;
+}
+
+::-moz-placeholder {
+    color: #171412;
+    opacity: 1;
+}
+
+/* Since FF19 lowers the opacity of the placeholder by default */
+:-ms-input-placeholder {
+    color: #171412;
+}
+
+/* Typography
+-------------------------------------------------------------- */
+
+h1,
+.h1,
+h2,
+.h2,
+h3,
+.h3,
+h4,
+.h4,
+h5,
+.h5,
+h6,
+.h6 {
+    font-family: variable.$font-main;
+    color: var(--on-suface-container);
+    margin: 0;
+    text-rendering: optimizeLegibility;
+}
+
+h1,
+.h1 {
+    font-size: 80px;
+    line-height: 88px;
+    font-weight: 500;
+}
+
+h2,
+.h2 {
+    font-size: 56px;
+    line-height: 68px;
+    font-weight: 500;
+}
+
+h3,
+.h3 {
+    font-size: 44px;
+    line-height: 52px;
+    font-weight: 500;
+}
+
+h4,
+.h4 {
+    font-size: 32px;
+    line-height: 40px;
+    font-weight: 500;
+}
+
+h5,
+.h5 {
+    font-size: 22px;
+    line-height: 30px;
+    font-weight: 500;
+}
+
+h6,
+.h6 {
+    font-size: 20px;
+    line-height: 28px;
+    font-weight: 500;
+}
+
+/* link style
+-------------------------------------------------------------- */
+a {
+    text-decoration: none;
+    color: var(--on-suface-container);
+    cursor: pointer;
+    @include mixin.transition3;
+
+    &:hover,
+    &:focus {
+        color: var(--primary); //change
+        outline: 0;
+        @include mixin.transition3;
+    }
+}
+
+/* tf-container
+-------------------------------------------------------------- */
+.tf-container {
+    margin-left: auto;
+    margin-right: auto;
+    padding-right: 15px;
+    padding-left: 15px;
+    max-width: 1320px;
+    width: 100%;
+
+    .row {
+        margin-left: -15px !important;
+        margin-right: -15px !important;
+
+        >* {
+            padding-left: 15px !important;
+            padding-right: 15px !important;
+        }
+    }
+
+    &.full {
+        max-width: 100vw;
+    }
+
+    &.w-1870 {
+        max-width: 1870px;
+    }
+
+    &.w-1830 {
+        max-width: 1830px;
+    }
+
+}
+
+/* Extra classes
+-------------------------------------------------------------- */
+
+.hidden {
+    display: none;
+}
+
+.block {
+    display: block;
+}
+
+.relative {
+    position: relative;
+}
+
+.absolute {
+    position: absolute;
+}
+
+.fixed {
+    position: fixed !important;
+}
+
+.position-unset {
+    position: unset !important;
+}
+
+.z-5 {
+    z-index: 5;
+}
+
+.flex {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+
+}
+
+.body-2 {
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 30px;
+}
+
+.title {
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 28px;
+}
+
+.caption-1 {
+    font-weight: 400 !important;
+    font-size: 14px !important;
+    line-height: 22px !important;
+}
+
+.caption-2 {
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 20px;
+}
+
+.label {
+    font-weight: 500 !important;
+    font-size: 12px !important;
+    line-height: 20px !important;
+    letter-spacing: 1.2px !important;
+}
+
+.position-relative {
+    position: relative;
+}
+
+.text-btn-uppercase {
+    text-transform: uppercase;
+}
+
+.text-btn {
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 24px;
+}
+.overflow-auto{
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.pt-0 {
+    padding-top: 0 !important;
+}
+
+.g-10 {
+    gap: 10px;
+}
+
+.g-12 {
+    gap: 12px !important;
+}
+
+.g-14 {
+    gap: 14px !important;
+}
+
+.g-20 {
+    gap: 20px !important;
+}
+
+.g-24 {
+    gap: 24px;
+}
+
+.g-30 {
+    gap: 30px !important;
+}
+
+.g-40 {
+    gap: 40px !important;
+}
+
+.rg-20 {
+    row-gap: 20px !important;
+}
+
+.rg-30 {
+    row-gap: 30px !important;
+}
+
+.rg-40 {
+    row-gap: 40px !important;
+}
+
+
+.rg-60 {
+    row-gap: 60px;
+}
+
+.m-lr-40 {
+    margin-left: 40px;
+    margin-right: 40px;
+}
+
+.pt-48 {
+    padding-top: 48px !important;
+}
+
+.pb-28 {
+    padding-bottom: 28px !important;
+}
+
+.mb-8 {
+    margin-bottom: 8px !important;
+}
+
+.mb-11 {
+    margin-bottom: 11px !important;
+}
+
+.mb-12 {
+    margin-bottom: 12px !important;
+}
+
+.mb-15 {
+    margin-bottom: 15px !important;
+}
+
+.mb-16 {
+    margin-bottom: 16px !important;
+}
+
+.mb-18 {
+    margin-bottom: 18px !important;
+}
+
+.mb-20 {
+    margin-bottom: 20px !important;
+}
+
+.mb-24 {
+    margin-bottom: 24px !important;
+}
+
+.mb-28 {
+    margin-bottom: 28px !important;
+}
+
+.mb-30 {
+    margin-bottom: 30px !important;
+}
+
+.mb-32 {
+    margin-bottom: 32px !important;
+}
+
+.mb-34 {
+    margin-bottom: 34px !important;
+}
+
+.mb-36 {
+    margin-bottom: 36px !important;
+}
+
+.mb-40 {
+    margin-bottom: 40px !important;
+}
+
+.mb-48 {
+    margin-bottom: 48px !important;
+}
+
+.mb-50 {
+    margin-bottom: 50px !important;
+}
+
+.mb-60 {
+    margin-bottom: 60px !important;
+}
+.mb-66 {
+    margin-bottom: 66px !important;
+}
+
+.color-white {
+    color: var(--white) !important;
+}
+
+.color-primary {
+    color: var(--primary) !important;
+}
+
+.color-text-1 {
+    color: var(--color-text-1) !important;
+}
+
+.color-text-3 {
+    color: var(--color-text-3) !important;
+}
+
+.color-text-4 {
+    color: var(--color-text-4) !important;
+}
+
+.bg-surface {
+    background-color: var(--surface) !important;
+}
+
+.color-on-suface-variant-2 {
+    color: var(--on-suface-variant-2) !important;
+}
+
+.color-on-suface-variant-1 {
+    color: var(--on-suface-variant-1) !important;
+}
+
+.color-on-suface-container {
+    color: var(--on-suface-container) !important;
+}
+
+.bg-on-suface-container {
+    background-color: var(--on-suface-container) !important;
+}
+
+.color-text-2 {
+    color: var(--color-text-2) !important;
+}
+
+.fw-7 {
+    font-weight: 700 !important;
+}

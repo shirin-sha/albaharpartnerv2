@@ -1,0 +1,82 @@
+@use "../abstracts/mixin";
+@use "../abstracts/variable";
+
+.nice-select {
+    border: unset !important;
+    position: relative;
+    &::before{
+        content: '\e90f';
+        font-family: variable.$fontIcon;
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-weight: 400;
+        @include mixin.transition3();
+    }
+    &::after {
+        display: none;
+    }
+
+    >span {
+        font-weight: 400;
+        font-size: 16px;
+        line-height: 26px;
+        color: var(--color-text);
+    }
+
+    >.list {
+        margin-top: 10px;
+        border-radius: 16px;
+        max-height: unset;
+        border: unset !important;
+        top: 110%;
+        border: 1px solid var(--Line);
+        box-shadow: 0px 5px 18px 5px #40485726;
+        .option {
+            height: 41px;
+            padding: 0 15px;
+            border-radius: 12px;
+            font-weight: 400;
+            font-size: 16px;
+            line-height: 41px;
+            color: var(--secondary);
+            position: relative;
+
+            &.selected {
+                color: var(--secondary);
+                font-weight: 400;
+            }
+        }
+    }
+    &.no-border{
+        border: none !important;
+        padding: 0 !important;
+    }
+
+    &.open {
+        z-index: 50;
+        &::before{
+            transform: translateY(-50%) rotate(180deg);
+        }
+    }
+
+    &.default {
+        padding: 0;
+        padding-right: 18px;
+        border: 0 !important;
+
+        &::after {
+            right: 0;
+            top: 44%;
+            right: 2px;
+        }
+
+        ul.list {
+            width: 220px;
+            right: 0;
+            left: unset;
+        }
+    }
+    
+}

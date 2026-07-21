@@ -1,0 +1,34 @@
+// Fonts load via next/font (see lib/fonts.ts); variables set on <html>.
+$font-main: var(--font-rethink-sans), sans-serif;
+$font-main2: var(--font-oxygen), sans-serif;
+$font-main3: var(--font-inter-tight), sans-serif;
+$font-main4: var(--font-suse), sans-serif;
+$font-main5: var(--font-geologica), sans-serif;
+$font-main6: var(--font-nunito), sans-serif;
+$font-main7: var(--font-archivo), sans-serif;
+$fontIcon: "icomoon";
+
+:root {
+    --primary: #6d2c84;
+    --white: #ffffff;
+    --black: #000000;
+    --error: #C72929;
+    --on-suface-container: #24283E;
+    --on-suface-variant-1: #6D7074;
+    --on-suface-variant-2: #A2A3AB;
+    --surface: #F3F5F5;
+    --outline: #E4E4E4;
+    --line-1: #FFFFFF26;
+    --bg-1: #FFFFFF26;
+    --bg-2: #ECF2F2;
+    --bg-3: rgba(0, 0, 0, 0.15);
+    --bg-4: #6d2c8466;
+    --bg-5: #24283E1A;
+    --bg-6: #F7F7F7;
+    --color-text-1: #ADF9EB;
+    --color-text-2: #636666;
+    --color-text-3: #858585;
+    --color-text-4: #;
+    --border-1: rgba(36, 40, 62, 0.2);
+
+}

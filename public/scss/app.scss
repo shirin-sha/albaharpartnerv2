@@ -1,0 +1,39 @@
+/* ---------------------------------------------------------
+    * Name: 
+    * Version: 1.0.0
+    * Author: Themesflat
+    * Author URI: http://themesflat.com 
+
+	* Abstracts variable
+    
+    * Reset css styles
+
+    * Components
+
+    * section
+
+    * dashboard
+
+    * Responsive
+ ------------------------------------------------------------------------------ */
+
+/*--------- Abstracts variable ---------- */
+@use "abstracts/index";
+
+/*---------- Reset css styles ----------- */
+@use "reset";
+
+/*------------ Components ---------------- */
+@use "component/index" as index2;
+
+/*------------ widgets ---------------- */
+@use "widgets";
+
+/*------------ sections ---------------- */
+@use "sections";
+
+/*-------------- Responsive ----------------- */
+@use "responsive";
+
+/*-------------- RTL ----------------- */
+@use "rtl";

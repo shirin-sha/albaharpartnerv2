@@ -1,0 +1,340 @@
+/* Custom styles for admin UI components */
+
+/* Base font size for admin - LARGE */
+.admin-bg-gradient {
+  font-size: 18px !important;
+  line-height: 1.7 !important;
+}
+
+.admin-bg-gradient * {
+  font-size: inherit;
+}
+
+/* Smooth transitions */
+.btn,
+.form-control,
+.form-select,
+.nav-link {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Card hover effect */
+.card {
+  transition: all 0.2s ease-in-out;
+}
+
+.card:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Card header and titles - EXTRA LARGE */
+.card-header h3 {
+  font-size: 1.85rem !important;
+  font-weight: 700 !important;
+}
+
+.card-header p {
+  font-size: 1.35rem !important;
+}
+
+/* Tab styling - EXTRA LARGE */
+.nav-tabs .nav-link {
+  border: none;
+  border-bottom: 4px solid transparent;
+  color: #6c757d;
+  padding: 1.25rem 2rem;
+  font-size: 1.5rem !important;
+  font-weight: 600 !important;
+}
+
+.nav-tabs .nav-link:hover {
+  border-bottom-color: #dee2e6;
+  color: #495057;
+}
+
+.nav-tabs .nav-link.active {
+  color: #0d6efd;
+  border-bottom-color: #0d6efd;
+  background-color: transparent;
+  font-weight: 700 !important;
+}
+
+.nav-tabs .nav-link span {
+  font-size: 1.5rem !important;
+}
+
+/* Gap utilities for older Bootstrap versions */
+.gap-2 > * + * {
+  margin-top: 0.5rem;
+}
+
+.gap-3 > * + * {
+  margin-top: 1rem;
+}
+
+.gap-4 > * + * {
+  margin-top: 1.5rem;
+}
+
+/* Sticky header */
+.admin-header-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Admin gradient background */
+.admin-bg-gradient {
+  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+  min-height: 100vh;
+}
+
+/* Form improvements - EXTRA LARGE TEXT */
+.form-control,
+.form-select {
+  padding: 1.25rem 1.5rem !important;
+  font-size: 1.6rem !important;
+  line-height: 1.8 !important;
+  min-height: 70px !important;
+  font-weight: 400 !important;
+}
+
+.form-control::placeholder {
+  font-size: 1.5rem !important;
+  color: #6c757d;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Textarea specific sizing - EXTRA LARGE */
+textarea.form-control {
+  min-height: 180px !important;
+  resize: vertical;
+  font-size: 1.6rem !important;
+  line-height: 1.8 !important;
+  padding: 1.25rem 1.5rem !important;
+}
+
+/* Better spacing */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+/* Form labels - EXTRA LARGE and bold */
+.form-label {
+  font-weight: 700 !important;
+  margin-bottom: 0.75rem;
+  font-size: 1.5rem !important;
+  color: #1a1a1a !important;
+  display: block !important;
+}
+
+/* Helper text - much larger */
+.form-text,
+small.text-muted {
+  font-size: 1.3rem !important;
+  color: #6c757d;
+  display: block !important;
+  margin-top: 0.5rem !important;
+}
+
+/* Array manager cards */
+.array-item-card {
+  transition: all 0.2s ease-in-out;
+  border: 1px solid #dee2e6;
+}
+
+.array-item-card:hover {
+  border-color: #0d6efd;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+/* Better card padding */
+.card-body {
+  padding: 2rem;
+}
+
+/* Section titles - EXTRA LARGE */
+h4 {
+  font-size: 1.75rem !important;
+  font-weight: 700 !important;
+  color: #1a1a1a !important;
+  margin-bottom: 0.85rem !important;
+}
+
+h3 {
+  font-size: 1.9rem !important;
+  font-weight: 700 !important;
+}
+
+/* Paragraphs and general text - EXTRA LARGE */
+p {
+  font-size: 1.4rem !important;
+  line-height: 1.8 !important;
+}
+
+/* Badge text - extra large */
+.badge {
+  font-size: 1.3rem !important;
+  padding: 0.65rem 1rem !important;
+  font-weight: 600 !important;
+}
+
+/* All text inputs and values */
+input[type="text"],
+input[type="number"],
+input[type="email"],
+input[type="url"],
+textarea,
+select {
+  font-size: 1.6rem !important;
+}
+
+/* Card text */
+.card-body p,
+.card-body span,
+.card-body div {
+  font-size: 1.4rem;
+}
+
+/* Gap utilities */
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.gap-3 {
+  gap: 1rem;
+}
+
+.gap-4 {
+  gap: 1.5rem;
+}
+
+/* Spacing utilities */
+.mb-4 {
+  margin-bottom: 1.5rem !important;
+}
+
+.py-4 {
+  padding-top: 1.5rem !important;
+  padding-bottom: 1.5rem !important;
+}
+
+/* Alert animations */
+@keyframes slideInDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.alert {
+  animation: slideInDown 0.3s ease-out;
+  font-size: 1.2rem !important;
+  padding: 1.2rem 1.5rem !important;
+  font-weight: 500 !important;
+}
+
+/* Toggle switch styling - EXTRA LARGE */
+.form-switch .form-check-input {
+  width: 5rem;
+  height: 2.5rem;
+  cursor: pointer;
+  margin-top: 0;
+}
+
+.form-switch .form-check-input:checked {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+.form-check-label {
+  font-size: 1.5rem !important;
+  font-weight: 600 !important;
+  padding-left: 1rem;
+  cursor: pointer;
+}
+
+/* Badge positioning */
+.position-absolute {
+  position: absolute !important;
+}
+
+.top-0 {
+  top: 0 !important;
+}
+
+.end-0 {
+  right: 0 !important;
+}
+
+/* Button sizing improvements - EXTRA LARGE */
+.btn {
+  padding: 1.1rem 2.25rem !important;
+  font-size: 1.5rem !important;
+  font-weight: 600 !important;
+  min-height: 65px !important;
+  line-height: 1.7 !important;
+}
+
+.btn-sm {
+  padding: 0.85rem 1.5rem !important;
+  font-size: 1.3rem !important;
+  min-height: 52px !important;
+}
+
+.btn-lg {
+  padding: 1.35rem 2.75rem !important;
+  font-size: 1.75rem !important;
+  min-height: 75px !important;
+  font-weight: 700 !important;
+}
+
+/* Button group improvements */
+.btn-group .btn {
+  border-radius: 0;
+}
+
+.btn-group .btn:first-child {
+  border-top-left-radius: 0.375rem;
+  border-bottom-left-radius: 0.375rem;
+}
+
+.btn-group .btn:last-child {
+  border-top-right-radius: 0.375rem;
+  border-bottom-right-radius: 0.375rem;
+}
+
+/* Loading spinner */
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0.15em;
+}
+
+/* Responsive utilities */
+@media (max-width: 768px) {
+  .admin-header-sticky h1 {
+    font-size: 1.5rem;
+  }
+  
+  .nav-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .nav-tabs .nav-link {
+    white-space: nowrap;
+  }
+}

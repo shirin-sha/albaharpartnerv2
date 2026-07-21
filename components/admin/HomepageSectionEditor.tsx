@@ -1,0 +1,152 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import type { SectionData, SectionEditorProps, SectionFormData } from '@/app/admin/homepage/types';
+import { SECTION_FIELD_RENDERERS } from './homepage-section-fields';
+
+export default function HomepageSectionEditor({
+  sectionId,
+  section,
+  onSave,
+  isOpen,
+  onToggle,
+}: SectionEditorProps) {
+  const [formData, setFormData] = useState<SectionFormData>({
+    ltr: section?.ltr ?? {},
+    rtl: section?.rtl ?? {},
+  });
+
+  useEffect(() => {
+    if (section) {
+      const ltrData = (section.ltr ?? {}) as Record<string, unknown>;
+      const rtlData = (section.rtl ?? {}) as Record<string, unknown>;
+      if (sectionId === 'hero') {
+        setFormData({
+          ltr: { slides: Array.isArray(ltrData.slides) ? ltrData.slides : (ltrData.title ? [ltrData] : []) },
+          rtl: { slides: Array.isArray(rtlData.slides) ? rtlData.slides : (rtlData.title ? [rtlData] : []) },
+        });
+      } else if (sectionId === 'process') {
+        setFormData({
+          ltr: { ...ltrData, steps: Array.isArray(ltrData.steps) ? ltrData.steps : [] },
+          rtl: { ...rtlData, steps: Array.isArray(rtlData.steps) ? rtlData.steps : [] },
+        });
+      } else if (sectionId === 'caseStudies') {
+        setFormData({
+          ltr: { ...ltrData, caseStudies: Array.isArray(ltrData.caseStudies) ? ltrData.caseStudies : [] },
+          rtl: { ...rtlData, caseStudies: Array.isArray(rtlData.caseStudies) ? rtlData.caseStudies : [] },
+        });
+      } else if (sectionId === 'features') {
+        setFormData({
+          ltr: {
+            ...ltrData,
+            benefits: Array.isArray(ltrData.benefits) ? ltrData.benefits : [],
+            counters: Array.isArray(ltrData.counters) ? ltrData.counters : [],
+          },
+          rtl: {
+            ...rtlData,
+            benefits: Array.isArray(rtlData.benefits) ? rtlData.benefits : [],
+            counters: Array.isArray(rtlData.counters) ? rtlData.counters : [],
+          },
+        });
+      } else if (sectionId === 'blogs') {
+        setFormData({
+          ltr: { ...ltrData, posts: Array.isArray(ltrData.posts) ? ltrData.posts : [] },
+          rtl: { ...rtlData, posts: Array.isArray(rtlData.posts) ? rtlData.posts : [] },
+        });
+      } else if (sectionId === 'brands') {
+        setFormData({
+          ltr: { ...ltrData, brands: Array.isArray(ltrData.brands) ? ltrData.brands : [] },
+          rtl: { ...rtlData, brands: Array.isArray(rtlData.brands) ? rtlData.brands : [] },
+        });
+      } else {
+        setFormData({ ltr: ltrData, rtl: rtlData });
+      }
+    } else {
+      const emptyLtr: Record<string, unknown> =
+        sectionId === 'hero'
+          ? { slides: [] }
+          : sectionId === 'services'
+            ? { tag: '', heading: '', subheading: '', language: 'ltr', isActive: true }
+            : sectionId === 'process'
+              ? { steps: [], tag: '', heading: '', subheading: '', buttonText: '', buttonLink: '', language: 'ltr', isActive: true }
+              : sectionId === 'caseStudies'
+                ? { caseStudies: [], tag: '', heading: '', subheading: '', language: 'ltr', isActive: true }
+                : sectionId === 'features'
+                  ? {
+                      benefits: [],
+                      counters: [],
+                      tag: '',
+                      heading: '',
+                      description: '',
+                      imagePath: '',
+                      buttonText: '',
+                      buttonLink: '',
+                      language: 'ltr',
+                      isActive: true,
+                    }
+                  : sectionId === 'blogs'
+                    ? { posts: [], tag: '', heading: '', subheading: '', buttonText: '', buttonLink: '', language: 'ltr', isActive: true }
+                    : sectionId === 'brands'
+                      ? { brands: [], heading: '', language: 'ltr', isActive: true }
+                      : {};
+      setFormData({ ltr: emptyLtr, rtl: { ...emptyLtr, language: 'rtl' } });
+    }
+  }, [section, sectionId]);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const updateData: Partial<SectionData> = {
+      enabled: section?.enabled ?? true,
+      order: section?.order ?? 0,
+      ltr: formData.ltr,
+      rtl: formData.rtl,
+    };
+    onSave(sectionId, updateData);
+  };
+
+  const updateField = (lang: 'ltr' | 'rtl', path: string, value: unknown) => {
+    const keys = path.split('.');
+    setFormData((prev) => {
+      const newData = { ...prev };
+      const langData = { ...newData[lang] } as Record<string, unknown>;
+      let current: Record<string, unknown> = langData;
+      for (let i = 0; i < keys.length - 1; i++) {
+        if (!current[keys[i]] || typeof current[keys[i]] !== 'object') current[keys[i]] = {};
+        current = current[keys[i]] as Record<string, unknown>;
+      }
+      current[keys[keys.length - 1]] = value;
+      return { ...newData, [lang]: langData };
+    });
+  };
+
+  const FieldRenderer = SECTION_FIELD_RENDERERS[sectionId];
+  const fields = FieldRenderer ? (
+    <FieldRenderer formData={formData} setFormData={setFormData} updateField={updateField} />
+  ) : null;
+
+  return (
+    <div className="admin-cms-section-card" style={{ background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '8px' }}>
+      <div
+        className="admin-cms-section-header"
+        onClick={onToggle}
+        style={{ background: '#ffffff', borderBottom: '1px solid #e5e7eb', padding: '16px 24px' }}
+      >
+        <h3 style={{ color: '#1f2937', fontWeight: '600', margin: 0, textTransform: 'capitalize' }}>{sectionId}</h3>
+        <span className="admin-cms-toggle">{isOpen ? '−' : '+'}</span>
+      </div>
+      {isOpen && (
+        <form onSubmit={handleSubmit} className="admin-cms-form">
+          {fields}
+          <div className="form-actions">
+            <button type="submit" className="button button-primary">
+              Save (English & Arabic)
+            </button>
+            <button type="button" className="admin-btn admin-btn-edit" onClick={onToggle}>
+              Cancel
+            </button>
+          </div>
+        </form>
+      )}
+    </div>
+  );
+}

@@ -1,0 +1,97 @@
+@use "../abstracts/mixin";
+
+.testimonial-item{
+    border: 2px solid var(--surface);
+    padding: 32px 30px 30px;
+    background: var(--white);
+    .testimonial-top{
+        padding-bottom: 13px;
+        margin-bottom: 16px;
+        border-bottom: 1px solid var(--outline);
+        position: relative;
+        &::before{
+            content: "";
+            position: absolute;
+            bottom: -1px;
+            left: auto;
+            right: 0;
+            width: 0;
+            height: 1px;
+            background-color: var(--primary);
+            @include mixin.transition3();
+        }
+    }
+    .item-content{
+        .text{
+            color: var(--on-suface-variant-1);
+            margin-bottom: 16px;
+        }
+    }
+    .info-user{
+        @include mixin.d-flex();
+        align-items: center;
+        gap: 12px;
+        .image{
+            border-radius: 50%;
+        }
+    }
+    &:hover{
+        .testimonial-top{
+            &::before{
+                left: 0;
+                right: auto;
+                width: 100%;
+            }
+        }
+    }
+
+    &.no-boder{
+        border: 0;
+    }
+    &.style-2{
+        @include mixin.d-flex();
+        padding: 0;
+        border: none;
+        height: 100%;
+        .image{
+            img{
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+        }
+        .testimonial-content{
+            width: 100%;
+            max-width: calc(100% - 210px);
+            padding: 35px 26px 35px;
+            border: 2px solid var(--surface);
+            height: 100%;
+            .name-testimonials{
+                display: inline-block;
+                margin-bottom: 16px;
+                border-bottom: 1px solid var(--outline);
+                padding-bottom: 16px;
+                width: 100%;
+            }
+            .desc{
+                margin-bottom: 20px;
+                color: var(--on-suface-variant-1);
+            }
+            .name-user{
+                color: var(--on-suface-container);
+            }
+            .caption-2{
+                color: var(--on-suface-variant-1);
+            }
+        }   
+    }
+    &.bg-surface{
+        background-color: var(--surface);
+        .position-user{
+            white-space: unset !important;
+        }
+        .info-content{
+            max-width: calc(100% - 60px);
+        }
+    }
+}

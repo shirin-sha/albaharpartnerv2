@@ -44,9 +44,10 @@ export default function CtaSection({ content, language = 'ltr' }: CtaSectionProp
                 <h2 className="title-section mb-12 wow fadeInUp">
                   {content.heading}
                 </h2>
-                <div className="sub-title body-2 wow fadeInUp">
-                  {content.description}
-                </div>
+                <div
+                  className="sub-title body-2 wow fadeInUp"
+                  dangerouslySetInnerHTML={{ __html: content.description }}
+                />
               </div>
               <div className="bottom g-20">
                 <div className="wow fadeInUp">

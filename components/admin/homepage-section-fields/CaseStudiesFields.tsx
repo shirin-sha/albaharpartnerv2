@@ -1,6 +1,7 @@
 'use client';
 
 import ImageUpload from '@/components/admin/ui/ImageUpload';
+import RichTextEditor from '@/components/admin/ui/RichTextEditor';
 import type { SectionFieldsProps } from '@/app/admin/homepage/types';
 
 interface CaseStudyItem {
@@ -138,28 +139,28 @@ export function CaseStudiesFields({ formData, setFormData, updateField }: Sectio
                     </div>
                     <div className="form-row-bilingual">
                       <div className="form-group">
-                        <label>Description</label>
-                        <textarea
+                        <RichTextEditor
+                          label="Description"
                           value={String(studyLtr.description ?? '')}
-                          onChange={(e) => {
+                          onChange={(value) => {
                             const newStudies = [...caseStudiesLtr];
-                            newStudies[index] = { ...studyLtr, description: e.target.value };
+                            newStudies[index] = { ...studyLtr, description: value };
                             setFormData({ ...formData, ltr: { ...formData.ltr, caseStudies: newStudies } });
                           }}
-                          rows={4}
+                          placeholder="Enter case study description..."
                         />
                       </div>
                       <div className="form-group">
-                        <label>Description</label>
-                        <textarea
-                          dir="rtl"
+                        <RichTextEditor
+                          label="Description"
                           value={String(studyRtl.description ?? '')}
-                          onChange={(e) => {
+                          onChange={(value) => {
                             const newStudies = [...caseStudiesRtl];
-                            newStudies[index] = { ...studyRtl, description: e.target.value };
+                            newStudies[index] = { ...studyRtl, description: value };
                             setFormData({ ...formData, rtl: { ...formData.rtl, caseStudies: newStudies } });
                           }}
-                          rows={4}
+                          placeholder="أدخل وصف دراسة الحالة..."
+                          className="rtl-editor"
                         />
                       </div>
                     </div>

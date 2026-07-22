@@ -20,8 +20,6 @@ export interface HeaderContent {
     link: string;
   };
   menuItems: MenuItem[];
-  buttonText: string;
-  buttonLink: string;
   language: 'ltr' | 'rtl';
   isActive: boolean;
   createdAt?: Date;

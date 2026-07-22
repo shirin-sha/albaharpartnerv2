@@ -2,13 +2,12 @@
 
 import { Counter } from '@/types/homepage';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
+import RichTextEditor from '@/components/admin/ui/RichTextEditor';
 import type { SectionFieldsProps } from '@/app/admin/homepage/types';
 
 export function FeaturesFields({ formData, setFormData, updateField }: SectionFieldsProps) {
   const ltr = formData.ltr as Record<string, unknown>;
   const rtl = formData.rtl as Record<string, unknown>;
-  const benefitsLtr = (ltr?.benefits as string[] | undefined) ?? [];
-  const benefitsRtl = (rtl?.benefits as string[] | undefined) ?? [];
   const countersLtr = (ltr?.counters as Counter[] | undefined) ?? [];
   const countersRtl = (rtl?.counters as Counter[] | undefined) ?? [];
   const maxCounters = Math.max(countersLtr.length, countersRtl.length);
@@ -54,12 +53,21 @@ export function FeaturesFields({ formData, setFormData, updateField }: SectionFi
         </div>
         <div className="form-row-bilingual">
           <div className="form-group">
-            <label>Description</label>
-            <textarea value={String(ltr?.description ?? '')} onChange={(e) => updateField('ltr', 'description', e.target.value)} rows={6} />
+            <RichTextEditor
+              label="Description"
+              value={String(ltr?.description ?? '')}
+              onChange={(value) => updateField('ltr', 'description', value)}
+              placeholder="Enter description..."
+            />
           </div>
           <div className="form-group">
-            <label>Description</label>
-            <textarea dir="rtl" value={String(rtl?.description ?? '')} onChange={(e) => updateField('rtl', 'description', e.target.value)} rows={6} />
+            <RichTextEditor
+              label="Description"
+              value={String(rtl?.description ?? '')}
+              onChange={(value) => updateField('rtl', 'description', value)}
+              placeholder="أدخل الوصف..."
+              className="rtl-editor"
+            />
           </div>
         </div>
       </div>
@@ -73,33 +81,6 @@ export function FeaturesFields({ formData, setFormData, updateField }: SectionFi
           }}
           folder="section"
         />
-      </div>
-      <div className="form-group">
-        <label>Benefits (English, one per line)</label>
-        <textarea
-          value={Array.isArray(benefitsLtr) ? benefitsLtr.join('\n') : ''}
-          onChange={(e) => {
-            const newBenefits = e.target.value.split('\n').filter((f) => f.trim());
-            setFormData({ ...formData, ltr: { ...formData.ltr, benefits: newBenefits } });
-          }}
-          rows={6}
-          placeholder="Benefit 1&#10;Benefit 2&#10;Benefit 3"
-        />
-        <small>Enter each benefit on a new line</small>
-      </div>
-      <div className="form-group">
-        <label>Benefits (Arabic, one per line)</label>
-        <textarea
-          dir="rtl"
-          value={Array.isArray(benefitsRtl) ? benefitsRtl.join('\n') : ''}
-          onChange={(e) => {
-            const newBenefits = e.target.value.split('\n').filter((f) => f.trim());
-            setFormData({ ...formData, rtl: { ...formData.rtl, benefits: newBenefits } });
-          }}
-          rows={6}
-          placeholder="Benefit 1&#10;Benefit 2&#10;Benefit 3"
-        />
-        <small>Enter each benefit on a new line</small>
       </div>
       <div>
         <div className="form-row-bilingual-header">

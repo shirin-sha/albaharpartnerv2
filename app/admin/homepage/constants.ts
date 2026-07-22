@@ -12,7 +12,6 @@ export const HOME_SECTION_IDS = [
   'brands',
   'caseStudies',
   'features',
-  'blogs',
   'cta',
 ] as const;
 
@@ -103,16 +102,9 @@ export function buildSectionsFromContent(
       rtl: rtl?.featuresSection ?? {},
     },
     {
-      sectionId: 'blogs',
-      enabled: true,
-      order: 8,
-      ltr: ltrContent.blogsSection ?? {},
-      rtl: rtl?.blogsSection ?? {},
-    },
-    {
       sectionId: 'cta',
       enabled: true,
-      order: 9,
+      order: 8,
       ltr: {
         ...(ltrContent.ctaSection ?? {}),
         imagePath:

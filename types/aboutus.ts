@@ -62,13 +62,10 @@ export interface AboutBDSSection {
 }
 
 export interface AboutBPCSection {
+  tag: string;
   heading: string;
   imagePath: string;
   description: string;
-  serviceOfferingsTitle: string;
-  serviceOfferings: string[];
-  coreIndustriesTitle: string;
-  coreIndustries: string[];
   language: 'ltr' | 'rtl';
   isActive: boolean;
 }

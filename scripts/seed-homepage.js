@@ -198,8 +198,8 @@ const defaultLTRContent = {
     imagePath: "/image/section/Al-Bahar-founder.jpg",
     personName: "Mohamed Abdulrahman Al-Bahar",
     personTitle: "Founder and CEO of Al-Bahar and Partners",
-    secondaryHeading: "Business Digital Solutions (BDS) Division",
-    secondaryDescription: "The Business Digital Solutions (BDS) Division drives digital transformation through practical, scalable solutions tailored to operational needs. From strategy and solution design to implementation and ongoing support, BDS helps businesses streamline workflows, enhance customer experience, and build secure, future-ready digital capabilities.",
+    buttonText: "Learn More",
+    buttonLink: "/about-us",
     language: "ltr",
     isActive: true,
   },
@@ -278,14 +278,6 @@ const defaultLTRContent = {
     heading: "Why Choose Us for Digital Transformation?",
     description: "We combine trusted technology partnerships with practical delivery capabilities—helping organizations implement solutions that are secure, scalable, and built to last.",
     imagePath: "/image/section/img-section-why-choose-h7.jpg",
-    benefits: [
-      "Partner-backed enterprise solutions",
-      "Structured planning and implementation",
-      "Security-first and compliance-aware approach",
-      "Reliable post-deployment support",
-      "Experienced team and proven workflows",
-      "Long-term value and continuous improvement",
-    ],
     buttonText: "Request a Consultation",
     buttonLink: "/contact-us",
     counters: [
@@ -293,48 +285,6 @@ const defaultLTRContent = {
       { value: 3600, label: "Happy<br />Customers", order: 1, isActive: true },
       { value: 900, label: "Project<br />Completed", order: 2, isActive: true },
       { value: 40, label: "Awards &amp;<br />Recognitions", order: 3, isActive: true },
-    ],
-    language: "ltr",
-    isActive: true,
-  },
-
-  blogsSection: {
-    tag: "READ OUR BLOG",
-    heading: "Insights & Ideas",
-    subheading: "Get the latest insights, expert tips, and updates to stay informed and inspired.",
-    buttonText: "View All Articles",
-    buttonLink: "/news-updates",
-    posts: [
-      {
-        title: "Building Secure Identity and Access Systems",
-        category: "Identity & Access",
-        imagePath: "/image/blog/tf-post-grid-absolute-3.jpg",
-        date: { day: "18", month: "DEC" },
-        link: "#",
-        order: 0,
-        language: "ltr",
-        isActive: true,
-      },
-      {
-        title: "Strengthening Cybersecurity for Modern Enterprises",
-        category: "Cybersecurity",
-        imagePath: "/image/blog/tf-post-grid-absolute-4.jpg",
-        date: { day: "18", month: "DEC" },
-        link: "#",
-        order: 1,
-        language: "ltr",
-        isActive: true,
-      },
-      {
-        title: "Payment Technology Trends Shaping Customer Experience",
-        category: "Payment Technology",
-        imagePath: "/image/blog/tf-post-grid-absolute-5.jpg",
-        date: { day: "22", month: "DEC" },
-        link: "#",
-        order: 2,
-        language: "ltr",
-        isActive: true,
-      },
     ],
     language: "ltr",
     isActive: true,
@@ -497,8 +447,8 @@ const defaultRTLContent = {
     imagePath: "/image/section/Al-Bahar-founder.jpg",
     personName: "محمد عبدالرحمن البحر",
     personTitle: "المؤسس والرئيس التنفيذي للبحر والشركاء",
-    secondaryHeading: "قسم حلول الأعمال الرقمية",
-    secondaryDescription: "يدفع قسم حلول الأعمال الرقمية (BDS) التحول الرقمي من خلال حلول عملية وقابلة للتوسع ومصممة خصيصًا للاحتياجات التشغيلية. من الاستراتيجية وتصميم الحلول إلى التنفيذ والدعم المستمر، يساعد BDS الشركات على تبسيط سير العمل وتحسين تجربة العملاء وبناء قدرات رقمية آمنة وجاهزة للمستقبل.",
+    buttonText: "اعرف المزيد",
+    buttonLink: "/about-us",
     language: "rtl",
     isActive: true,
   },
@@ -549,14 +499,6 @@ const defaultRTLContent = {
     heading: "لماذا تختارنا للتحول الرقمي؟",
     description: "نجمع بين شراكات التكنولوجيا الموثوقة وقدرات التسليم العملية—مساعدة المؤسسات على تنفيذ حلول آمنة وقابلة للتوسع ومبنية لتدوم.",
     imagePath: "/image/section/img-section-why-choose-h7.jpg",
-    benefits: [
-      "حلول المؤسسات المدعومة من الشركاء",
-      "التخطيط والتنفيذ المنظم",
-      "نهج الأمان أولاً والوعي بالامتثال",
-      "دعم موثوق بعد النشر",
-      "فريق متمرس وسير عمل مثبت",
-      "قيمة طويلة الأجل وتحسين مستمر",
-    ],
     buttonText: "طلب استشارة",
     buttonLink: "/contact-us",
     counters: [
@@ -564,38 +506,6 @@ const defaultRTLContent = {
       { value: 3600, label: "عملاء<br />سعداء", order: 1, isActive: true },
       { value: 900, label: "مشروع<br />مكتمل", order: 2, isActive: true },
       { value: 40, label: "جوائز<br />وتقديرات", order: 3, isActive: true },
-    ],
-    language: "rtl",
-    isActive: true,
-  },
-
-  blogsSection: {
-    tag: "اقرأ مدونتنا",
-    heading: "الأفكار والآراء",
-    subheading: "احصل على أحدث الأفكار ونصائح الخبراء والتحديثات للبقاء على اطلاع وملهم.",
-    buttonText: "عرض جميع المقالات",
-    buttonLink: "/news-updates",
-    posts: [
-      {
-        title: "بناء أنظمة هوية ووصول آمنة",
-        category: "الهوية والوصول",
-        imagePath: "/image/blog/tf-post-grid-absolute-3.jpg",
-        date: { day: "18", month: "ديسمبر" },
-        link: "#",
-        order: 0,
-        language: "rtl",
-        isActive: true,
-      },
-      {
-        title: "تعزيز الأمن السيبراني للمؤسسات الحديثة",
-        category: "الأمن السيبراني",
-        imagePath: "/image/blog/tf-post-grid-absolute-4.jpg",
-        date: { day: "18", month: "ديسمبر" },
-        link: "#",
-        order: 1,
-        language: "rtl",
-        isActive: true,
-      },
     ],
     language: "rtl",
     isActive: true,
@@ -644,7 +554,6 @@ async function seedHomepage() {
       console.log('   - Brands: 15 partner logos');
       console.log('   - Case Studies: 4 customer stories');
       console.log('   - Features: Why choose us + 4 counters');
-      console.log('   - Blogs: 3 articles');
       console.log('   - CTA: Contact section');
     } else {
       console.log('ℹ️  LTR homepage content already exists');
@@ -661,18 +570,20 @@ async function seedHomepage() {
       console.log('   - Brands: 5 partner logos');
       console.log('   - Case Studies: 2 customer stories (Arabic)');
       console.log('   - Features: Why choose us + 4 counters (Arabic)');
-      console.log('   - Blogs: 2 articles (Arabic)');
       console.log('   - CTA: Contact section (Arabic)');
     } else {
       console.log('ℹ️  RTL homepage content already exists');
     }
     
+    // Remove deprecated homepage blogs section if present
+    await collection.updateMany({}, { $unset: { blogsSection: '' } });
+
     console.log('\n🎉 Database seeding completed!');
     console.log('\n📋 Next steps:');
     console.log('1. Run: npm run dev');
     console.log('2. Visit: http://localhost:3000');
     console.log('3. Admin: http://localhost:3000/admin/homepage');
-    console.log('\n✨ All 10 sections are now visible on your homepage!');
+    console.log('\n✨ Homepage sections are now ready!');
     
   } catch (error) {
     console.error('❌ Error seeding database:', error);

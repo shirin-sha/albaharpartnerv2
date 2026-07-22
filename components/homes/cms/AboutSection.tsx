@@ -36,14 +36,10 @@ export default function AboutSection({ content, language = 'ltr' }: AboutSection
   const aboutRight = (
     <div className="about-right">
       <div className="section-content">
-        <div className="text body-2 color-on-suface-container text-anime-wave-2">
-          {content.description.split('<br/>').map((line, index, array) => (
-            <React.Fragment key={index}>
-              {line}
-              {index < array.length - 1 && <br />}
-            </React.Fragment>
-          ))}
-        </div>
+        <div
+          className="text body-2 color-on-suface-container text-anime-wave-2"
+          dangerouslySetInnerHTML={{ __html: content.description }}
+        />
         <div className="bottom g-40 text-anime-wave-2">
           <Link
             href={content.buttonLink || '/contact-us'}

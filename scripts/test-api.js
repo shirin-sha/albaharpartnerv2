@@ -37,8 +37,6 @@ async function testAPI() {
       console.log('- Has featuresSection:', !!data.data.featuresSection);
       console.log('- Benefits count:', data.data.featuresSection?.benefits?.length || 0);
       console.log('- Counters count:', data.data.featuresSection?.counters?.length || 0);
-      console.log('- Has blogsSection:', !!data.data.blogsSection);
-      console.log('- Blog posts count:', data.data.blogsSection?.posts?.length || 0);
       console.log('- Has ctaSection:', !!data.data.ctaSection);
       
       console.log('\n✅ All sections present!');

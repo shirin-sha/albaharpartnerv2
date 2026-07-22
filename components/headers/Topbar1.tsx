@@ -30,7 +30,7 @@ export default function Topbar1() {
                 <div className="top-bar-content">
                   <i className="icon-Envelope" />
                   <a href="mailto:info@albahargroup.com" className="caption-1 color-white" aria-label="Email Al Bahar and Partners">
-                  info@albahargroup.com
+                  info@albaharpartner.com
                   </a>
                 </div>
               </div>

@@ -47,35 +47,10 @@ export default function FeaturesSection({ content, language = 'ltr' }: FeaturesS
                 <h2 className="wow fadeInUp mb-12">
                   {content.heading}
                 </h2>
-                <div className="sub-title body-2 wow fadeInUp">
-                  {content.description}
-                </div>
-              </div>
-              <div className="cols g-10 mb-36">
-                <div className="benefit-lists">
-                  {content.benefits.slice(0, Math.ceil(content.benefits.length / 2)).map((benefit, index) => (
-                    <div className="benefit-items" key={index}>
-                      <div className="icon wow fadeInUp">
-                        <i className="icon-checkbox" />
-                      </div>
-                      <div className="title wow fadeInUp" data-wow-delay=".1s">
-                        {benefit}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="benefit-lists">
-                  {content.benefits.slice(Math.ceil(content.benefits.length / 2)).map((benefit, index) => (
-                    <div className="benefit-items" key={index}>
-                      <div className="icon wow fadeInUp" data-wow-delay=".2s">
-                        <i className="icon-checkbox" />
-                      </div>
-                      <div className="title wow fadeInUp" data-wow-delay=".3s">
-                        {benefit}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <div
+                  className="sub-title body-2 wow fadeInUp"
+                  dangerouslySetInnerHTML={{ __html: content.description }}
+                />
               </div>
               <div className="wow fadeInUp">
                 <Link

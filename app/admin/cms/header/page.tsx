@@ -7,7 +7,6 @@ import ImageUpload from '@/components/admin/ui/ImageUpload';
 const HEADER_SECTIONS = [
   { id: 'logo', label: 'Logo Settings', description: 'Logo image, link, alt, size (shared)' },
   { id: 'menu', label: 'Navigation Menu', description: 'Menu items + dropdown items (bilingual)' },
-  { id: 'button', label: 'Header Button', description: 'Button text (bilingual) + link' },
 ] as const;
 
 type HeaderSectionId = (typeof HEADER_SECTIONS)[number]['id'];
@@ -498,8 +497,6 @@ export default function HeaderManager() {
       link: '/',
     },
     menuItems: [],
-    buttonText: 'Profile',
-    buttonLink: '#',
   });
 
   const showMessage = (type: 'success' | 'error', text: string) => {
@@ -511,8 +508,14 @@ export default function HeaderManager() {
     if (!contentLtr || !contentRtl) return;
     setSaving(section);
     try {
-      // For logo section, use LTR content (shared settings)
-      // For button section, save both languages
+      const stripLegacyButton = <T extends HeaderContent>(content: T) => {
+        const { buttonText: _buttonText, buttonLink: _buttonLink, ...rest } = content as T & {
+          buttonText?: string;
+          buttonLink?: string;
+        };
+        return rest;
+      };
+
       if (section === 'logo') {
         const method = contentLtr._id ? 'PUT' : 'POST';
         // Logo is shared, so save using LTR content
@@ -520,12 +523,16 @@ export default function HeaderManager() {
           fetch('/api/header', {
             method,
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...contentLtr, language: 'ltr' }),
+            body: JSON.stringify({ ...stripLegacyButton(contentLtr), language: 'ltr' }),
           }),
           fetch('/api/header', {
             method: contentRtl._id ? 'PUT' : 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...contentRtl, logo: contentLtr.logo, language: 'rtl' }),
+            body: JSON.stringify({
+              ...stripLegacyButton(contentRtl),
+              logo: contentLtr.logo,
+              language: 'rtl',
+            }),
           }),
         ]);
         const [ltrResult, rtlResult] = await Promise.all([ltrRes.json(), rtlRes.json()]);
@@ -541,12 +548,12 @@ export default function HeaderManager() {
           fetch('/api/header', {
             method: contentLtr._id ? 'PUT' : 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...contentLtr, language: 'ltr' }),
+            body: JSON.stringify({ ...stripLegacyButton(contentLtr), language: 'ltr' }),
           }),
           fetch('/api/header', {
             method: contentRtl._id ? 'PUT' : 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...contentRtl, language: 'rtl' }),
+            body: JSON.stringify({ ...stripLegacyButton(contentRtl), language: 'rtl' }),
           }),
         ]);
         const [ltrResult, rtlResult] = await Promise.all([ltrRes.json(), rtlRes.json()]);
@@ -727,73 +734,6 @@ export default function HeaderManager() {
                 disabled={saving === 'menu'}
               >
                 {saving === 'menu' ? 'Saving...' : 'Save Menu'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {selectedSection === 'button' && (
-        <div className="admin-cms-section-card" style={{ marginBottom: 24 }}>
-          <div className="admin-cms-section-header" style={{ cursor: 'default' }}>
-            <h3>Header Button</h3>
-            <button type="button" className="admin-btn admin-btn-delete" onClick={() => setSelectedSection(null)}>
-              Close
-            </button>
-          </div>
-          <div className="admin-cms-form">
-            <div className="form-group">
-              <label>Button Text (English)</label>
-              <input
-                type="text"
-                value={contentLtr.buttonText}
-                onChange={(e) =>
-                  setContentLtr({
-                    ...contentLtr,
-                    buttonText: e.target.value,
-                  })
-                }
-              />
-            </div>
-            <div className="form-group">
-              <label>Button Text (Arabic)</label>
-              <input
-                type="text"
-                dir="rtl"
-                value={contentRtl.buttonText}
-                onChange={(e) =>
-                  setContentRtl({
-                    ...contentRtl,
-                    buttonText: e.target.value,
-                  })
-                }
-              />
-            </div>
-            <div className="form-group">
-              <label>Button Link</label>
-              <input
-                type="text"
-                value={contentLtr.buttonLink}
-                onChange={(e) => {
-                  const link = e.target.value;
-                  setContentLtr({
-                    ...contentLtr,
-                    buttonLink: link,
-                  });
-                  setContentRtl({
-                    ...contentRtl,
-                    buttonLink: link,
-                  });
-                }}
-              />
-            </div>
-            <div className="form-actions">
-              <button
-                className="button button-primary"
-                onClick={() => handleSaveSection('button')}
-                disabled={saving === 'button'}
-              >
-                {saving === 'button' ? 'Saving...' : 'Save Button'}
               </button>
             </div>
           </div>

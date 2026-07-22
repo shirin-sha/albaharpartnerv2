@@ -68,8 +68,10 @@ export async function POST(request: NextRequest) {
       );
     }
     
+    const { blogsSection: _unusedBlogsSection, ...bodyWithoutBlogs } = body;
+
     const newContent: HomepageContent = {
-      ...body,
+      ...bodyWithoutBlogs,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -100,7 +102,7 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
-    const { _id, ...updateData } = body;
+    const { _id, blogsSection: _unusedBlogsSection, ...updateData } = body;
     
     if (!_id) {
       return NextResponse.json(
@@ -138,6 +140,9 @@ export async function PUT(request: NextRequest) {
         $set: {
           ...updateData,
           updatedAt: new Date(),
+        },
+        $unset: {
+          blogsSection: '',
         },
       }
     );

@@ -48,11 +48,6 @@ export default function HomepageSectionEditor({
             counters: Array.isArray(rtlData.counters) ? rtlData.counters : [],
           },
         });
-      } else if (sectionId === 'blogs') {
-        setFormData({
-          ltr: { ...ltrData, posts: Array.isArray(ltrData.posts) ? ltrData.posts : [] },
-          rtl: { ...rtlData, posts: Array.isArray(rtlData.posts) ? rtlData.posts : [] },
-        });
       } else if (sectionId === 'brands') {
         setFormData({
           ltr: { ...ltrData, brands: Array.isArray(ltrData.brands) ? ltrData.brands : [] },
@@ -84,9 +79,7 @@ export default function HomepageSectionEditor({
                       language: 'ltr',
                       isActive: true,
                     }
-                  : sectionId === 'blogs'
-                    ? { posts: [], tag: '', heading: '', subheading: '', buttonText: '', buttonLink: '', language: 'ltr', isActive: true }
-                    : sectionId === 'brands'
+                  : sectionId === 'brands'
                       ? { brands: [], heading: '', language: 'ltr', isActive: true }
                       : {};
       setFormData({ ltr: emptyLtr, rtl: { ...emptyLtr, language: 'rtl' } });

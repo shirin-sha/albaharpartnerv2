@@ -406,6 +406,165 @@
   resize: vertical;
 }
 
+.form-row-stacked {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.rich-text-editor-shell {
+  width: 100%;
+  background: #fff;
+}
+
+.rich-text-editor-toolbar {
+  flex-wrap: wrap;
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+  min-height: 40px;
+}
+
+.rich-text-toolbar-btn {
+  border: none;
+  background: transparent;
+  padding: 6px 12px;
+  cursor: pointer;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #333;
+  font-size: 14px;
+}
+
+.rich-text-toolbar-btn:hover {
+  background-color: #f0f0f0;
+}
+
+.rich-text-toolbar-divider {
+  width: 1px;
+  height: 20px;
+  background-color: #dee2e6;
+  margin: 0 4px;
+}
+
+.rich-text-dropdown-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+}
+
+.rich-text-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  min-width: 150px;
+
+  button {
+    width: 100%;
+    text-align: left;
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+
+    &:hover,
+    &.active {
+      background: #e6f2ff;
+    }
+  }
+}
+
+.rich-text-editor-content {
+  width: 100%;
+  min-height: 180px;
+  outline: none;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #333;
+  white-space: normal;
+  overflow-wrap: anywhere;
+
+  p,
+  div,
+  span,
+  li,
+  a,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-size: inherit !important;
+    line-height: inherit !important;
+    font-weight: 400;
+    color: inherit;
+  }
+
+  p {
+    margin: 0 0 0.75em;
+    white-space: normal;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  div {
+    margin: 0;
+    white-space: normal;
+  }
+
+  strong,
+  b {
+    font-weight: 600;
+  }
+
+  ul,
+  ol {
+    margin: 0 0 0.75em;
+    padding-left: 1.5em;
+  }
+
+  ul {
+    list-style-type: disc;
+  }
+
+  ol {
+    list-style-type: decimal;
+  }
+
+  ul li,
+  ol li {
+    display: list-item;
+    margin-bottom: 0.25em;
+  }
+
+  ul li {
+    list-style-type: disc;
+  }
+
+  ol li {
+    list-style-type: decimal;
+  }
+}
+
+.rich-text-editor-content[data-placeholder]:empty::before,
+.rich-text-editor-content[data-placeholder]:has(> p:only-child > br:only-child)::before {
+  content: attr(data-placeholder);
+  color: #999;
+  pointer-events: none;
+}
+
 .form-group small {
   display: block;
   margin-top: 4px;

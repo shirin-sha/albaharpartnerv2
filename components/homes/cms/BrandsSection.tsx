@@ -20,7 +20,7 @@ export default function BrandsSection({ content, language = 'ltr' }: BrandsSecti
   }
 
   return (
-    <section className="section-brand h-7 section-one-page" id="brands" dir={language}>
+    <section className="section-brand h-7 tf-spacing-7 section-one-page" id="brands" dir={language}>
       <div className="tf-container">
         <div className="row">
           <div className="col-12">

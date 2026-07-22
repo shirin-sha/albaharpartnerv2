@@ -21,7 +21,7 @@ export default function FaqsCMS({ data }: Props) {
               <div className="left">
                 <div className="heading-section">
                   <div className="text-anime-wave">
-                    <span className="tag label text-btn-uppercase bg-white">{data.tag}</span>
+                    <span className="tag label text-btn-uppercase">{data.tag}</span>
                   </div>
                   <h3 className="title-section mb-12 text-anime-wave">
                     {data.heading}

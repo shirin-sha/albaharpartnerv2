@@ -5,7 +5,6 @@ import dynamic from "next/dynamic";
 
 const Quickview = dynamic(() => import("@/components/modals/Quickview"));
 const Search = dynamic(() => import("@/components/modals/Search"));
-const SideOffcanvas = dynamic(() => import("@/components/modals/SideOffcanvas"));
 
 export default function DeferredGlobalOverlays() {
   const [shouldLoad, setShouldLoad] = useState(false);
@@ -41,7 +40,6 @@ export default function DeferredGlobalOverlays() {
 
   return (
     <>
-      <SideOffcanvas />
       {shouldLoad && (
         <>
           <Quickview />

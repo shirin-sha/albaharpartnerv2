@@ -11,9 +11,7 @@ import Breadcumb from "@/components/common/Breadcumb";
 import AboutAlBaharCMS from "@/components/otherPages/AboutAlBaharCMS";
 import VisionMissionValuesCMS from "@/components/otherPages/VisionMissionValuesCMS";
 import HeritageCMS from "@/components/otherPages/HeritageCMS";
-import AboutBDSCMS from "@/components/otherPages/AboutBDSCMS";
 import AboutBPCCMS from "@/components/otherPages/AboutBPCCMS";
-import TeamCMS from "@/components/otherPages/TeamCMS";
 import HistoryCMS from "@/components/otherPages/HistoryCMS";
 import FaqsCMS from "@/components/otherPages/FaqsCMS";
 import ServicesCMS from "@/components/services/ServicesCMS";
@@ -91,13 +89,11 @@ export default async function ArabicPage({ params, searchParams }: PageProps) {
             </div>
           )}
           <div className="main-content">
-            {content?.aboutAlBahar && <AboutAlBaharCMS data={content.aboutAlBahar} />}
-            {content?.visionMissionValues && <VisionMissionValuesCMS data={content.visionMissionValues} />}
             {content?.heritage && <HeritageCMS data={content.heritage} />}
-            {content?.aboutBDS && <AboutBDSCMS data={content.aboutBDS} />}
-            {content?.aboutBPC && <AboutBPCCMS data={content.aboutBPC} />}
-            {content?.team && <TeamCMS data={content.team} />}
+            {content?.aboutAlBahar && <AboutAlBaharCMS data={content.aboutAlBahar} />}
             {content?.history && <HistoryCMS data={content.history} />}
+            {content?.aboutBPC && <AboutBPCCMS data={content.aboutBPC} />}
+            {content?.visionMissionValues && <VisionMissionValuesCMS data={content.visionMissionValues} />}
             {content?.faqs && <FaqsCMS data={content.faqs} />}
           </div>
         </>

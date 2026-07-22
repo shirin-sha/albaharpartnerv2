@@ -102,9 +102,6 @@ const headerDataLTR = {
       hasDropdown: false,
     },
   ],
-
-  buttonText: "Profile",
-  buttonLink: "#",
 };
 
 const headerDataRTL = {
@@ -227,9 +224,6 @@ const headerDataRTL = {
       hasDropdown: false,
     },
   ],
-
-  buttonText: "الملف الشخصي",
-  buttonLink: "#",
 };
 
 async function seedHeaderData() {

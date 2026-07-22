@@ -3,18 +3,18 @@
 import { useState, useEffect } from 'react';
 import { AboutUsContent } from '@/types/aboutus';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
+import RichTextEditor from '@/components/admin/ui/RichTextEditor';
 import Link from 'next/link';
+import { prepareRichTextContent } from '@/lib/rich-text-utils';
 
 const ABOUT_SECTIONS = [
   { id: 'meta', label: 'Meta (SEO)' },
   { id: 'header', label: 'Page Header' },
-  { id: 'aboutAlBahar', label: 'About Al-Bahar' },
-  { id: 'visionMissionValues', label: 'Vision/Mission/Values' },
-  { id: 'heritage', label: 'Heritage' },
-  { id: 'aboutBDS', label: 'About BDS' },
+  { id: 'heritage', label: 'Our Heritage' },
+  { id: 'aboutAlBahar', label: 'About Al-Bahar Group' },
+  { id: 'history', label: 'Our History' },
   { id: 'aboutBPC', label: 'About BPC' },
-  { id: 'team', label: 'Team' },
-  { id: 'history', label: 'History' },
+  { id: 'visionMissionValues', label: 'What Guides and Drives Our Future' },
   { id: 'faqs', label: 'FAQs' },
 ] as const;
 
@@ -54,13 +54,13 @@ export default function AboutUsManager() {
       const [ltrResult, rtlResult] = await Promise.all([ltrRes.json(), rtlRes.json()]);
       
       if (ltrResult.success && ltrResult.data) {
-        setContentLtr(ltrResult.data);
+        setContentLtr(normalizeLoadedContent(ltrResult.data));
       } else {
         setContentLtr(getEmptyContent('ltr'));
       }
       
       if (rtlResult.success && rtlResult.data) {
-        setContentRtl(rtlResult.data);
+        setContentRtl(normalizeLoadedContent(rtlResult.data));
       } else {
         setContentRtl(getEmptyContent('rtl'));
       }
@@ -73,6 +73,14 @@ export default function AboutUsManager() {
       setLoading(false);
     }
   };
+
+  const normalizeLoadedContent = (content: AboutUsContent): AboutUsContent => ({
+    ...content,
+    aboutBPC: {
+      ...content.aboutBPC,
+      description: prepareRichTextContent(content.aboutBPC?.description || ''),
+    },
+  });
 
   const getEmptyContent = (lang: 'ltr' | 'rtl'): AboutUsContent => ({
     language: lang,
@@ -124,13 +132,10 @@ export default function AboutUsManager() {
       isActive: true,
     },
     aboutBPC: {
+      tag: 'About BPC',
       heading: 'About BPC',
       imagePath: '',
       description: '',
-      serviceOfferingsTitle: '',
-      serviceOfferings: [],
-      coreIndustriesTitle: '',
-      coreIndustries: [],
       language: lang,
       isActive: true,
     },
@@ -178,17 +183,32 @@ export default function AboutUsManager() {
     if (!contentLtr || !contentRtl) return;
     setSaving(section);
     try {
+      const normalizeAboutBPC = (content: AboutUsContent) => ({
+        ...content,
+        aboutBPC: {
+          tag: content.aboutBPC?.tag || '',
+          heading: content.aboutBPC?.heading || '',
+          imagePath: content.aboutBPC?.imagePath || '',
+          description: prepareRichTextContent(content.aboutBPC?.description || ''),
+          language: content.language,
+          isActive: content.aboutBPC?.isActive ?? true,
+        },
+      });
+
+      const ltrPayload = normalizeAboutBPC(contentLtr);
+      const rtlPayload = normalizeAboutBPC(contentRtl);
+
       // Save both LTR and RTL in parallel
       const [ltrRes, rtlRes] = await Promise.all([
         fetch('/api/aboutus', {
           method: contentLtr._id ? 'PUT' : 'POST',
         headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...contentLtr, language: 'ltr' }),
+          body: JSON.stringify({ ...ltrPayload, language: 'ltr' }),
         }),
         fetch('/api/aboutus', {
           method: contentRtl._id ? 'PUT' : 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...contentRtl, language: 'rtl' }),
+          body: JSON.stringify({ ...rtlPayload, language: 'rtl' }),
         }),
       ]);
       
@@ -877,7 +897,42 @@ export default function AboutUsManager() {
               return (
                 <div className="admin-cms-section-card" style={{ marginBottom: '20px' }}>
                   <div className="admin-cms-form">
-                    {/* Heading */}
+                    <div>
+                      <div className="form-row-bilingual-header">
+                        <div className="form-label-header">English</div>
+                        <div className="form-label-header">العربية</div>
+                      </div>
+                      <div className="form-row-bilingual">
+                        <div className="form-group">
+                          <label>Tag</label>
+                          <input
+                            type="text"
+                            value={contentLtr.aboutBPC.tag || ''}
+                            onChange={(e) =>
+                              setContentLtr({
+                                ...contentLtr,
+                                aboutBPC: { ...contentLtr.aboutBPC, tag: e.target.value },
+                              })
+                            }
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>Tag</label>
+                          <input
+                            type="text"
+                            dir="rtl"
+                            value={contentRtl.aboutBPC.tag || ''}
+                            onChange={(e) =>
+                              setContentRtl({
+                                ...contentRtl,
+                                aboutBPC: { ...contentRtl.aboutBPC, tag: e.target.value },
+                              })
+                            }
+                          />
+                        </div>
+                      </div>
+                    </div>
+
                     <div>
                       <div className="form-row-bilingual-header">
                         <div className="form-label-header">English</div>
@@ -913,8 +968,7 @@ export default function AboutUsManager() {
                         </div>
                       </div>
                     </div>
-            
-                    {/* Image (shared) */}
+
                     <div className="form-group">
                       <label>Image</label>
                       <ImageUpload
@@ -932,236 +986,35 @@ export default function AboutUsManager() {
                         folder="about"
                       />
                     </div>
-            
-                    {/* Description */}
+
                     <div>
-                      <div className="form-row-bilingual-header">
-                        <div className="form-label-header">English</div>
-                        <div className="form-label-header">العربية</div>
-                      </div>
-                      <div className="form-row-bilingual">
-                        <div className="form-group">
-                          <label>Description</label>
-                          <textarea
-                            value={contentLtr.aboutBPC.description || ''}
-                            onChange={(e) =>
-                              setContentLtr({
-                                ...contentLtr,
-                                aboutBPC: { ...contentLtr.aboutBPC, description: e.target.value },
-                              })
-                            }
-                            rows={4}
-                          />
-                        </div>
-                        <div className="form-group">
-                          <label>Description</label>
-                          <textarea
-                            dir="rtl"
-                            value={contentRtl.aboutBPC.description || ''}
-                            onChange={(e) =>
-                              setContentRtl({
-                                ...contentRtl,
-                                aboutBPC: { ...contentRtl.aboutBPC, description: e.target.value },
-                              })
-                            }
-                            rows={4}
-                          />
-                        </div>
+                      <div className="form-row-stacked">
+                        <RichTextEditor
+                          label="Description (English)"
+                          value={contentLtr.aboutBPC.description || ''}
+                          onChange={(value) =>
+                            setContentLtr({
+                              ...contentLtr,
+                              aboutBPC: { ...contentLtr.aboutBPC, description: value },
+                            })
+                          }
+                          placeholder="Enter description..."
+                        />
+                        <RichTextEditor
+                          label="Description (Arabic)"
+                          value={contentRtl.aboutBPC.description || ''}
+                          onChange={(value) =>
+                            setContentRtl({
+                              ...contentRtl,
+                              aboutBPC: { ...contentRtl.aboutBPC, description: value },
+                            })
+                          }
+                          placeholder="أدخل الوصف..."
+                          className="rtl-editor"
+                        />
                       </div>
                     </div>
-            
-                    {/* Service Offerings Title */}
-                    <div>
-                      <div className="form-row-bilingual-header">
-                        <div className="form-label-header">English</div>
-                        <div className="form-label-header">العربية</div>
-                      </div>
-                      <div className="form-row-bilingual">
-                        <div className="form-group">
-                          <label>Service Offerings Title</label>
-                          <input
-                            type="text"
-                            value={contentLtr.aboutBPC.serviceOfferingsTitle || ''}
-                            onChange={(e) =>
-                              setContentLtr({
-                                ...contentLtr,
-                                aboutBPC: {
-                                  ...contentLtr.aboutBPC,
-                                  serviceOfferingsTitle: e.target.value,
-                                },
-                              })
-                            }
-                          />
-                        </div>
-                        <div className="form-group">
-                          <label>Service Offerings Title</label>
-                          <input
-                            type="text"
-                            dir="rtl"
-                            value={contentRtl.aboutBPC.serviceOfferingsTitle || ''}
-                            onChange={(e) =>
-                              setContentRtl({
-                                ...contentRtl,
-                                aboutBPC: {
-                                  ...contentRtl.aboutBPC,
-                                  serviceOfferingsTitle: e.target.value,
-                                },
-                              })
-                            }
-                          />
-                        </div>
-                      </div>
-                    </div>
-            
-                    {/* Service Offerings list */}
-                    <div>
-                      <div className="form-row-bilingual-header">
-                        <div className="form-label-header">English</div>
-                        <div className="form-label-header">العربية</div>
-                      </div>
-                      <div className="form-row-bilingual">
-                        <div className="form-group">
-                          <label>Service Offerings (one per line)</label>
-                          <textarea
-                            value={
-                              Array.isArray(contentLtr.aboutBPC.serviceOfferings)
-                                ? contentLtr.aboutBPC.serviceOfferings.join('\n')
-                                : ''
-                            }
-                            onChange={(e) => {
-                              const serviceOfferings = e.target.value
-                                .split('\n')
-                                .map((s) => s.trim())
-                                .filter(Boolean);
-                              setContentLtr({
-                                ...contentLtr,
-                                aboutBPC: { ...contentLtr.aboutBPC, serviceOfferings },
-                              });
-                            }}
-                            rows={6}
-                          />
-                        </div>
-                        <div className="form-group">
-                          <label>Service Offerings (one per line)</label>
-                          <textarea
-                            dir="rtl"
-                            value={
-                              Array.isArray(contentRtl.aboutBPC.serviceOfferings)
-                                ? contentRtl.aboutBPC.serviceOfferings.join('\n')
-                                : ''
-                            }
-                            onChange={(e) => {
-                              const serviceOfferings = e.target.value
-                                .split('\n')
-                                .map((s) => s.trim())
-                                .filter(Boolean);
-                              setContentRtl({
-                                ...contentRtl,
-                                aboutBPC: { ...contentRtl.aboutBPC, serviceOfferings },
-                              });
-                            }}
-                            rows={6}
-                          />
-                        </div>
-                      </div>
-                    </div>
-            
-                    {/* Core Industries Title */}
-                    <div>
-                      <div className="form-row-bilingual-header">
-                        <div className="form-label-header">English</div>
-                        <div className="form-label-header">العربية</div>
-                      </div>
-                      <div className="form-row-bilingual">
-                        <div className="form-group">
-                          <label>Core Industries Title</label>
-                          <input
-                            type="text"
-                            value={contentLtr.aboutBPC.coreIndustriesTitle || ''}
-                            onChange={(e) =>
-                              setContentLtr({
-                                ...contentLtr,
-                                aboutBPC: {
-                                  ...contentLtr.aboutBPC,
-                                  coreIndustriesTitle: e.target.value,
-                                },
-                              })
-                            }
-                          />
-                        </div>
-                        <div className="form-group">
-                          <label>Core Industries Title</label>
-                          <input
-                            type="text"
-                            dir="rtl"
-                            value={contentRtl.aboutBPC.coreIndustriesTitle || ''}
-                            onChange={(e) =>
-                              setContentRtl({
-                                ...contentRtl,
-                                aboutBPC: {
-                                  ...contentRtl.aboutBPC,
-                                  coreIndustriesTitle: e.target.value,
-                                },
-                              })
-                            }
-                          />
-                        </div>
-                      </div>
-                    </div>
-            
-                    {/* Core Industries list */}
-                    <div>
-                      <div className="form-row-bilingual-header">
-                        <div className="form-label-header">English</div>
-                        <div className="form-label-header">العربية</div>
-                      </div>
-                      <div className="form-row-bilingual">
-                        <div className="form-group">
-                          <label>Core Industries (one per line)</label>
-                          <textarea
-                            value={
-                              Array.isArray(contentLtr.aboutBPC.coreIndustries)
-                                ? contentLtr.aboutBPC.coreIndustries.join('\n')
-                                : ''
-                            }
-                            onChange={(e) => {
-                              const coreIndustries = e.target.value
-                                .split('\n')
-                                .map((s) => s.trim())
-                                .filter(Boolean);
-                              setContentLtr({
-                                ...contentLtr,
-                                aboutBPC: { ...contentLtr.aboutBPC, coreIndustries },
-                              });
-                            }}
-                            rows={6}
-                          />
-                        </div>
-                        <div className="form-group">
-                          <label>Core Industries (one per line)</label>
-                          <textarea
-                            dir="rtl"
-                            value={
-                              Array.isArray(contentRtl.aboutBPC.coreIndustries)
-                                ? contentRtl.aboutBPC.coreIndustries.join('\n')
-                                : ''
-                            }
-                            onChange={(e) => {
-                              const coreIndustries = e.target.value
-                                .split('\n')
-                                .map((s) => s.trim())
-                                .filter(Boolean);
-                              setContentRtl({
-                                ...contentRtl,
-                                aboutBPC: { ...contentRtl.aboutBPC, coreIndustries },
-                              });
-                            }}
-                            rows={6}
-                          />
-                        </div>
-                      </div>
-                    </div>
-            
+
                     <div className="form-actions">
                       <button
                         className="button button-primary"

@@ -67,52 +67,8 @@ export default function Header7() {
                       </span>
                     </Link>
                   </div>
-                  <div className="nav-btn">
-                    <Link
-                      href={`#`}
-                      className="tf-btn bg-color-primary style-1"
-                    >
-                      <span>Profile</span>
-                    </Link>
-                  </div>
                 </div>
                 <div className="nav-icon">
-               
-                  <div className="canvas-btn">
-                    <a href="#canvnasMegamenu" data-bs-toggle="offcanvas" aria-label="Open navigation menu">
-                      <span className="visually-hidden">Open navigation menu</span>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width={24}
-                        height={24}
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        aria-hidden="true"
-                      >
-                        <path
-                          d="M4 6H20.5"
-                          stroke="white"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <path
-                          d="M4 12H16"
-                          stroke="white"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                        <path
-                          d="M4 18L17.9647 18"
-                          stroke="white"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                    </a>
-                  </div>
                   <div className="mobile-button">
                     <a href="#canvasMobile" data-bs-toggle="offcanvas" aria-label="Open mobile menu">
                       <span className="visually-hidden">Open mobile menu</span>

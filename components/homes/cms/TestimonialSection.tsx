@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 import { TestimonialSection as TestimonialSectionType } from "@/types/homepage";
 
@@ -20,6 +21,8 @@ export default function TestimonialSection({ content, language = 'ltr' }: Testim
     title?: string;
     designation?: string;
     role?: string;
+    buttonText?: string;
+    buttonLink?: string;
   };
   const personName =
     testimonialContent.personName ||
@@ -73,18 +76,19 @@ export default function TestimonialSection({ content, language = 'ltr' }: Testim
                   <h2 className="title-section wow fadeInUp mb-12">
                     {content.heading}
                   </h2>
-                  <div className="sub-title body-2 wow fadeInUp">
-                    {content.description}
-                  </div>
+                  <div
+                    className="sub-title body-2 wow fadeInUp"
+                    dangerouslySetInnerHTML={{ __html: content.description }}
+                  />
                 </div>
-                {content.secondaryHeading && (
-                  <h3 className="mb-16 wow fadeInUp">{content.secondaryHeading}</h3>
-                )}
-                {content.secondaryDescription && (
-                  <div className="text color-on-suface-variant-1 body-2 wow fadeInUp">
-                    {content.secondaryDescription}
-                  </div>
-                )}
+                <div className="wow fadeInUp">
+                  <Link
+                    href={testimonialContent.buttonLink || "/about-us"}
+                    className="tf-btn style-1 bg-color-primary"
+                  >
+                    <span>{testimonialContent.buttonText || "Learn More"}</span>
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

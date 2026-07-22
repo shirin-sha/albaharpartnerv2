@@ -120,22 +120,10 @@ const aboutUsDataLTR = {
   },
 
   aboutBPC: {
+    tag: "About BPC",
     heading: "About BPC",
     imagePath: "/image/section/section-contact-home-h.jpg",
     description: "Established in 1961, Al-Bahar and Partners (BPC) is a financially solid group specializing in distribution and turnkey project delivery. We offer world-renowned products with comprehensive support services.",
-    serviceOfferingsTitle: "Two Service Offerings:",
-    serviceOfferings: [
-      "BDS: Business Digital Solutions",
-      "PAT: Printing & Audio Technology",
-    ],
-    coreIndustriesTitle: "5 Core Industries:",
-    coreIndustries: [
-      "Electronic Chip Cards & Payments",
-      "Audio Visual Technologies",
-      "Office Automation & Document Management",
-      "IT Infrastructure & Cybersecurity",
-      "Managed Services & Cloud Solutions",
-    ],
     language: "ltr",
     isActive: true,
   },
@@ -551,22 +539,10 @@ const aboutUsDataRTL = {
   },
 
   aboutBPC: {
+    tag: "عن BPC",
     heading: "عن BPC",
     imagePath: "/image/section/section-contact-home-h.jpg",
     description: "تأسست شركة البحر والشركاء (BPC) في عام 1961، وهي مجموعة قوية مالياً متخصصة في التوزيع وتسليم المشاريع الجاهزة. نقدم منتجات مشهورة عالمياً مع خدمات دعم شاملة.",
-    serviceOfferingsTitle: "عرضان للخدمة:",
-    serviceOfferings: [
-      "BDS: حلول الأعمال الرقمية",
-      "PAT: تقنية الطباعة والصوت",
-    ],
-    coreIndustriesTitle: "5 صناعات أساسية:",
-    coreIndustries: [
-      "البطاقات الإلكترونية الذكية والمدفوعات",
-      "تقنيات الصوت والفيديو",
-      "أتمتة المكاتب وإدارة الوثائق",
-      "البنية التحتية لتكنولوجيا المعلومات والأمن السيبراني",
-      "الخدمات المُدارة والحلول السحابية",
-    ],
     language: "rtl",
     isActive: true,
   },

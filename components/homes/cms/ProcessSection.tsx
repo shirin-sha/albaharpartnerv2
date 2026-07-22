@@ -60,7 +60,10 @@ export default function ProcessSection({ content, language = 'ltr' }: ProcessSec
                       <span className="label text-btn-uppercase">{step.title}</span>
                     </div>
                     <div className="process-content">
-                      <div className="desc">{step.description}</div>
+                      <div
+                        className="desc"
+                        dangerouslySetInnerHTML={{ __html: step.description }}
+                      />
                     </div>
                   </div>
                 </div>

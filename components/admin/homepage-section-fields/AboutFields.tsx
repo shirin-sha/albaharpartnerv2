@@ -1,5 +1,6 @@
 'use client';
 
+import RichTextEditor from '@/components/admin/ui/RichTextEditor';
 import type { SectionFieldsProps } from '@/app/admin/homepage/types';
 
 export function AboutFields({ formData, updateField }: SectionFieldsProps) {
@@ -46,12 +47,21 @@ export function AboutFields({ formData, updateField }: SectionFieldsProps) {
         </div>
         <div className="form-row-bilingual">
           <div className="form-group">
-            <label>Description</label>
-            <textarea value={String(ltr?.description ?? '')} onChange={(e) => updateField('ltr', 'description', e.target.value)} rows={6} />
+            <RichTextEditor
+              label="Description"
+              value={String(ltr?.description ?? '')}
+              onChange={(value) => updateField('ltr', 'description', value)}
+              placeholder="Enter description..."
+            />
           </div>
           <div className="form-group">
-            <label>Description</label>
-            <textarea dir="rtl" value={String(rtl?.description ?? '')} onChange={(e) => updateField('rtl', 'description', e.target.value)} rows={6} />
+            <RichTextEditor
+              label="Description"
+              value={String(rtl?.description ?? '')}
+              onChange={(value) => updateField('rtl', 'description', value)}
+              placeholder="أدخل الوصف..."
+              className="rtl-editor"
+            />
           </div>
         </div>
       </div>

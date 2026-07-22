@@ -13,7 +13,7 @@ export default function AboutAlBaharCMS({ data }: Props) {
 
   return (
     <section
-      className="section-about h-1 h-3 tf-spacing-2 section-one-page"
+      className="section-about h-1 h-3 bg-surface tf-spacing-2 section-one-page"
       id="about"
     >
       <div className="tf-container">
@@ -21,7 +21,7 @@ export default function AboutAlBaharCMS({ data }: Props) {
           <div className="col-lg-8">
             <div className="heading-section about-content-left">
               <div className="text-anime-wave">
-                <span className="tag label text-btn-uppercase">{data.tag}</span>
+                <span className="tag label text-btn-uppercase bg-white">{data.tag}</span>
               </div>
               <h3
                 className="title-section mb-40 about-albahar-title"

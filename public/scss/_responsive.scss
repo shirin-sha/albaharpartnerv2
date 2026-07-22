@@ -698,7 +698,6 @@
     &.style-border-bottom {
       margin-bottom: -80px;
 
-      .canvas-btn,
       .main-menu {
         display: none !important;
       }
@@ -997,10 +996,6 @@
     }
 
     .main-menu {
-      display: none;
-    }
-
-    .canvas-btn {
       display: none;
     }
 

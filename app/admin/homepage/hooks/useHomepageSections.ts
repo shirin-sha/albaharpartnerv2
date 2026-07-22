@@ -52,8 +52,8 @@ function getEmptyContent(lang: 'ltr' | 'rtl'): HomepageContent {
       imagePath: '',
       personName: '',
       personTitle: '',
-      secondaryHeading: '',
-      secondaryDescription: '',
+      buttonText: '',
+      buttonLink: '',
       language: lang,
       isActive: true,
     },
@@ -76,20 +76,9 @@ function getEmptyContent(lang: 'ltr' | 'rtl'): HomepageContent {
       heading: '',
       description: '',
       imagePath: '',
-      benefits: [],
       counters: [],
       buttonText: '',
       buttonLink: '',
-      language: lang,
-      isActive: true,
-    },
-    blogsSection: {
-      tag: '',
-      heading: '',
-      subheading: '',
-      buttonText: '',
-      buttonLink: '',
-      posts: [],
       language: lang,
       isActive: true,
     },
@@ -138,21 +127,33 @@ function applySectionToContent(
     case 'services':
       content.servicesSection = { ...content.servicesSection, ...sectionData, language: lang };
       break;
-    case 'testimonial':
-      content.testimonialSection = { ...content.testimonialSection, ...sectionData, language: lang };
+    case 'testimonial': {
+      const testimonialSection = {
+        ...content.testimonialSection,
+        ...sectionData,
+        language: lang,
+      } as HomepageContent['testimonialSection'] & Record<string, unknown>;
+      delete testimonialSection.secondaryHeading;
+      delete testimonialSection.secondaryDescription;
+      content.testimonialSection = testimonialSection;
       break;
+    }
     case 'brands':
       content.brandsSection = { ...content.brandsSection, ...sectionData, language: lang };
       break;
     case 'caseStudies':
       content.caseStudiesSection = { ...content.caseStudiesSection, ...sectionData, language: lang };
       break;
-    case 'features':
-      content.featuresSection = { ...content.featuresSection, ...sectionData, language: lang };
+    case 'features': {
+      const featuresSection = {
+        ...content.featuresSection,
+        ...sectionData,
+        language: lang,
+      } as HomepageContent['featuresSection'] & Record<string, unknown>;
+      delete featuresSection.benefits;
+      content.featuresSection = featuresSection;
       break;
-    case 'blogs':
-      content.blogsSection = { ...content.blogsSection, ...sectionData, language: lang };
-      break;
+    }
     case 'cta':
       content.ctaSection = { ...content.ctaSection, ...sectionData, language: lang };
       break;
@@ -225,17 +226,24 @@ export function useHomepageSections() {
       applySectionToContent(ltrContent, sectionId, ltrData, 'ltr');
       applySectionToContent(rtlContent, sectionId, rtlData, 'rtl');
 
+      const { blogsSection: _ltrBlogs, ...ltrPayload } = ltrContent as HomepageContent & {
+        blogsSection?: unknown;
+      };
+      const { blogsSection: _rtlBlogs, ...rtlPayload } = rtlContent as HomepageContent & {
+        blogsSection?: unknown;
+      };
+
       try {
         const [ltrSaveRes, rtlSaveRes] = await Promise.all([
           fetch('/api/homepage', {
             method: ltrContent._id ? 'PUT' : 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...ltrContent, language: 'ltr' }),
+            body: JSON.stringify({ ...ltrPayload, language: 'ltr' }),
           }),
           fetch('/api/homepage', {
             method: rtlContent._id ? 'PUT' : 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...rtlContent, language: 'rtl' }),
+            body: JSON.stringify({ ...rtlPayload, language: 'rtl' }),
           }),
         ]);
 

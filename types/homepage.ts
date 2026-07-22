@@ -89,8 +89,8 @@ export interface TestimonialSection {
   imagePath: string;
   personName: string;
   personTitle: string;
-  secondaryHeading: string;
-  secondaryDescription: string;
+  buttonText: string;
+  buttonLink: string;
   language: 'ltr' | 'rtl';
   isActive: boolean;
 }
@@ -145,36 +145,9 @@ export interface FeaturesSection {
   heading: string;
   description: string;
   imagePath: string;
-  benefits: string[];
   buttonText: string;
   buttonLink: string;
   counters: Counter[];
-  language: 'ltr' | 'rtl';
-  isActive: boolean;
-}
-
-export interface BlogPost {
-  _id?: string;
-  title: string;
-  category: string;
-  imagePath: string;
-  date: {
-    day: string;
-    month: string;
-  };
-  link: string;
-  language: 'ltr' | 'rtl';
-  isActive: boolean;
-}
-
-export interface BlogsSection {
-  _id?: string;
-  tag: string;
-  heading: string;
-  subheading: string;
-  buttonText: string;
-  buttonLink: string;
-  posts: BlogPost[];
   language: 'ltr' | 'rtl';
   isActive: boolean;
 }
@@ -197,7 +170,6 @@ export interface HomepageContent {
   brandsSection: BrandsSection;
   caseStudiesSection: CaseStudiesSection;
   featuresSection: FeaturesSection;
-  blogsSection: BlogsSection;
   ctaSection: CtaSection;
   language: 'ltr' | 'rtl';
   isActive: boolean;

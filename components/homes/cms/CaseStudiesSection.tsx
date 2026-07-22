@@ -78,7 +78,10 @@ export default function CaseStudiesSection({ content, language = 'ltr' }: CaseSt
                       {caseStudy.title}
                     </Link>
                   </h3>
-                  <div className="desc">{caseStudy.description}</div>
+                  <div
+                    className="desc"
+                    dangerouslySetInnerHTML={{ __html: caseStudy.description }}
+                  />
                   <Link href={caseStudy.link || "#"} className="tf-btn-arrow-t-r">
                     <span>View Case Study</span>
                     <div className="icon">

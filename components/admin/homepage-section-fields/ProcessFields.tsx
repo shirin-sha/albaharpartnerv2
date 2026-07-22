@@ -1,6 +1,7 @@
 'use client';
 
 import { ProcessStep } from '@/types/homepage';
+import RichTextEditor from '@/components/admin/ui/RichTextEditor';
 import type { SectionFieldsProps } from '@/app/admin/homepage/types';
 
 export function ProcessFields({ formData, setFormData, updateField }: SectionFieldsProps) {
@@ -156,28 +157,28 @@ export function ProcessFields({ formData, setFormData, updateField }: SectionFie
                     </div>
                     <div className="form-row-bilingual">
                       <div className="form-group">
-                        <label>Description</label>
-                        <textarea
+                        <RichTextEditor
+                          label="Description"
                           value={stepLtr.description ?? ''}
-                          onChange={(e) => {
+                          onChange={(value) => {
                             const newSteps = [...stepsLtr];
-                            newSteps[index] = { ...stepLtr, description: e.target.value };
+                            newSteps[index] = { ...stepLtr, description: value };
                             setFormData({ ...formData, ltr: { ...formData.ltr, steps: newSteps } });
                           }}
-                          rows={4}
+                          placeholder="Enter step description..."
                         />
                       </div>
                       <div className="form-group">
-                        <label>Description</label>
-                        <textarea
-                          dir="rtl"
+                        <RichTextEditor
+                          label="Description"
                           value={stepRtl.description ?? ''}
-                          onChange={(e) => {
+                          onChange={(value) => {
                             const newSteps = [...stepsRtl];
-                            newSteps[index] = { ...stepRtl, description: e.target.value };
+                            newSteps[index] = { ...stepRtl, description: value };
                             setFormData({ ...formData, rtl: { ...formData.rtl, steps: newSteps } });
                           }}
-                          rows={4}
+                          placeholder="أدخل وصف الخطوة..."
+                          className="rtl-editor"
                         />
                       </div>
                     </div>

@@ -2132,7 +2132,7 @@
   }
 
   &.h-1 {
-    background-color: var(--surface);
+    background-color: var(--white);
 
     .section-faqs-inner {
       gap: 0 30px;
@@ -2746,4 +2746,73 @@
 
 .section-one-page {
   scroll-margin-top: 70px;
+}
+
+.cms-rich-text {
+  p,
+  div,
+  span,
+  li,
+  a,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-size: inherit;
+    line-height: inherit;
+    font-weight: inherit;
+    color: inherit;
+    margin: 0;
+  }
+
+  p {
+    margin-bottom: 1em;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  ul,
+  ol {
+    margin: 0 0 1em;
+    padding-left: 1.5em;
+  }
+
+  ul {
+    list-style-type: disc;
+  }
+
+  ol {
+    list-style-type: decimal;
+  }
+
+  ul li,
+  ol li {
+    display: list-item;
+    margin-bottom: 0.35em;
+  }
+
+  ul li {
+    list-style-type: disc;
+  }
+
+  ol li {
+    list-style-type: decimal;
+  }
+
+  strong,
+  b {
+    font-weight: 600;
+  }
+
+  a {
+    text-decoration: underline;
+  }
+}
+
+.heading-section.style-color-white .cms-rich-text a {
+  color: inherit;
 }

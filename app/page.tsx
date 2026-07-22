@@ -10,26 +10,16 @@ import ProcessSection from "@/components/homes/cms/ProcessSection";
 import ServicesSection from "@/components/homes/cms/ServicesSection";
 import TestimonialSection from "@/components/homes/cms/TestimonialSection";
 import BrandsSection from "@/components/homes/cms/BrandsSection";
-import CaseStudiesSection from "@/components/homes/cms/CaseStudiesSection";
 import FeaturesSection from "@/components/homes/cms/FeaturesSection";
-import BlogsSection from "@/components/homes/cms/BlogsSection";
 import CtaSection from "@/components/homes/cms/CtaSection";
-import { HomepageContent, BlogsSection as BlogsSectionType, CaseStudiesSection as CaseStudiesSectionType, ServicesSection as ServicesSectionType } from "@/types/homepage";
-import { HeaderContent } from "@/types/header";
-import { NewsUpdatesContent } from "@/types/news-updates";
-import { CustomerStoriesContent } from "@/types/customer-stories";
-import { SolutionsContent } from "@/types/solutions";
-import { BrandsContent } from "@/types/brands";
+import { ServicesSection as ServicesSectionType } from "@/types/homepage";
 import {
   getHomepageContent,
   getHeaderContent,
   getFooterContent,
-  getNewsUpdatesContent,
-  getCustomerStoriesContent,
   getSolutionsContent,
   getBrandsContent,
 } from "@/lib/data-fetch";
-import { newsMainImageSrc } from "@/lib/news-post-images";
 import Topbar1 from "@/components/headers/Topbar1";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -66,16 +56,12 @@ export default async function Page() {
     content,
     headerContent,
     footerContent,
-    newsUpdatesContent,
-    customerStoriesContent,
     solutionsContent,
     brandsContent,
   ] = await Promise.all([
     getHomepageContent(language),
     getHeaderContent(language),
     getFooterContent(language),
-    getNewsUpdatesContent(language),
-    getCustomerStoriesContent(language),
     getSolutionsContent(language),
     getBrandsContent(language),
   ]);
@@ -145,8 +131,13 @@ export default async function Page() {
           <TestimonialSection content={content.testimonialSection} language={language} />
         )}
         
-        {/* CMS-driven Brands Section (Brands preview from single Brands CMS) */}
-        {content?.brandsSection && (() => {
+      
+        {/* CMS-driven Features Section */}
+        {content?.featuresSection && (
+          <FeaturesSection content={content.featuresSection} language={language} />
+        )}
+          {/* CMS-driven Brands Section (Brands preview from single Brands CMS) */}
+          {content?.brandsSection && (() => {
           const baseSection = content.brandsSection;
 
           // Build brands array from Brands CMS (single source of truth)
@@ -173,86 +164,6 @@ export default async function Page() {
             <BrandsSection content={brandsSectionForHome} language={language} />
           );
         })()}
-        
-        {/* CMS-driven Case Studies Section (Customer Stories preview from single Customer Stories CMS) */}
-        {content?.caseStudiesSection && (() => {
-          const baseSection: CaseStudiesSectionType = content.caseStudiesSection;
-
-          // Build case studies array from Customer Stories CMS (single source of truth)
-          const mappedCaseStudies = customerStoriesContent?.stories
-            ?.filter((s) => s.isActive)
-            .map((s) => ({
-              _id: s._id,
-              title: s.title,
-              description: s.description,
-              imagePath: s.imagePath,
-              link: s.link,
-              language: baseSection.language,
-              isActive: s.isActive,
-            })) || [];
-
-          const caseStudiesSectionForHome: CaseStudiesSectionType = {
-            ...baseSection,
-            caseStudies: mappedCaseStudies,
-          };
-
-          if (caseStudiesSectionForHome.caseStudies.length === 0) {
-            return null;
-          }
-
-          return (
-            <CaseStudiesSection content={caseStudiesSectionForHome} language={language} />
-          );
-        })()}
-        
-        {/* CMS-driven Features Section */}
-        {content?.featuresSection && (
-          <FeaturesSection content={content.featuresSection} language={language} />
-        )}
-        
-        {/* CMS-driven Blogs Section (News preview from single News & Updates CMS) */}
-        {content?.blogsSection && (() => {
-          const baseSection: BlogsSectionType = content.blogsSection;
-
-          // Build posts array from News & Updates CMS (single source of truth)
-          const nonFeaturedPosts = newsUpdatesContent?.posts
-            ?.filter((p) => p.isActive && p.isFeatured !== true);
-          const sourcePosts =
-            nonFeaturedPosts && nonFeaturedPosts.length > 0
-              ? nonFeaturedPosts
-              : newsUpdatesContent?.posts?.filter((p) => p.isActive) || [];
-
-          const mappedPosts = sourcePosts
-            .slice(0, 3)
-            .map((p, index) => ({
-              _id: p._id,
-              title: p.title,
-              category: p.category,
-              imagePath: newsMainImageSrc(p),
-              date: p.date,
-              link:
-                p.link && p.link.trim() !== "#"
-                  ? p.link
-                  : `/news-updates/${p._id || String(index + 1)}`,
-              order: 0,
-              language: baseSection.language,
-              isActive: p.isActive,
-            })) || [];
-
-          const blogsSectionForHome: BlogsSectionType = {
-            ...baseSection,
-            posts: mappedPosts,
-          };
-
-          if (blogsSectionForHome.posts.length === 0) {
-            return null;
-          }
-
-          return (
-            <BlogsSection content={blogsSectionForHome} language={language} />
-          );
-        })()}
-        
         {/* CMS-driven CTA Section */}
         {content?.ctaSection && (
           <CtaSection content={content.ctaSection} language={language} />

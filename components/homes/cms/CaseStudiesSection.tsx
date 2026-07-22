@@ -79,7 +79,7 @@ export default function CaseStudiesSection({ content, language = 'ltr' }: CaseSt
                     </Link>
                   </h3>
                   <div
-                    className="desc"
+                    className="desc cms-rich-text"
                     dangerouslySetInnerHTML={{ __html: caseStudy.description }}
                   />
                   <Link href={caseStudy.link || "#"} className="tf-btn-arrow-t-r">

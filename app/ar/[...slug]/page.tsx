@@ -24,6 +24,7 @@ import CustomerStoriesCMS from "@/components/case-studies/CustomerStoriesCMS";
 import NewsUpdatesCMS from "@/components/blogs/NewsUpdatesCMS";
 import BrandsCMS from "@/components/case-studies/BrandsCMS";
 import Contact from "@/components/services/Contact";
+import CmsRichText from "@/components/common/CmsRichText";
 
 interface PageProps {
   params: Promise<{
@@ -181,7 +182,6 @@ export default async function ArabicPage({ params, searchParams }: PageProps) {
                   <span className="caption-1 page-breadkcum">{service.title}</span>
                 </div>
                 <h2 className="title-page-title">{service.title}</h2>
-                <div className="sub-title body-2" dangerouslySetInnerHTML={{ __html: service.description }} />
               </div>
             </div>
           </div>
@@ -203,7 +203,7 @@ export default async function ArabicPage({ params, searchParams }: PageProps) {
                     )}
                     {service.detailDescription && (
                       <div className="detalis-content mb-40">
-                        <div className="body-2" dangerouslySetInnerHTML={{ __html: service.detailDescription }} />
+                        <CmsRichText html={service.detailDescription} className="body-2" />
                       </div>
                     )}
                     {service.benefits && service.benefits.length > 0 && (

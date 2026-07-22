@@ -37,7 +37,7 @@ export default function AboutSection({ content, language = 'ltr' }: AboutSection
     <div className="about-right">
       <div className="section-content">
         <div
-          className="text body-2 color-on-suface-container text-anime-wave-2"
+          className="text body-2 color-on-suface-container text-anime-wave-2 cms-rich-text"
           dangerouslySetInnerHTML={{ __html: content.description }}
         />
         <div className="bottom g-40 text-anime-wave-2">

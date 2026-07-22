@@ -5,7 +5,7 @@ import { AboutUsContent } from '@/types/aboutus';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
 import RichTextEditor from '@/components/admin/ui/RichTextEditor';
 import Link from 'next/link';
-import { prepareRichTextContent } from '@/lib/rich-text-utils';
+import { toEditorHtml } from '@/lib/rich-text-utils';
 
 const ABOUT_SECTIONS = [
   { id: 'meta', label: 'Meta (SEO)' },
@@ -78,7 +78,7 @@ export default function AboutUsManager() {
     ...content,
     aboutBPC: {
       ...content.aboutBPC,
-      description: prepareRichTextContent(content.aboutBPC?.description || ''),
+      description: toEditorHtml(content.aboutBPC?.description || ''),
     },
   });
 
@@ -189,7 +189,7 @@ export default function AboutUsManager() {
           tag: content.aboutBPC?.tag || '',
           heading: content.aboutBPC?.heading || '',
           imagePath: content.aboutBPC?.imagePath || '',
-          description: prepareRichTextContent(content.aboutBPC?.description || ''),
+          description: content.aboutBPC?.description || '',
           language: content.language,
           isActive: content.aboutBPC?.isActive ?? true,
         },

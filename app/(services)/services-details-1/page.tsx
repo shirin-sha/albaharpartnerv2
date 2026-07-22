@@ -4,6 +4,7 @@ import Image from "next/image";
 import { Metadata } from "next";
 import { getSolutionsContent } from "@/lib/data-fetch";
 import Contact from "@/components/services/Contact";
+import CmsRichText from "@/components/common/CmsRichText";
 
 export const metadata: Metadata = {
   title: "Service Details || Al Bahar & Partners",
@@ -114,10 +115,6 @@ export default async function ServiceDetailsPage({ searchParams }: PageProps) {
               </span>
             </div>
             <h2 className="title-page-title">{service.title}</h2>
-            <div
-              className="sub-title body-2"
-              dangerouslySetInnerHTML={{ __html: service.description }}
-            />
           </div>
         </div>
       </div>
@@ -139,10 +136,7 @@ export default async function ServiceDetailsPage({ searchParams }: PageProps) {
                 )}
                 {service.detailDescription && (
                   <div className="detalis-content mb-40">
-                    <div
-                      className="body-2"
-                      dangerouslySetInnerHTML={{ __html: service.detailDescription }}
-                    />
+                    <CmsRichText html={service.detailDescription} className="body-2" />
                   </div>
                 )}
                 {service.benefits && service.benefits.length > 0 && (

@@ -61,7 +61,7 @@ export default function ProcessSection({ content, language = 'ltr' }: ProcessSec
                     </div>
                     <div className="process-content">
                       <div
-                        className="desc"
+                        className="desc cms-rich-text"
                         dangerouslySetInnerHTML={{ __html: step.description }}
                       />
                     </div>

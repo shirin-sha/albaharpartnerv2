@@ -77,7 +77,7 @@ export default function TestimonialSection({ content, language = 'ltr' }: Testim
                     {content.heading}
                   </h2>
                   <div
-                    className="sub-title body-2 wow fadeInUp"
+                    className="sub-title body-2 wow fadeInUp cms-rich-text"
                     dangerouslySetInnerHTML={{ __html: content.description }}
                   />
                 </div>

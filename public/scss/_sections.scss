@@ -2749,7 +2749,6 @@
 }
 
 .cms-rich-text {
-  p,
   div,
   span,
   li,
@@ -2764,15 +2763,23 @@
     line-height: inherit;
     font-weight: inherit;
     color: inherit;
-    margin: 0;
   }
 
   p {
-    margin-bottom: 1em;
+    margin: 0 0 1em !important;
+    font-size: inherit;
+    line-height: inherit;
+    font-weight: inherit;
+    color: inherit;
 
     &:last-child {
-      margin-bottom: 0;
+      margin-bottom: 0 !important;
     }
+  }
+
+  p:empty,
+  p:has(> br:only-child) {
+    min-height: 1em;
   }
 
   ul,

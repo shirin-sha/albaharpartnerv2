@@ -16,6 +16,10 @@ export function normalizeRichTextContent(content: string): string {
 
 const PARA_MARKER = '|||PARA|||';
 
+function looksLikeLegacyHtml(html: string): boolean {
+  return /<div[\s>]/i.test(html) || /<br\s*\/?>/i.test(html);
+}
+
 /**
  * Removes accidental hard line breaks from legacy textarea / contentEditable content
  * while preserving intentional paragraph splits (Enter key / double line break).
@@ -41,22 +45,21 @@ export function cleanupRichTextHtml(html: string): string {
   const stripOuterP = (chunk: string) =>
     chunk.replace(/^<p[^>]*>/i, '').replace(/<\/p>$/i, '').trim();
 
-  const parts = result
-    .split(PARA_MARKER)
-    .map(stripOuterP)
-    .filter((part) => part.length > 0);
+  const parts = result.split(PARA_MARKER).map(stripOuterP);
 
   if (parts.length === 0) {
     const single = stripOuterP(result.replace(/<\/?p[^>]*>/gi, '')).trim();
     return single ? `<p>${single}</p>` : '';
   }
 
-  return parts.map((part) => `<p>${part}</p>`).join('');
+  return parts
+    .map((part) => (part.length > 0 ? `<p>${part}</p>` : '<p></p>'))
+    .join('');
 }
 
 /** Merge accidental div blocks created by legacy editors into one paragraph. */
 export function mergeDivLinesToParagraph(html: string): string {
-  if (!html?.trim()) return '<p><br></p>';
+  if (!html?.trim()) return '';
   if (/<(ul|ol|table)\b/i.test(html)) return html;
 
   const container = html.trim();
@@ -68,12 +71,12 @@ export function mergeDivLinesToParagraph(html: string): string {
       .map((match) => match[1].replace(/<br\s*\/?>/gi, ' ').replace(/\s+/g, ' ').trim())
       .filter(Boolean)
       .join(' ');
-    return merged ? `<p>${merged}</p>` : '<p><br></p>';
+    return merged ? `<p>${merged}</p>` : '';
   }
 
   if (divMatches.length === 1 && !/<p[\s>]/i.test(container)) {
     const inner = divMatches[0][1].replace(/<br\s*\/?>/gi, ' ').replace(/\s+/g, ' ').trim();
-    return inner ? `<p>${inner}</p>` : '<p><br></p>';
+    return inner ? `<p>${inner}</p>` : '';
   }
 
   return container;
@@ -102,9 +105,29 @@ export function normalizeRichTextTypography(html: string): string {
   return result;
 }
 
-/** Normalize plain text and clean up legacy HTML line breaks. */
+/** Full legacy cleanup for old textarea / contentEditable content. */
 export function prepareRichTextContent(content: string): string {
   return normalizeRichTextTypography(
     mergeDivLinesToParagraph(cleanupRichTextHtml(normalizeRichTextContent(content))),
   );
+}
+
+/** Use in TipTap editor: clean only legacy HTML, leave TipTap output untouched. */
+export function toEditorHtml(content: string): string {
+  const trimmed = content?.trim() ?? '';
+  if (!trimmed) return '<p></p>';
+  if (looksLikeLegacyHtml(trimmed)) {
+    return prepareRichTextContent(trimmed) || '<p></p>';
+  }
+  return trimmed;
+}
+
+/** Use on frontend: legacy cleanup when needed, otherwise render TipTap HTML as saved. */
+export function prepareRichTextForDisplay(content: string): string {
+  const trimmed = content?.trim() ?? '';
+  if (!trimmed) return '';
+  if (looksLikeLegacyHtml(trimmed)) {
+    return prepareRichTextContent(trimmed);
+  }
+  return normalizeRichTextTypography(trimmed);
 }

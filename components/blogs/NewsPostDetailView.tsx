@@ -4,6 +4,7 @@ import React from "react";
 import type { NewsPost } from "@/types/news-updates";
 import { newsMainImageSrc } from "@/lib/news-post-images";
 import Breadcumb from "@/components/common/Breadcumb";
+import CmsRichText from "@/components/common/CmsRichText";
 
 function formatDate(p: { dateIso?: string; date: { day: string; month: string } }) {
   if (p.dateIso) {
@@ -106,10 +107,7 @@ export default function NewsPostDetailView({
                 <div className="desc-blog">
                   <h4 className="title-desc mb-20">{post.title}</h4>
                   {post.longDescription && (
-                    <div
-                      className="body-2 mt-20"
-                      dangerouslySetInnerHTML={{ __html: post.longDescription }}
-                    />
+                    <CmsRichText html={post.longDescription} className="body-2 mt-20" />
                   )}
                 </div>
               </div>

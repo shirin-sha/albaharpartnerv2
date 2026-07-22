@@ -1,6 +1,6 @@
 import Image from "next/image";
 import React from "react";
-import { prepareRichTextContent } from "@/lib/rich-text-utils";
+import CmsRichText from "@/components/common/CmsRichText";
 import { AboutBPCSection } from "@/types/aboutus";
 
 interface Props {
@@ -30,11 +30,9 @@ export default function AboutBPCCMS({ data }: Props) {
               </span>
             </div>
             <h3 className="title-section wow fadeInUp mb-12">{data.heading}</h3>
-            <div
-              className="sub-title body-2 cms-rich-text wow fadeInUp"
-              dangerouslySetInnerHTML={{
-                __html: prepareRichTextContent(data.description),
-              }}
+            <CmsRichText
+              html={data.description}
+              className="sub-title body-2 wow fadeInUp"
             />
           </div>
         </div>

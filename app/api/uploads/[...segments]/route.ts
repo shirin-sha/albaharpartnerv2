@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readFile } from 'fs/promises';
-import { existsSync } from 'fs';
 import path from 'path';
+import { resolveUploadFile } from '@/lib/upload-path';
 
 const MIME_TYPES: Record<string, string> = {
   '.jpg': 'image/jpeg',
@@ -17,7 +17,7 @@ function isSafePath(segments: string[]): boolean {
 }
 
 export async function GET(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ segments: string[] }> }
 ) {
   try {
@@ -27,14 +27,24 @@ export async function GET(
       return NextResponse.json({ success: false, message: 'Invalid file path' }, { status: 400 });
     }
 
-    const filePath = path.join(process.cwd(), 'public', 'image', ...segments);
-    if (!existsSync(filePath)) {
+    const resolved = await resolveUploadFile(segments);
+
+    console.log('[api/uploads] request', {
+      requestedUrl: request.nextUrl.pathname,
+      requestedPath: resolved.requestedPath,
+      uploadRoot: resolved.rootDir,
+      candidatePaths: resolved.candidates.map((candidate) => path.join(resolved.rootDir, candidate)),
+      resolvedPath: resolved.resolvedPath,
+      exists: resolved.exists,
+    });
+
+    if (!resolved.resolvedPath) {
       return NextResponse.json({ success: false, message: 'File not found' }, { status: 404 });
     }
 
-    const ext = path.extname(filePath).toLowerCase();
+    const ext = path.extname(resolved.resolvedPath).toLowerCase();
     const contentType = MIME_TYPES[ext] || 'application/octet-stream';
-    const fileBuffer = await readFile(filePath);
+    const fileBuffer = await readFile(resolved.resolvedPath);
     const body = new Uint8Array(fileBuffer);
 
     return new NextResponse(body, {

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
+import { getUploadRoot, normalizeUploadFolder } from '@/lib/upload-path';
 
 export async function POST(request: NextRequest) {
   try {
@@ -44,9 +45,17 @@ export async function POST(request: NextRequest) {
     // Determine upload path based on folder parameter
     // If folder is provided and matches existing structure, use it
     // Otherwise, use 'general' folder
-    const uploadFolder = folder.startsWith('/') ? folder.slice(1) : folder;
-    const uploadPath = path.join(process.cwd(), 'public', 'image', uploadFolder);
+    const uploadFolder = normalizeUploadFolder(folder);
+    const uploadPath = path.join(getUploadRoot(), uploadFolder);
     const filePath = path.join(uploadPath, fileName);
+
+    console.log('[api/upload] request', {
+      requestedFolder: folder,
+      normalizedFolder: uploadFolder,
+      uploadRoot: getUploadRoot(),
+      resolvedDirectory: uploadPath,
+      targetFilePath: filePath,
+    });
 
     // Create directory if it doesn't exist
     if (!existsSync(uploadPath)) {
@@ -59,7 +68,7 @@ export async function POST(request: NextRequest) {
     await writeFile(filePath, buffer);
 
     // Return a runtime-served URL path (more reliable in container deployments)
-    const publicPath = `/api/uploads/${uploadFolder}/${fileName}`;
+    const publicPath = `/api/uploads/${uploadFolder.replace(/\\/g, '/')}/${fileName}`;
 
     return NextResponse.json({
       success: true,

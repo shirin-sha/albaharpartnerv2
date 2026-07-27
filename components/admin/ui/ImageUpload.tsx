@@ -11,6 +11,28 @@ interface ImageUploadProps {
   required?: boolean; // Make the field required
 }
 
+function normalizeUploadFolder(pathValue: string, fallbackFolder?: string): string {
+  if (!pathValue) return fallbackFolder || 'general';
+
+  const parts = pathValue
+    .split('/')
+    .filter(Boolean)
+    .filter((part) => part !== '.' && part !== '..');
+
+  while (
+    parts.length > 0 &&
+    (parts[0] === 'api' || parts[0] === 'uploads' || parts[0] === 'image')
+  ) {
+    if (parts[0] === 'api' && parts[1] === 'uploads') {
+      parts.splice(0, 2);
+      continue;
+    }
+    parts.shift();
+  }
+
+  return parts[0] || fallbackFolder || 'general';
+}
+
 export default function ImageUpload({
   label,
   value,
@@ -27,25 +49,7 @@ export default function ImageUpload({
 
   // Extract folder from existing value if not provided
   const getFolderFromValue = (path: string): string => {
-    if (!path) return folder || 'general';
-    
-    // Handle paths like /image/hero/slide-1.jpg
-    if (path.startsWith('/image/')) {
-      const parts = path.split('/').filter(p => p); // Remove empty strings
-      if (parts.length >= 2 && parts[0] === 'image') {
-        return parts[1]; // Return the folder name (e.g., 'hero', 'blog', 'brand')
-      }
-    }
-    
-    // Handle paths like image/hero/slide-1.jpg (without leading slash)
-    if (path.startsWith('image/')) {
-      const parts = path.split('/').filter(p => p);
-      if (parts.length >= 2 && parts[0] === 'image') {
-        return parts[1];
-      }
-    }
-    
-    return folder || 'general';
+    return normalizeUploadFolder(path, folder);
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {

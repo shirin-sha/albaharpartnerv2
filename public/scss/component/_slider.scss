@@ -401,6 +401,13 @@ section#testimonials .swiper-pagination {
     position: relative;
     margin-right: -15px;
     margin-left: -15px;
+
+    .sw-layout1 {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100%;
+    }
+
     .swiper-wrapper {
         margin-top: 11px !important;
     }

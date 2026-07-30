@@ -80,7 +80,7 @@ export default function ServicesSection({ content, language = 'ltr' }: ServicesS
               <div className="tab-content">
                 {activeServices.map((service, index) => (
                   (() => {
-                    const detailsHref = `${detailsBasePath}?id=${service.id}`;
+                    const detailsHref = `${detailsBasePath}/${service.id}`;
                     return (
                   <div
                     key={service.id}

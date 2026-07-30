@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import FooterCMS from "@/components/footers/FooterCMS";
 import HeaderCMS from "@/components/headers/HeaderCMS";
 import Header7 from "@/components/headers/Header7";
@@ -135,10 +135,26 @@ export default async function ArabicPage({ params, searchParams }: PageProps) {
     }
 
     case 'services-details-1': {
+      const pathId = slugArray?.[1];
+      const queryId = resolvedSearchParams?.id;
+
+      // Legacy: /ar/services-details-1?id=... → /ar/services-details-1/[id]
+      if (!pathId && queryId) {
+        redirect(`/ar/services-details-1/${queryId}`);
+      }
+
       const content = await getSolutionsContent(language);
-      const id = resolvedSearchParams?.id;
       const solutions = content?.solutions || [];
-      const service = id ? solutions.find((s) => s.id === id) : solutions[0];
+
+      if (!pathId) {
+        const firstActive = solutions.find((s) => s.isActive) || solutions[0];
+        if (firstActive?.id) {
+          redirect(`/ar/services-details-1/${firstActive.id}`);
+        }
+        redirect("/ar/solutions");
+      }
+
+      const service = solutions.find((s) => s.id === pathId);
 
       if (!service) {
         pageContent = (
@@ -230,7 +246,7 @@ export default async function ArabicPage({ params, searchParams }: PageProps) {
                           return (
                             <li key={item.id} className="nav-tab-item" role="presentation">
                               <Link
-                                href={`/ar/services-details-1?id=${item.id}`}
+                                href={`/ar/services-details-1/${item.id}`}
                                 className={`list-menu-item title${isActive ? " active" : ""}`}
                               >
                                 {item.title} <i className="icon-arrowRight" />

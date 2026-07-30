@@ -290,7 +290,7 @@ function MenuItemsManager({ menuItemsLtr, menuItemsRtl, onUpdate }: MenuItemsMan
                         type="text"
                         value={itemLtr.href || ''}
                         onChange={(e) => updateMenuItem(index, 'href', e.target.value, 'ltr')}
-                        placeholder="/about-us or /ar/about-us"
+                        placeholder="/about-us or /services-details-1/solution-id"
                       />
                       <small>Use paths like /about-us, /solutions, /contact-us</small>
                     </div>
@@ -406,7 +406,7 @@ function MenuItemsManager({ menuItemsLtr, menuItemsRtl, onUpdate }: MenuItemsMan
                                       type="text"
                                       value={dropdownItem.href || ''}
                                       onChange={(e) => updateDropdownItem(index, dropdownIndex, 'href', e.target.value, 'ltr')}
-                                      placeholder="/solutions or /services-details-1?id=..."
+                                      placeholder="/solutions or /services-details-1/solution-id"
                                       style={{ fontSize: '14px', padding: '8px' }}
                                     />
                                   </div>

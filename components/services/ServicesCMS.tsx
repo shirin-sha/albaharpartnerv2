@@ -27,7 +27,7 @@ export default function ServicesCMS({ data, language = 'ltr' }: Props) {
                 <div className="section-services-item style-border" key={solution.id || index}>
                   <div className="image tf-animate-1">
                     <Link
-                      href={`${detailsBasePath}?id=${solution.id}`}
+                      href={`${detailsBasePath}/${solution.id}`}
                       className="link"
                     >
                       <span className="visually-hidden">{`View solution: ${solution.title}`}</span>
@@ -44,7 +44,7 @@ export default function ServicesCMS({ data, language = 'ltr' }: Props) {
                     <div className="heading">
                       <h3 className="wow fadeInUp">
                         <Link
-                          href={`${detailsBasePath}?id=${solution.id}`}
+                          href={`${detailsBasePath}/${solution.id}`}
                           className="name-services"
                         >
                           {solution.title}
@@ -74,7 +74,7 @@ export default function ServicesCMS({ data, language = 'ltr' }: Props) {
                     )}
                     <div className="wow fadeInUp">
                       <Link
-                        href={`${detailsBasePath}?id=${solution.id}`}
+                        href={`${detailsBasePath}/${solution.id}`}
                         className="tf-btn style-1 bg-color-primary"
                       >
                         <span>{viewServicesLabel}</span>

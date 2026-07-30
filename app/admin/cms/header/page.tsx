@@ -53,13 +53,20 @@ function MenuItemsManager({ menuItemsLtr, menuItemsRtl, onUpdate }: MenuItemsMan
   };
 
   const updateMenuItem = (index: number, field: keyof MenuItem, value: any, lang: 'ltr' | 'rtl') => {
-    const items = lang === 'ltr' ? [...menuItemsLtr] : [...menuItemsRtl];
-    items[index] = { ...items[index], [field]: value };
-    if (lang === 'ltr') {
-      onUpdate(items, menuItemsRtl);
-    } else {
-      onUpdate(menuItemsLtr, items);
+    const sharedFields: Array<keyof MenuItem> = ['href', 'isActive', 'hasDropdown', 'order'];
+    const shouldSyncBoth = sharedFields.includes(field);
+
+    const newLtr = [...menuItemsLtr];
+    const newRtl = [...menuItemsRtl];
+
+    if (shouldSyncBoth || lang === 'ltr') {
+      newLtr[index] = { ...newLtr[index], [field]: value };
     }
+    if (shouldSyncBoth || lang === 'rtl') {
+      newRtl[index] = { ...newRtl[index], [field]: value };
+    }
+
+    onUpdate(newLtr, newRtl);
   };
 
   const moveItem = (index: number, direction: 'up' | 'down') => {
@@ -137,19 +144,27 @@ function MenuItemsManager({ menuItemsLtr, menuItemsRtl, onUpdate }: MenuItemsMan
     value: any,
     lang: 'ltr' | 'rtl'
   ) => {
+    const sharedFields: Array<keyof MenuItem> = ['href', 'isActive', 'order'];
+    const shouldSyncBoth = sharedFields.includes(field);
+
     const newLtr = [...menuItemsLtr];
     const newRtl = [...menuItemsRtl];
-    const parent = lang === 'ltr' ? newLtr[parentIndex] : newRtl[parentIndex];
-    const dropdownItems = [...(parent.dropdownItems || [])];
-    dropdownItems[dropdownIndex] = { ...dropdownItems[dropdownIndex], [field]: value };
 
-    if (lang === 'ltr') {
-      newLtr[parentIndex] = { ...parent, dropdownItems };
-      onUpdate(newLtr, menuItemsRtl);
-    } else {
-      newRtl[parentIndex] = { ...parent, dropdownItems };
-      onUpdate(menuItemsLtr, newRtl);
+    const updateSide = (items: MenuItem[]) => {
+      const parent = items[parentIndex];
+      const dropdownItems = [...(parent.dropdownItems || [])];
+      dropdownItems[dropdownIndex] = { ...dropdownItems[dropdownIndex], [field]: value };
+      items[parentIndex] = { ...parent, dropdownItems };
+    };
+
+    if (shouldSyncBoth || lang === 'ltr') {
+      updateSide(newLtr);
     }
+    if (shouldSyncBoth || lang === 'rtl') {
+      updateSide(newRtl);
+    }
+
+    onUpdate(newLtr, newRtl);
   };
 
   return (
@@ -273,23 +288,18 @@ function MenuItemsManager({ menuItemsLtr, menuItemsRtl, onUpdate }: MenuItemsMan
                       <label>Link (URL)</label>
                       <input
                         type="text"
-                        value={itemLtr.href}
-                        onChange={(e) => {
-                          updateMenuItem(index, 'href', e.target.value, 'ltr');
-                          updateMenuItem(index, 'href', e.target.value, 'rtl');
-                        }}
-                        placeholder="/page or #section"
+                        value={itemLtr.href || ''}
+                        onChange={(e) => updateMenuItem(index, 'href', e.target.value, 'ltr')}
+                        placeholder="/about-us or /ar/about-us"
                       />
+                      <small>Use paths like /about-us, /solutions, /contact-us</small>
                     </div>
                     <div style={{ display: 'flex', gap: '16px', alignItems: 'center', marginBottom: '16px' }}>
                       <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
                         <input
                           type="checkbox"
                           checked={itemLtr.isActive}
-                          onChange={(e) => {
-                            updateMenuItem(index, 'isActive', e.target.checked, 'ltr');
-                            updateMenuItem(index, 'isActive', e.target.checked, 'rtl');
-                          }}
+                          onChange={(e) => updateMenuItem(index, 'isActive', e.target.checked, 'ltr')}
                         />
                         <span>Active</span>
                       </label>
@@ -298,13 +308,20 @@ function MenuItemsManager({ menuItemsLtr, menuItemsRtl, onUpdate }: MenuItemsMan
                           type="checkbox"
                           checked={itemLtr.hasDropdown || false}
                           onChange={(e) => {
-                            updateMenuItem(index, 'hasDropdown', e.target.checked, 'ltr');
-                            updateMenuItem(index, 'hasDropdown', e.target.checked, 'rtl');
-                            if (!e.target.checked) {
-                              // Clear dropdown items if unchecked
-                              updateMenuItem(index, 'dropdownItems', [], 'ltr');
-                              updateMenuItem(index, 'dropdownItems', [], 'rtl');
-                            }
+                            const checked = e.target.checked;
+                            const newLtr = [...menuItemsLtr];
+                            const newRtl = [...menuItemsRtl];
+                            newLtr[index] = {
+                              ...newLtr[index],
+                              hasDropdown: checked,
+                              dropdownItems: checked ? (newLtr[index].dropdownItems || []) : [],
+                            };
+                            newRtl[index] = {
+                              ...newRtl[index],
+                              hasDropdown: checked,
+                              dropdownItems: checked ? (newRtl[index].dropdownItems || []) : [],
+                            };
+                            onUpdate(newLtr, newRtl);
                           }}
                         />
                         <span>Has Dropdown</span>
@@ -387,11 +404,9 @@ function MenuItemsManager({ menuItemsLtr, menuItemsRtl, onUpdate }: MenuItemsMan
                                     <label style={{ fontSize: '12px' }}>Link (URL)</label>
                                     <input
                                       type="text"
-                                      value={dropdownItem.href}
-                                      onChange={(e) => {
-                                        updateDropdownItem(index, dropdownIndex, 'href', e.target.value, 'ltr');
-                                        updateDropdownItem(index, dropdownIndex, 'href', e.target.value, 'rtl');
-                                      }}
+                                      value={dropdownItem.href || ''}
+                                      onChange={(e) => updateDropdownItem(index, dropdownIndex, 'href', e.target.value, 'ltr')}
+                                      placeholder="/solutions or /services-details-1?id=..."
                                       style={{ fontSize: '14px', padding: '8px' }}
                                     />
                                   </div>
@@ -399,10 +414,7 @@ function MenuItemsManager({ menuItemsLtr, menuItemsRtl, onUpdate }: MenuItemsMan
                                     <input
                                       type="checkbox"
                                       checked={dropdownItem.isActive}
-                                      onChange={(e) => {
-                                        updateDropdownItem(index, dropdownIndex, 'isActive', e.target.checked, 'ltr');
-                                        updateDropdownItem(index, dropdownIndex, 'isActive', e.target.checked, 'rtl');
-                                      }}
+                                      onChange={(e) => updateDropdownItem(index, dropdownIndex, 'isActive', e.target.checked, 'ltr')}
                                     />
                                     <span>Active</span>
                                   </label>

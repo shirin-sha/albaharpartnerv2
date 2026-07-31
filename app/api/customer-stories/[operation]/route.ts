@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { CustomerStory } from '@/types/customer-stories';
 import { revalidatePath } from 'next/cache';
-import { cleanupUnusedImages, deleteImageFiles, extractImagePaths } from '@/lib/image-utils';
 
 const DB_NAME = 'albaharpartners1';
 const COLLECTION_NAME = 'customerstories';
@@ -110,9 +109,6 @@ export async function PUT(
     const db = client.db(DB_NAME);
     const collection = db.collection(COLLECTION_NAME);
 
-    const oldDocument = await collection.findOne({ language: 'ltr' });
-    const oldStory = oldDocument?.stories?.[storyIndex];
-
     // Update the specific story at the given index
     const result = await collection.findOneAndUpdate(
       { language: 'ltr' },
@@ -130,10 +126,6 @@ export async function PUT(
         success: false,
         message: 'Customer Stories content not found',
       }, { status: 404 });
-    }
-
-    if (oldStory) {
-      await cleanupUnusedImages(oldStory, story);
     }
 
     revalidatePath('/customer-stories');
@@ -220,11 +212,6 @@ export async function DELETE(
       },
       { returnDocument: 'after' }
     );
-
-    const imagePaths = extractImagePaths(storyToDelete);
-    if (imagePaths.size > 0) {
-      await deleteImageFiles(Array.from(imagePaths));
-    }
 
     revalidatePath('/customer-stories');
     revalidatePath('/');

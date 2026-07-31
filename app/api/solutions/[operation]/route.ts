@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { SolutionItem } from '@/types/solutions';
 import { revalidatePath } from 'next/cache';
-import { cleanupUnusedImages, deleteImageFiles, extractImagePaths } from '@/lib/image-utils';
 
 const DB_NAME = 'albaharpartners1';
 const COLLECTION_NAME = 'solutions';
@@ -114,9 +113,6 @@ export async function PUT(
     const db = client.db(DB_NAME);
     const collection = db.collection(COLLECTION_NAME);
 
-    const oldDocument = await collection.findOne({ language: 'ltr' });
-    const oldSolution = oldDocument?.solutions?.[solutionIndex];
-
     // Update the specific solution at the given index
     const result = await collection.findOneAndUpdate(
       { language: 'ltr' },
@@ -134,10 +130,6 @@ export async function PUT(
         success: false,
         message: 'Solutions content not found',
       }, { status: 404 });
-    }
-
-    if (oldSolution) {
-      await cleanupUnusedImages(oldSolution, solution);
     }
 
     revalidatePath('/solutions');
@@ -225,11 +217,6 @@ export async function DELETE(
       },
       { returnDocument: 'after' }
     );
-
-    const imagePaths = extractImagePaths(solutionToDelete);
-    if (imagePaths.size > 0) {
-      await deleteImageFiles(Array.from(imagePaths));
-    }
 
     revalidatePath('/solutions');
     revalidatePath('/');

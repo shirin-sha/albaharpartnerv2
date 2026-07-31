@@ -105,35 +105,6 @@ export function extractImagePaths(obj: any, paths: Set<string> = new Set()): Set
   return paths;
 }
 
-function normalizeImagePathKey(imagePath: string): string {
-  return imagePath
-    .replace(/^\/api\/uploads\//, '/image/')
-    .replace(/^api\/uploads\//, '/image/')
-    .replace(/^\//, '');
-}
-
-/**
- * Delete image files present in oldData but not in newData.
- */
-export async function cleanupUnusedImages(
-  oldData: unknown,
-  newData: unknown
-): Promise<{ deleted: number; failed: number; notFound: number }> {
-  const oldImagePaths = extractImagePaths(oldData);
-  const newImagePaths = extractImagePaths(newData);
-  const newKeys = new Set(Array.from(newImagePaths).map(normalizeImagePathKey));
-
-  const imagesToDelete = Array.from(oldImagePaths).filter((oldPath) => {
-    return !newImagePaths.has(oldPath) && !newKeys.has(normalizeImagePathKey(oldPath));
-  });
-
-  if (imagesToDelete.length === 0) {
-    return { deleted: 0, failed: 0, notFound: 0 };
-  }
-
-  return deleteImageFiles(imagesToDelete);
-}
-
 /**
  * Get all image files in a directory recursively (as public `/image/...` paths when under public/)
  */

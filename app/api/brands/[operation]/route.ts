@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { Brand } from '@/types/brands';
 import { revalidatePath } from 'next/cache';
-import { cleanupUnusedImages, deleteImageFiles, extractImagePaths } from '@/lib/image-utils';
+import { ObjectId } from 'mongodb';
 
 const DB_NAME = 'albaharpartners1';
 const COLLECTION_NAME = 'brands';
@@ -126,9 +126,6 @@ export async function PUT(
     const db = client.db(DB_NAME);
     const collection = db.collection(COLLECTION_NAME);
 
-    const oldDocument = await collection.findOne({ language: 'ltr' });
-    const oldBrand = oldDocument?.brands?.[brandIndex];
-
     // Update the specific brand at the given index
     const result = await collection.findOneAndUpdate(
       { language: 'ltr' },
@@ -146,10 +143,6 @@ export async function PUT(
         success: false,
         message: 'Brands content not found',
       }, { status: 404 });
-    }
-
-    if (oldBrand) {
-      await cleanupUnusedImages(oldBrand, brand);
     }
 
     revalidatePath('/brands');
@@ -236,11 +229,6 @@ export async function DELETE(
       },
       { returnDocument: 'after' }
     );
-
-    const imagePaths = extractImagePaths(brandToDelete);
-    if (imagePaths.size > 0) {
-      await deleteImageFiles(Array.from(imagePaths));
-    }
 
     revalidatePath('/brands');
     revalidatePath('/');

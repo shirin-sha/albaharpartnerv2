@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { BrandsContent } from '@/types/brands';
 import { revalidatePath } from 'next/cache';
-import { cleanupUnusedImages } from '@/lib/image-utils';
 
 const DB_NAME = 'albaharpartners1';
 const COLLECTION_NAME = 'brands';
@@ -108,8 +107,6 @@ export async function PUT(request: NextRequest) {
     const db = client.db(DB_NAME);
     const collection = db.collection(COLLECTION_NAME);
 
-    const oldDocument = await collection.findOne({ language: body.language });
-
     const { _id, createdAt, ...updateData } = body;
     const updatedContent = {
       ...updateData,
@@ -127,10 +124,6 @@ export async function PUT(request: NextRequest) {
         success: false,
         message: 'Failed to update Brands content',
       }, { status: 500 });
-    }
-
-    if (oldDocument) {
-      await cleanupUnusedImages(oldDocument, updatedContent);
     }
 
     // Revalidate brands page

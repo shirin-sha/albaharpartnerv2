@@ -3,7 +3,7 @@ import { getDatabase } from '@/lib/mongodb';
 import { HomepageContent } from '@/types/homepage';
 import { ObjectId } from 'mongodb';
 import { revalidatePath } from 'next/cache';
-import { extractImagePaths, deleteImageFiles, cleanupUnusedImages } from '@/lib/image-utils';
+import { extractImagePaths, deleteImageFiles } from '@/lib/image-utils';
 
 // GET - Fetch homepage content
 export async function GET(request: NextRequest) {
@@ -159,7 +159,17 @@ export async function PUT(request: NextRequest) {
     
     // Clean up old images that are no longer used
     if (oldDocument) {
-      await cleanupUnusedImages(oldDocument, updateData);
+      const oldImagePaths = extractImagePaths(oldDocument);
+      const newImagePaths = extractImagePaths(updateData);
+      
+      // Find images that were in old but not in new
+      const imagesToDelete = Array.from(oldImagePaths).filter(
+        oldPath => !newImagePaths.has(oldPath) && !newImagePaths.has(oldPath.replace(/^\//, ''))
+      );
+      
+      if (imagesToDelete.length > 0) {
+        await deleteImageFiles(Array.from(imagesToDelete));
+      }
     }
     
     // Revalidate homepage after updating content

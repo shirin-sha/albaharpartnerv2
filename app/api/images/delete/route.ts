@@ -20,17 +20,11 @@ export async function DELETE(request: NextRequest) {
 
     const deleted = await deleteImageFile(imagePath);
 
-    if (deleted) {
-      return NextResponse.json({
-        success: true,
-        message: 'Image deleted successfully',
-      });
-    } else {
-      return NextResponse.json({
-        success: false,
-        message: 'Image not found or already deleted',
-      }, { status: 404 });
-    }
+    return NextResponse.json({
+      success: true,
+      deleted,
+      message: deleted ? 'Image deleted successfully' : 'Image not found or already deleted',
+    });
   } catch (error) {
     console.error('Error deleting image:', error);
     return NextResponse.json(

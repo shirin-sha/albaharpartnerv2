@@ -33,6 +33,20 @@ function normalizeUploadFolder(pathValue: string, fallbackFolder?: string): stri
   return parts[0] || fallbackFolder || 'general';
 }
 
+async function deleteStoredImage(imagePath: string) {
+  if (!imagePath || /^https?:\/\//i.test(imagePath)) return;
+
+  try {
+    await fetch('/api/images/delete', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ imagePath }),
+    });
+  } catch (err) {
+    console.warn('Failed to delete old image file:', imagePath, err);
+  }
+}
+
 export default function ImageUpload({
   label,
   value,
@@ -73,10 +87,12 @@ export default function ImageUpload({
     setError(null);
     setUploading(true);
 
+    const previousPath = value;
+
     try {
       const formData = new FormData();
       formData.append('file', file);
-      
+
       // Determine folder: use prop, or extract from existing value, or default to 'general'
       const uploadFolder = folder || getFolderFromValue(value) || 'general';
       formData.append('folder', uploadFolder);
@@ -91,6 +107,11 @@ export default function ImageUpload({
       if (result.success) {
         onChange(result.path);
         setError(null);
+
+        // Remove previous file after successful replace
+        if (previousPath && previousPath !== result.path) {
+          await deleteStoredImage(previousPath);
+        }
       } else {
         setError(result.message || 'Failed to upload image');
       }
@@ -106,10 +127,13 @@ export default function ImageUpload({
     }
   };
 
-  const handleRemove = () => {
-    // Only clear the field in the form; actual file cleanup is handled on save / backend
+  const handleRemove = async () => {
+    const previousPath = value;
     onChange('');
     setError(null);
+    if (previousPath) {
+      await deleteStoredImage(previousPath);
+    }
   };
 
   const resolvedImageSrc = value.startsWith('/image/')
@@ -124,7 +148,7 @@ export default function ImageUpload({
           {required && <span className="text-danger ms-1">*</span>}
         </label>
       )}
-      
+
       <div className="d-flex flex-column gap-2">
         {/* File Upload Button */}
         <div>
@@ -140,11 +164,11 @@ export default function ImageUpload({
           <label
             htmlFor={`file-upload-${label?.replace(/\s+/g, '-') || 'image'}-${inputId}`}
             className={`btn btn-sm btn-secondary`}
-            style={{ 
+            style={{
               cursor: uploading ? 'not-allowed' : 'pointer',
               border: '1px solid #dee2e6',
               backgroundColor: '#f8f9fa',
-              color: '#495057'
+              color: '#495057',
             }}
           >
             {uploading ? (
@@ -179,45 +203,47 @@ export default function ImageUpload({
                 className="img-fluid rounded"
                 style={{ maxHeight: '200px', width: 'auto' }}
                 onError={(e) => {
-                  e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23ddd" width="200" height="200"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EImage not found%3C/text%3E%3C/svg%3E';
+                  e.currentTarget.src =
+                    'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23ddd" width="200" height="200"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EImage not found%3C/text%3E%3C/svg%3E';
                 }}
               />
-              {/* Trash / bin icon */}
               {!required && (
-              <div
-                onClick={handleRemove}
-                title="Remove image"
-                style={{
-                  position: 'absolute',
-                  top: '8px',
-                  right: '8px',
-                  backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                  borderRadius: '4px',
-                  padding: '4px',
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="#dc3545"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+                <div
+                  onClick={() => {
+                    void handleRemove();
+                  }}
+                  title="Remove image"
+                  style={{
+                    position: 'absolute',
+                    top: '8px',
+                    right: '8px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                    borderRadius: '4px',
+                    padding: '4px',
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
                 >
-                  <polyline points="3 6 5 6 21 6" />
-                  <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-                  <path d="M10 11v6" />
-                  <path d="M14 11v6" />
-                  <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
-                </svg>
-              </div>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="#dc3545"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <polyline points="3 6 5 6 21 6" />
+                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                    <path d="M10 11v6" />
+                    <path d="M14 11v6" />
+                    <path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
+                  </svg>
+                </div>
               )}
             </div>
           </div>

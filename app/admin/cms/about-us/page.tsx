@@ -1411,6 +1411,131 @@ export default function AboutUsManager() {
                                         <option value="below">Below Timeline</option>
                                       </select>
                                     </div>
+
+                                    {/* Logos (shared for EN/AR) */}
+                                    <div className="form-group">
+                                      <label>Logos / Images</label>
+                                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                        {(itemLtr.logos || []).map((logo, logoIndex) => (
+                                          <div
+                                            key={logoIndex}
+                                            style={{
+                                              padding: '12px',
+                                              border: '1px solid #e5e7eb',
+                                              borderRadius: '6px',
+                                              background: '#f9fafb',
+                                            }}
+                                          >
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                                              <span style={{ fontSize: '13px', fontWeight: 500 }}>Logo {logoIndex + 1}</span>
+                                              <button
+                                                type="button"
+                                                className="hero-slide-remove"
+                                                onClick={async () => {
+                                                  const removedLogo = (itemLtr.logos || [])[logoIndex];
+                                                  if (removedLogo?.src) {
+                                                    try {
+                                                      await fetch('/api/images/delete', {
+                                                        method: 'DELETE',
+                                                        headers: { 'Content-Type': 'application/json' },
+                                                        body: JSON.stringify({ imagePath: removedLogo.src }),
+                                                      });
+                                                    } catch (err) {
+                                                      console.warn('Failed to delete logo file:', err);
+                                                    }
+                                                  }
+                                                  const nextLogos = (itemLtr.logos || []).filter((_, i) => i !== logoIndex);
+                                                  const newItemsLtr = [...(contentLtr.history.items || [])];
+                                                  const newItemsRtl = [...(contentRtl.history.items || [])];
+                                                  newItemsLtr[index] = { ...itemLtr, logos: nextLogos };
+                                                  newItemsRtl[index] = { ...itemRtl, logos: nextLogos };
+                                                  setContentLtr({
+                                                    ...contentLtr,
+                                                    history: { ...contentLtr.history, items: newItemsLtr },
+                                                  });
+                                                  setContentRtl({
+                                                    ...contentRtl,
+                                                    history: { ...contentRtl.history, items: newItemsRtl },
+                                                  });
+                                                }}
+                                              >
+                                                Remove
+                                              </button>
+                                            </div>
+                                            <ImageUpload
+                                              value={logo.src || ''}
+                                              onChange={(value) => {
+                                                const nextLogos = [...(itemLtr.logos || [])];
+                                                nextLogos[logoIndex] = { ...nextLogos[logoIndex], src: value };
+                                                const newItemsLtr = [...(contentLtr.history.items || [])];
+                                                const newItemsRtl = [...(contentRtl.history.items || [])];
+                                                newItemsLtr[index] = { ...itemLtr, logos: nextLogos };
+                                                newItemsRtl[index] = { ...itemRtl, logos: nextLogos };
+                                                setContentLtr({
+                                                  ...contentLtr,
+                                                  history: { ...contentLtr.history, items: newItemsLtr },
+                                                });
+                                                setContentRtl({
+                                                  ...contentRtl,
+                                                  history: { ...contentRtl.history, items: newItemsRtl },
+                                                });
+                                              }}
+                                              folder="brand"
+                                              helperText="Upload timeline logo image"
+                                            />
+                                            <div className="form-group" style={{ marginTop: '8px', marginBottom: 0 }}>
+                                              <label>Alt text</label>
+                                              <input
+                                                type="text"
+                                                value={logo.alt || ''}
+                                                onChange={(e) => {
+                                                  const nextLogos = [...(itemLtr.logos || [])];
+                                                  nextLogos[logoIndex] = { ...nextLogos[logoIndex], alt: e.target.value };
+                                                  const newItemsLtr = [...(contentLtr.history.items || [])];
+                                                  const newItemsRtl = [...(contentRtl.history.items || [])];
+                                                  newItemsLtr[index] = { ...itemLtr, logos: nextLogos };
+                                                  newItemsRtl[index] = { ...itemRtl, logos: nextLogos };
+                                                  setContentLtr({
+                                                    ...contentLtr,
+                                                    history: { ...contentLtr.history, items: newItemsLtr },
+                                                  });
+                                                  setContentRtl({
+                                                    ...contentRtl,
+                                                    history: { ...contentRtl.history, items: newItemsRtl },
+                                                  });
+                                                }}
+                                                placeholder="Logo name"
+                                              />
+                                            </div>
+                                          </div>
+                                        ))}
+                                        <button
+                                          type="button"
+                                          className="button button-secondary"
+                                          onClick={() => {
+                                            const nextLogos = [
+                                              ...(itemLtr.logos || []),
+                                              { src: '', alt: '', width: 100, height: 60 },
+                                            ];
+                                            const newItemsLtr = [...(contentLtr.history.items || [])];
+                                            const newItemsRtl = [...(contentRtl.history.items || [])];
+                                            newItemsLtr[index] = { ...itemLtr, logos: nextLogos };
+                                            newItemsRtl[index] = { ...itemRtl, logos: nextLogos };
+                                            setContentLtr({
+                                              ...contentLtr,
+                                              history: { ...contentLtr.history, items: newItemsLtr },
+                                            });
+                                            setContentRtl({
+                                              ...contentRtl,
+                                              history: { ...contentRtl.history, items: newItemsRtl },
+                                            });
+                                          }}
+                                          style={{ alignSelf: 'flex-start', fontSize: '13px', padding: '6px 12px' }}
+                                        >
+                                          + Add Logo
+                                        </button>
+                                      </div>
+                                    </div>
                                   </div>
                                 </div>
                               );

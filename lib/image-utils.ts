@@ -1,21 +1,31 @@
-import { unlink, readdir, stat } from 'fs/promises';
+import { unlink, readdir } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
+import { getUploadRoot, resolveUploadFile } from '@/lib/upload-path';
 
 /**
- * Convert image path (e.g., /image/hero/slide-1.jpg) to filesystem path
+ * Convert a public/CMS image path to an absolute filesystem path under the upload root.
+ * Supports both `/image/...` and `/api/uploads/...`.
  */
-export function imagePathToFilePath(imagePath: string): string | null {
+export async function imagePathToFilePath(imagePath: string): Promise<string | null> {
   if (!imagePath) return null;
-  
-  // Remove leading slash if present
-  const cleanPath = imagePath.startsWith('/') ? imagePath.slice(1) : imagePath;
-  
-  // Check if it's an image path
-  if (!cleanPath.startsWith('image/')) return null;
-  
-  // Convert to filesystem path
-  return path.join(process.cwd(), 'public', cleanPath);
+
+  // External URLs are never local upload files
+  if (/^https?:\/\//i.test(imagePath)) return null;
+
+  const resolved = await resolveUploadFile(imagePath);
+  if (!resolved.resolvedPath) return null;
+
+  const rootDir = path.resolve(resolved.rootDir);
+  const filePath = path.resolve(resolved.resolvedPath);
+
+  // Prevent path traversal outside the upload root
+  const rootWithSep = rootDir.endsWith(path.sep) ? rootDir : rootDir + path.sep;
+  if (filePath !== rootDir && !filePath.startsWith(rootWithSep)) {
+    return null;
+  }
+
+  return filePath;
 }
 
 /**
@@ -23,11 +33,11 @@ export function imagePathToFilePath(imagePath: string): string | null {
  */
 export async function deleteImageFile(imagePath: string): Promise<boolean> {
   try {
-    const filePath = imagePathToFilePath(imagePath);
+    const filePath = await imagePathToFilePath(imagePath);
     if (!filePath || !existsSync(filePath)) {
-      return false; // File doesn't exist, consider it deleted
+      return false;
     }
-    
+
     await unlink(filePath);
     return true;
   } catch (error) {
@@ -52,14 +62,14 @@ export async function deleteImageFiles(imagePaths: string[]): Promise<{
 
   for (const imagePath of imagePaths) {
     if (!imagePath) continue;
-    
+
     try {
-      const filePath = imagePathToFilePath(imagePath);
+      const filePath = await imagePathToFilePath(imagePath);
       if (!filePath || !existsSync(filePath)) {
         results.notFound++;
         continue;
       }
-      
+
       await unlink(filePath);
       results.deleted++;
     } catch (error) {
@@ -78,41 +88,55 @@ export function extractImagePaths(obj: any, paths: Set<string> = new Set()): Set
   if (!obj) return paths;
 
   if (typeof obj === 'string') {
-    // Check if it's an image path
-    if (obj.startsWith('/image/') || obj.startsWith('image/')) {
+    if (
+      obj.startsWith('/image/') ||
+      obj.startsWith('image/') ||
+      obj.startsWith('/api/uploads/') ||
+      obj.startsWith('api/uploads/')
+    ) {
       paths.add(obj);
     }
   } else if (Array.isArray(obj)) {
-    obj.forEach(item => extractImagePaths(item, paths));
+    obj.forEach((item) => extractImagePaths(item, paths));
   } else if (typeof obj === 'object') {
-    Object.values(obj).forEach(value => extractImagePaths(value, paths));
+    Object.values(obj).forEach((value) => extractImagePaths(value, paths));
   }
 
   return paths;
 }
 
 /**
- * Get all image files in a directory recursively
+ * Get all image files in a directory recursively (as public `/image/...` paths when under public/)
  */
 export async function getAllImageFiles(dirPath: string): Promise<string[]> {
   const imageFiles: string[] = [];
   const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];
+  const uploadRoot = getUploadRoot();
 
   try {
     const entries = await readdir(dirPath, { withFileTypes: true });
-    
+
     for (const entry of entries) {
       const fullPath = path.join(dirPath, entry.name);
-      
+
       if (entry.isDirectory()) {
         const subFiles = await getAllImageFiles(fullPath);
         imageFiles.push(...subFiles);
       } else if (entry.isFile()) {
         const ext = path.extname(entry.name).toLowerCase();
-        if (imageExtensions.includes(ext)) {
-          // Convert to public path format
-          const relativePath = fullPath.replace(process.cwd() + path.sep + 'public' + path.sep, '');
-          imageFiles.push('/' + relativePath.replace(/\\/g, '/'));
+        if (!imageExtensions.includes(ext)) continue;
+
+        const relativeFromUpload = path.relative(uploadRoot, fullPath).replace(/\\/g, '/');
+        if (relativeFromUpload && !relativeFromUpload.startsWith('..')) {
+          imageFiles.push(`/api/uploads/${relativeFromUpload}`);
+          continue;
+        }
+
+        const relativeFromPublic = fullPath
+          .replace(process.cwd() + path.sep + 'public' + path.sep, '')
+          .replace(/\\/g, '/');
+        if (relativeFromPublic && !path.isAbsolute(relativeFromPublic)) {
+          imageFiles.push('/' + relativeFromPublic);
         }
       }
     }

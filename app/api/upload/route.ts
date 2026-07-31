@@ -3,12 +3,14 @@ import { writeFile, mkdir } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
 import { getUploadRoot, normalizeUploadFolder } from '@/lib/upload-path';
+import { deleteImageFile } from '@/lib/image-utils';
 
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const file = formData.get('file') as File;
-    const folder = formData.get('folder') as string || 'general';
+    const folder = (formData.get('folder') as string) || 'general';
+    const previousPath = (formData.get('previousPath') as string) || '';
 
     if (!file) {
       return NextResponse.json(
@@ -42,9 +44,6 @@ export async function POST(request: NextRequest) {
     const baseName = path.basename(originalName, ext);
     const fileName = `${baseName}_${timestamp}${ext}`;
 
-    // Determine upload path based on folder parameter
-    // If folder is provided and matches existing structure, use it
-    // Otherwise, use 'general' folder
     const uploadFolder = normalizeUploadFolder(folder);
     const uploadPath = path.join(getUploadRoot(), uploadFolder);
     const filePath = path.join(uploadPath, fileName);
@@ -55,20 +54,23 @@ export async function POST(request: NextRequest) {
       uploadRoot: getUploadRoot(),
       resolvedDirectory: uploadPath,
       targetFilePath: filePath,
+      previousPath: previousPath || null,
     });
 
-    // Create directory if it doesn't exist
     if (!existsSync(uploadPath)) {
       await mkdir(uploadPath, { recursive: true });
     }
 
-    // Convert file to buffer and save
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
     await writeFile(filePath, buffer);
 
-    // Return a runtime-served URL path (more reliable in container deployments)
     const publicPath = `/api/uploads/${uploadFolder.replace(/\\/g, '/')}/${fileName}`;
+
+    // Delete previous image after successful replace (covers all admin sections using ImageUpload)
+    if (previousPath && previousPath !== publicPath) {
+      await deleteImageFile(previousPath);
+    }
 
     return NextResponse.json({
       success: true,

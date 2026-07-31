@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { NewsPost } from '@/types/news-updates';
 import { revalidatePath } from 'next/cache';
+import { cleanupUnusedImages, deleteImageFiles, extractImagePaths } from '@/lib/image-utils';
 
 const DB_NAME = 'albaharpartners1';
 const COLLECTION_NAME = 'newsupdates';
@@ -126,6 +127,9 @@ export async function PUT(
     const db = client.db(DB_NAME);
     const collection = db.collection(COLLECTION_NAME);
 
+    const oldDocument = await collection.findOne({ language: 'ltr' });
+    const oldPost = oldDocument?.posts?.[postIndex];
+
     const normalizedPost = normalizePost(post);
     const isFeaturedPost = normalizedPost.isFeatured === true;
 
@@ -157,6 +161,10 @@ export async function PUT(
         success: false,
         message: 'News & Updates content not found',
       }, { status: 404 });
+    }
+
+    if (oldPost) {
+      await cleanupUnusedImages(oldPost, normalizedPost);
     }
 
     revalidatePath('/news-updates');
@@ -243,6 +251,11 @@ export async function DELETE(
       },
       { returnDocument: 'after' }
     );
+
+    const imagePaths = extractImagePaths(postToDelete);
+    if (imagePaths.size > 0) {
+      await deleteImageFiles(Array.from(imagePaths));
+    }
 
     revalidatePath('/news-updates');
     revalidatePath('/');

@@ -96,6 +96,9 @@ export default function ImageUpload({
       // Determine folder: use prop, or extract from existing value, or default to 'general'
       const uploadFolder = folder || getFolderFromValue(value) || 'general';
       formData.append('folder', uploadFolder);
+      if (previousPath) {
+        formData.append('previousPath', previousPath);
+      }
 
       const response = await fetch('/api/upload', {
         method: 'POST',
@@ -107,8 +110,7 @@ export default function ImageUpload({
       if (result.success) {
         onChange(result.path);
         setError(null);
-
-        // Remove previous file after successful replace
+        // Server already deletes previousPath; keep client fallback for older API behavior
         if (previousPath && previousPath !== result.path) {
           await deleteStoredImage(previousPath);
         }

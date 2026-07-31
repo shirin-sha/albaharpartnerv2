@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { SolutionsContent } from '@/types/solutions';
 import { revalidatePath } from 'next/cache';
-import { extractImagePaths, deleteImageFiles } from '@/lib/image-utils';
+import { extractImagePaths, deleteImageFiles, cleanupUnusedImages } from '@/lib/image-utils';
 
 const DB_NAME = 'albaharpartners1';
 const COLLECTION_NAME = 'solutions';
@@ -134,17 +134,7 @@ export async function PUT(request: NextRequest) {
 
     // Clean up old images that are no longer used
     if (oldDocument) {
-      const oldImagePaths = extractImagePaths(oldDocument);
-      const newImagePaths = extractImagePaths(updateData);
-      
-      // Find images that were in old but not in new
-      const imagesToDelete = Array.from(oldImagePaths).filter(
-        oldPath => !newImagePaths.has(oldPath) && !newImagePaths.has(oldPath.replace(/^\//, ''))
-      );
-      
-      if (imagesToDelete.length > 0) {
-        await deleteImageFiles(Array.from(imagesToDelete));
-      }
+      await cleanupUnusedImages(oldDocument, updateData);
     }
 
     // Revalidate pages that use solutions content

@@ -427,7 +427,7 @@ export default function SolutionsManagePage() {
                       value={formData.imgSrc}
                       onChange={(value) => setFormData({ ...formData, imgSrc: value })}
                       folder="solutions"
-                      helperText="Recommended: 1120 × 840 px (4:3). Full image is shown on the homepage Our Solutions section (no crop)."
+                      helperText="Recommended: 1120 × 840 px (4:3)."
                     />
                   </div>
                   <div className="form-group">
@@ -436,7 +436,7 @@ export default function SolutionsManagePage() {
                       value={formData.detailImgSrc}
                       onChange={(value) => setFormData({ ...formData, detailImgSrc: value })}
                       folder="solutions"
-                      helperText="Recommended: 1700 × 1024 px (~5:3). Shown on the service details page."
+                      helperText="Recommended: 1700 × 1024 px (~5:3)."
                     />
                   </div>
                 </div>

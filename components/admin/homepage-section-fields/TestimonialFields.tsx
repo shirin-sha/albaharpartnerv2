@@ -75,7 +75,7 @@ export function TestimonialFields({ formData, updateField }: SectionFieldsProps)
             updateField('rtl', 'imagePath', value);
           }}
           folder="about"
-          helperText="Recommended: 1210 × 1210 px (1:1). Keep face centered; edges may crop."
+          helperText="Recommended: 1210 × 1210 px (1:1)."
         />
       </div>
       <div>

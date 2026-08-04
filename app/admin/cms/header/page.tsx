@@ -629,7 +629,7 @@ export default function HeaderManager() {
                   });
                 }}
                 folder="logo"
-                helperText="Recommended: 340 × 80 px (transparent PNG). Display height ~40px."
+                helperText="Recommended: 340 × 80 px (~4:1)."
               />
             </div>
             <div className="form-group">

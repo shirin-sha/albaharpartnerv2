@@ -181,7 +181,7 @@ export function CaseStudiesFields({ formData, setFormData, updateField }: Sectio
                         });
                       }}
                       folder="case-studies-item"
-                      helperText="Recommended: 946 × 1260 px (~3:4 portrait). Center subject; edges may crop."
+                      helperText="Recommended: 946 × 1260 px (~3:4)."
                     />
                   </div>
                   <div className="form-group">

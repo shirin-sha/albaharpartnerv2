@@ -262,7 +262,7 @@ export default function TeamManagePage() {
                 value={formData.imgSrc}
                 onChange={(value) => setFormData((prev) => ({ ...prev, imgSrc: value }))}
                 folder="team"
-                helperText="Recommended: 600 × 600 px (1:1). Head-and-shoulders centered."
+                helperText="Recommended: 600 × 600 px (1:1)."
               />
             </div>
 

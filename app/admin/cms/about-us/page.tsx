@@ -984,7 +984,7 @@ export default function AboutUsManager() {
                           });
                         }}
                         folder="about"
-                        helperText="Recommended: 1800 × 1800 px (1:1). Center subject; edges may crop."
+                        helperText="Recommended: 1800 × 1800 px (1:1)."
                       />
                     </div>
 
@@ -1482,7 +1482,7 @@ export default function AboutUsManager() {
                                                 });
                                               }}
                                               folder="brand"
-                                              helperText="Recommended: 200 × 120 px (5:3). Transparent PNG; contained, no crop."
+                                              helperText="Recommended: 200 × 120 px (5:3)."
                                             />
                                             <div className="form-group" style={{ marginTop: '8px', marginBottom: 0 }}>
                                               <label>Alt text</label>
@@ -2017,7 +2017,7 @@ export default function AboutUsManager() {
                       });
                     }}
                     folder="about"
-                    helperText="Recommended: 1230 × 1230 px (1:1). Center subject; edges may crop."
+                    helperText="Recommended: 1230 × 1230 px (1:1)."
                   />
                 </div>
         
@@ -2252,7 +2252,7 @@ export default function AboutUsManager() {
                         });
                       }}
                       folder="aboutus/vision-mission-values"
-                      helperText="Recommended: 320 × 320 px (1:1). Shown as a circle; center the subject."
+                      helperText="Recommended: 320 × 320 px (1:1)."
                     />
                   </div>
 

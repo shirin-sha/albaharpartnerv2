@@ -94,7 +94,7 @@ export function CtaFields({ formData, updateField }: SectionFieldsProps) {
                   updateField('rtl', 'imagePath', value);
                 }}
                 folder="section"
-                helperText="Recommended: 1920 × 800 px (wide landscape). Keep subject centered; cover-cropped."
+                helperText="Recommended: 1920 × 800 px (~12:5)."
               />
             </div>
             <div className="form-group">

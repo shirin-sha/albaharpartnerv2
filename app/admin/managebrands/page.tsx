@@ -332,7 +332,7 @@ export default function BrandsManagePage() {
                       onChange={(value) => setFormData({ ...formData, imagePath: value })}
                       folder="brand"
                       required
-                      helperText="Recommended: transparent PNG/SVG logo. Displayed at 16:9, contained and centered (no crop)."
+                      helperText="Recommended: 1200 × 675 px (16:9). Transparent PNG/SVG; contained, no crop."
                     />
                   </div>
                   <div className="form-group">
@@ -412,6 +412,7 @@ export default function BrandsManagePage() {
                           }}
                           folder="products"
                           required
+                          helperText="Recommended: 1200 × 1200 px (1:1). Center subject."
                         />
                       </div>
                       <div className="form-group">

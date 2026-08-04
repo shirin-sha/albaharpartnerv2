@@ -295,6 +295,7 @@ export default function StoriesManagePage() {
                       value={formData.imagePath}
                       onChange={(value) => setFormData({ ...formData, imagePath: value })}
                       folder="stories"
+                      helperText="Recommended: 946 × 1260 px (~3:4 portrait). Center subject; edges may crop."
                     />
                   </div>
                   <div className="form-group">

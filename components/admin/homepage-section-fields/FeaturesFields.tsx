@@ -80,6 +80,7 @@ export function FeaturesFields({ formData, setFormData, updateField }: SectionFi
             updateField('rtl', 'imagePath', value);
           }}
           folder="section"
+          helperText="Recommended: 1230 × 1230 px (1:1). Center subject; edges may crop."
         />
       </div>
       <div>

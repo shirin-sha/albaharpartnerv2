@@ -51,7 +51,7 @@ export default function ImageUpload({
   label,
   value,
   onChange,
-  helperText = 'Upload an image file',
+  helperText,
   className = '',
   folder,
   required = false,
@@ -249,8 +249,8 @@ export default function ImageUpload({
           </div>
         )}
 
-        {/* Helper Text */}
-        {helperText && !value && (
+        {/* Helper Text — always visible so recommended sizes stay after upload */}
+        {helperText && (
           <small className="text-muted">{helperText}</small>
         )}
       </div>

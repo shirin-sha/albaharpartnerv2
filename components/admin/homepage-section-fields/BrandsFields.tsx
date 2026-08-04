@@ -113,6 +113,7 @@ export function BrandsFields({ formData, setFormData, updateField }: SectionFiel
                         });
                       }}
                       folder="brand"
+                      helperText="Recommended: 400 × 200 px (2:1). Transparent PNG; contained, no crop."
                     />
                   </div>
                   <div className="form-group">

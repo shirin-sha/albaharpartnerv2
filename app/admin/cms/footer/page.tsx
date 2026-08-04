@@ -365,6 +365,7 @@ export default function FooterManager() {
                     });
                   }}
                   folder="logo"
+                  helperText="Recommended: 340 × 82 px (transparent PNG)."
                 />
               </div>
               <div className="form-group">

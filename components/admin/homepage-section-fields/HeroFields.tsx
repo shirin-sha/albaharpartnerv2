@@ -170,9 +170,8 @@ export function HeroFields({ formData, setFormData }: SectionFieldsProps) {
                   });
                 }}
                 folder="hero"
-                helperText="Recommended: 1920 × 1080 px (16:9)."
+                helperText="Recommended: 1920 × 1080 px (16:9). Keep the main subject in the center — edges may crop on different screens."
               />
-              <small>Recommended size: 1920 × 1080 px (ratio 16:9)</small>
             </div>
           </div>
         );

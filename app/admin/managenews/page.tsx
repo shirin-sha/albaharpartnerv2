@@ -425,11 +425,12 @@ export default function NewsManagePage() {
             {formData.isFeatured && (
               <>
                 <div className="form-group">
-                  <label>Featured Image (1290 x 430)</label>
+                  <label>Featured Image</label>
                   <ImageUpload
                     value={formData.imagePath}
                     onChange={(value) => setFormData({ ...formData, imagePath: value })}
                     folder="news"
+                    helperText="Recommended: 2580 × 1200 px (~2:1). Wide featured banner; keep subject centered."
                   />
                 </div>
               </>
@@ -441,6 +442,7 @@ export default function NewsManagePage() {
                       value={formData.detailImagePath}
                       onChange={(value) => setFormData({ ...formData, detailImagePath: value })}
                       folder="news"
+                      helperText="Recommended: 1820 × 1024 px (~16:9). Also cropped ~3:4 on list cards — keep subject centered."
                     />
                   </div>
                   <div className="form-group">

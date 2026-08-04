@@ -984,6 +984,7 @@ export default function AboutUsManager() {
                           });
                         }}
                         folder="about"
+                        helperText="Recommended: 1800 × 1800 px (1:1). Center subject; edges may crop."
                       />
                     </div>
 
@@ -1481,7 +1482,7 @@ export default function AboutUsManager() {
                                                 });
                                               }}
                                               folder="brand"
-                                              helperText="Upload timeline logo image"
+                                              helperText="Recommended: 200 × 120 px (5:3). Transparent PNG; contained, no crop."
                                             />
                                             <div className="form-group" style={{ marginTop: '8px', marginBottom: 0 }}>
                                               <label>Alt text</label>
@@ -2016,6 +2017,7 @@ export default function AboutUsManager() {
                       });
                     }}
                     folder="about"
+                    helperText="Recommended: 1230 × 1230 px (1:1). Center subject; edges may crop."
                   />
                 </div>
         
@@ -2250,6 +2252,7 @@ export default function AboutUsManager() {
                         });
                       }}
                       folder="aboutus/vision-mission-values"
+                      helperText="Recommended: 320 × 320 px (1:1). Shown as a circle; center the subject."
                     />
                   </div>
 

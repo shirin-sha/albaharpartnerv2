@@ -89,7 +89,7 @@ export default function HistoryCMS({ data }: Props) {
                             </div>
                             <div className="desc">{item.title}</div>
                             {item.logos && item.logos.length > 0 && (
-                              <div className="time-line-logos" style={{ marginTop: "16px", display: "flex", flexWrap: "wrap", gap: "12px", alignItems: "center", justifyContent: "center" }}>
+                              <div className="time-line-logos">
                                 {item.logos.map((logo, logoIndex) => (
                                   <div key={logoIndex} className="time-line-logo-item">
                                     <Image

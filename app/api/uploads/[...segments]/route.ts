@@ -10,6 +10,9 @@ const MIME_TYPES: Record<string, string> = {
   '.gif': 'image/gif',
   '.webp': 'image/webp',
   '.svg': 'image/svg+xml',
+  '.pdf': 'application/pdf',
+  '.doc': 'application/msword',
+  '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
 };
 
 function isSafePath(segments: string[]): boolean {
@@ -46,13 +49,23 @@ export async function GET(
     const contentType = MIME_TYPES[ext] || 'application/octet-stream';
     const fileBuffer = await readFile(resolved.resolvedPath);
     const body = new Uint8Array(fileBuffer);
+    const fileName = path.basename(resolved.resolvedPath);
+    const forceDownload =
+      request.nextUrl.searchParams.get('download') === '1' ||
+      ['.pdf', '.doc', '.docx'].includes(ext);
+
+    const headers: Record<string, string> = {
+      'Content-Type': contentType,
+      'Cache-Control': 'public, max-age=31536000, immutable',
+    };
+
+    if (forceDownload) {
+      headers['Content-Disposition'] = `attachment; filename="${fileName}"`;
+    }
 
     return new NextResponse(body, {
       status: 200,
-      headers: {
-        'Content-Type': contentType,
-        'Cache-Control': 'public, max-age=31536000, immutable',
-      },
+      headers,
     });
   } catch (error) {
     console.error('Error serving upload:', error);

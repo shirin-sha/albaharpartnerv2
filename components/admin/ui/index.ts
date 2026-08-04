@@ -12,3 +12,4 @@ export { default as LanguageSwitch } from './LanguageSwitch';
 export { default as ArrayManager } from './ArrayManager';
 export { default as FormGrid } from './FormGrid';
 export { default as ImageUpload } from './ImageUpload';
+export { default as DocumentUpload } from './DocumentUpload';

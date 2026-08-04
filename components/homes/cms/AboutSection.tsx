@@ -14,7 +14,7 @@ export default function AboutSection({ content, language = 'ltr' }: AboutSection
   const isRtl = language === "rtl";
 
   const aboutLeft = (
-    <div className="about-left bg-surface">
+    <div className="about-left">
       <div className="heading-section mb-0">
         <div className="text-anime-wave">
           <span className="tag label text-btn-uppercase bg-white">
@@ -64,17 +64,21 @@ export default function AboutSection({ content, language = 'ltr' }: AboutSection
 
   return (
     <section dir={language} className="section-about h-7">
-      {isRtl ? (
-        <>
-          {aboutRight}
-          {aboutLeft}
-        </>
-      ) : (
-        <>
-          {aboutLeft}
-          {aboutRight}
-        </>
-      )}
+      <div className="tf-container">
+        <div className="section-about-h7-row">
+          {isRtl ? (
+            <>
+              {aboutRight}
+              {aboutLeft}
+            </>
+          ) : (
+            <>
+              {aboutLeft}
+              {aboutRight}
+            </>
+          )}
+        </div>
+      </div>
     </section>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ContactUsContent } from '@/types/contact-us';
+import { toGoogleMapsEmbedUrl } from '@/lib/google-maps';
 
 const CONTACT_US_SECTIONS = [
   { id: 'meta', label: 'Meta (SEO)', description: 'Title, description, keywords (English & Arabic)' },
@@ -120,17 +121,35 @@ export default function ContactUsManager() {
     if (!contentLtr || !contentRtl) return;
     setSaving(section);
     try {
+      let ltrPayload = { ...contentLtr, language: 'ltr' as const };
+      let rtlPayload = { ...contentRtl, language: 'rtl' as const };
+
+      // Convert place/share links to iframe-safe embed URLs before saving
+      if (section === 'map') {
+        const embedUrl = toGoogleMapsEmbedUrl(contentLtr.mapSection.mapUrl);
+        ltrPayload = {
+          ...ltrPayload,
+          mapSection: { ...ltrPayload.mapSection, mapUrl: embedUrl },
+        };
+        rtlPayload = {
+          ...rtlPayload,
+          mapSection: { ...rtlPayload.mapSection, mapUrl: embedUrl },
+        };
+        setContentLtr({ ...contentLtr, mapSection: { ...contentLtr.mapSection, mapUrl: embedUrl } });
+        setContentRtl({ ...contentRtl, mapSection: { ...contentRtl.mapSection, mapUrl: embedUrl } });
+      }
+
       // Save both LTR and RTL in parallel
       const [ltrRes, rtlRes] = await Promise.all([
         fetch('/api/contact-us', {
           method: contentLtr._id ? 'PUT' : 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...contentLtr, language: 'ltr' }),
+          body: JSON.stringify(ltrPayload),
         }),
         fetch('/api/contact-us', {
           method: contentRtl._id ? 'PUT' : 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...contentRtl, language: 'rtl' }),
+          body: JSON.stringify(rtlPayload),
         }),
       ]);
       
@@ -696,8 +715,17 @@ export default function ContactUsManager() {
                       mapSection: { ...contentRtl.mapSection, mapUrl },
                     });
                   }}
+                  placeholder="Paste Google Maps link or coordinates"
                 />
-                <small>Google Maps embed URL</small>
+                <small style={{ display: 'block', marginTop: 8, lineHeight: 1.5 }}>
+                  Paste any of these (auto-converted on save):
+                  <br />
+                  1) Coordinates: <code>29.339256,47.937339</code>
+                  <br />
+                  2) Place / share link from Google Maps (your link works)
+                  <br />
+                  3) Best: Google Maps → Share → Embed a map → copy iframe <code>src</code>
+                </small>
               </div>
               <div className="form-actions">
                 <button

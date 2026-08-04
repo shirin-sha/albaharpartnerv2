@@ -1058,17 +1058,42 @@
   }
 
   &.h-7 {
-    @include mixin.d-flex();
-    flex-wrap: wrap;
+    position: relative;
+    overflow: hidden;
+
+    // Content constrained to .tf-container like other homepage sections
+    .section-about-h7-row {
+      @include mixin.d-flex();
+      flex-wrap: wrap;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
 
     .about-left {
-      padding: 99px 111px 82px 15px;
+      position: relative;
+      padding: 80px 40px 80px 0;
       flex: 1 1 50%;
       @include mixin.d-flex();
       flex-direction: column;
-      align-items: flex-end;
+      align-items: flex-start;
+      z-index: 1;
+
+      // Full viewport left half grey (bleed beyond container)
+      &::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        width: 50vw;
+        background-color: var(--surface);
+        z-index: -1;
+      }
 
       .heading-section {
+        max-width: 100%;
+
         .tag {
           margin-bottom: 15px;
         }
@@ -1076,11 +1101,14 @@
     }
 
     .about-right {
-      padding: 81px 15px 82px 100px;
+      position: relative;
+      padding: 80px 0 80px 40px;
       flex: 1 1 50%;
+      z-index: 1;
 
       .section-content {
-        max-width: max-content;
+        max-width: 100%;
+        width: 100%;
       }
 
       .text {
@@ -1096,6 +1124,16 @@
 
     .tf-btn {
       padding: 15px 33px;
+    }
+
+    &[dir="rtl"] {
+      .about-left {
+        &::before {
+          right: auto;
+          left: 0;
+          width: 50vw;
+        }
+      }
     }
   }
 
@@ -2287,6 +2325,8 @@
       justify-content: space-between;
 
       .services-content {
+        flex: 1 1 auto;
+        min-width: 0;
         padding-right: 40px;
         padding-left: 40px;
 
@@ -2309,12 +2349,15 @@
       }
 
       .image {
-        max-width: 640px;
+        flex: 0 0 auto;
+        width: 560px;
+        max-width: 560px;
+        height: 420px;
 
         img {
           width: 100%;
           height: 100%;
-          object-fit: cover;
+          object-fit: contain;
         }
       }
     }

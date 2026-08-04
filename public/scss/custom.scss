@@ -215,22 +215,78 @@
 }
 
 .services-content-spacious {
-  padding-top: 50px;
-  padding-bottom: 50px;
+  padding-top: 40px;
+  padding-bottom: 40px;
 }
 
-.services-image-wrap {
-  width: 100%;
-  height: 100%;
-  min-height: 500px;
-  position: relative;
-  overflow: hidden;
+/* Home Our Solutions: identical image box on every tab; show full image (no crop) */
+.section-services.h-8 {
+  .services-image-wrap {
+    position: relative;
+    overflow: hidden;
+    flex: 0 0 560px;
+    width: 560px;
+    max-width: 560px;
+    height: 420px;
+    min-height: 420px;
+    background: #f3f4f6;
+  }
+
+  .services-image-fill {
+    position: absolute !important;
+    inset: 0;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    object-fit: contain;
+    object-position: center;
+  }
 }
 
-.services-image-fill {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+@media (max-width: 1199px) {
+  .section-services.h-8 {
+    .services-image-wrap {
+      flex-basis: 480px;
+      width: 480px;
+      max-width: 480px;
+      height: 360px;
+      min-height: 360px;
+    }
+
+    .services-inner .image {
+      width: 480px;
+      max-width: 480px;
+      height: 360px;
+    }
+  }
+}
+
+@media (max-width: 991px) {
+  .section-services.h-8 {
+    .services-image-wrap {
+      flex: 0 0 auto;
+      width: 100%;
+      max-width: 100%;
+      height: 360px;
+      min-height: 360px;
+    }
+
+    .services-inner .image {
+      width: 100%;
+      max-width: 100%;
+      height: 360px;
+    }
+  }
+}
+
+@media (max-width: 575px) {
+  .section-services.h-8 {
+    .services-image-wrap,
+    .services-inner .image {
+      height: 260px;
+      min-height: 260px;
+    }
+  }
 }
 
 .blogs-grid-layout {
@@ -266,7 +322,149 @@
 }
 
 .brand-marquee-img {
-  width: 280px;
-  height: 55px;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
+  object-position: center;
+}
+
+/* Homepage partners marquee — fixed logo box */
+.section-brand {
+  .brand-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 200px;
+    height: 100px;
+  }
+
+  .brand-marquee-img {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    object-position: center;
+  }
+}
+
+/* Brands page logo grid — same ratio, contain, centered */
+.brand-logo-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 1.5rem;
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-4px);
+  }
+}
+
+.brand-logo-frame {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #fafafa;
+  border-radius: 4px;
+  padding: 12px;
+}
+
+.brand-logo-img {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain !important;
+  object-position: center;
+}
+
+.brand-logo-name {
+  margin: 1rem 0 0;
+  text-align: center;
+  color: #333;
+  font-size: inherit;
+}
+
+.brand-detail-logo-frame {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #fff;
+  border-radius: 8px;
+  padding: 2rem;
+}
+
+.brand-detail-logo-img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center;
+}
+
+
+/* Solutions page — 3-column card grid */
+.solutions-grid {
+  width: 100%;
+}
+
+.solution-grid-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #fff;
+  border: 1px solid var(--outline, #e0e0e0);
+  border-radius: 12px;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    transform: translateY(-4px);
+
+    .solution-grid-title {
+      color: var(--primary);
+    }
+  }
+}
+
+.solution-grid-image {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  background: #f3f4f6;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+  }
+}
+
+.solution-grid-body {
+  padding: 18px 20px 20px;
+  text-align: center;
+}
+
+.solution-grid-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--on-suface-container, #111);
 }

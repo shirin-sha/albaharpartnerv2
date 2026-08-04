@@ -124,8 +124,7 @@ export default function ServicesSection({ content, language = 'ltr' }: ServicesS
                           src={service.imgSrc}
                           alt={service.title}
                           className="lazyload services-image-fill"
-                          width={960}
-                          height={720}
+                          fill
                           loading={index === 0 ? "eager" : "lazy"}
                           quality={65}
                           sizes="(max-width: 991px) 100vw, 50vw"

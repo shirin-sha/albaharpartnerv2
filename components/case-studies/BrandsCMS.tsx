@@ -56,62 +56,17 @@ export default function BrandsCMS({ data }: Props) {
                       className="col-lg-3 col-md-4 col-sm-6 col-12"
                       key={brand._id || index}
                     >
-                      <Link
-                        href={detailUrl}
-                        className="brand-logo-card"
-                        style={{
-                          display: 'block',
-                          backgroundColor: '#fff',
-                          padding: '2rem',
-                          borderRadius: '8px',
-                          border: '1px solid #e0e0e0',
-                          height: '100%',
-                          transition: 'all 0.3s ease',
-                          textDecoration: 'none',
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
-                          e.currentTarget.style.transform = 'translateY(-4px)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.boxShadow = 'none';
-                          e.currentTarget.style.transform = 'translateY(0)';
-                        }}
-                      >
-                        <div
-                          style={{
-                            width: '100%',
-                            height: '120px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                          }}
-                        >
+                      <Link href={detailUrl} className="brand-logo-card">
+                        <div className="brand-logo-frame">
                           <Image
                             src={brand.imagePath}
                             alt={brand.name}
-                            width={200}
-                            height={120}
-                            style={{
-                              width: 'auto',
-                              height: 'auto',
-                              maxWidth: '100%',
-                              maxHeight: '100%',
-                              objectFit: 'contain',
-                            }}
+                            width={320}
+                            height={180}
+                            className="brand-logo-img"
                           />
                         </div>
-                        <h5
-                          style={{
-                            marginTop: '1rem',
-                            marginBottom: '0',
-                            textAlign: 'center',
-                            color: '#333',
-                            fontSize: 'inherit',
-                          }}
-                        >
-                          {brand.name}
-                        </h5>
+                        <h5 className="brand-logo-name">{brand.name}</h5>
                       </Link>
                     </div>
                   );

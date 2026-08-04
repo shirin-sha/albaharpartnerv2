@@ -22,21 +22,13 @@ export default function BrandDetail({ brand }: Props) {
           <div className="row mb-66 rg-60">
             <div className="col-lg-6">
               <div className="thumbs-slider">
-                <div className="image">
+                <div className="image brand-detail-logo-frame">
                   <Image
                     src={brand.imagePath}
                     alt={brand.name}
                     width={600}
-                    height={600}
-                    className="lazyload"
-                    style={{
-                      width: "100%",
-                      height: "auto",
-                      objectFit: "contain",
-                      backgroundColor: "#fff",
-                      padding: "2rem",
-                      borderRadius: "8px",
-                    }}
+                    height={338}
+                    className="lazyload brand-detail-logo-img"
                   />
                 </div>
               </div>

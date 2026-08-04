@@ -20,6 +20,9 @@ export interface HeaderContent {
     link: string;
   };
   menuItems: MenuItem[];
+  /** Profile / CTA button (e.g. Download Profile) */
+  buttonText?: string;
+  buttonLink?: string;
   language: 'ltr' | 'rtl';
   isActive: boolean;
   createdAt?: Date;

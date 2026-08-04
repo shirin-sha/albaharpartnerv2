@@ -32,24 +32,37 @@ export default function HeaderCMS({ data }: Props) {
   if (!data.isActive) return null;
 
   const activeMenuItems = (data.menuItems || [])
-    .filter(item => item.isActive)
+    .filter((item) => item.isActive)
     .sort((a, b) => a.order - b.order);
 
   const isMenuActive = (href: string) => {
     const languageAwareHref = addLanguagePrefix(href, pathname);
-    const currentPath = pathname?.replace(/^\/ar/, '') || '/';
-    const hrefPath = languageAwareHref?.replace(/^\/ar/, '') || '/';
-    return hrefPath === currentPath || (hrefPath === '/' && currentPath === '/');
+    const currentPath = pathname?.replace(/^\/ar/, "") || "/";
+    const hrefPath = languageAwareHref?.replace(/^\/ar/, "") || "/";
+    return hrefPath === currentPath || (hrefPath === "/" && currentPath === "/");
   };
 
-  const isMenuParentActive = (item: typeof activeMenuItems[0]) => {
+  const isMenuParentActive = (item: (typeof activeMenuItems)[0]) => {
     if (!item.hasDropdown || !item.dropdownItems) return false;
     return item.dropdownItems.some((subItem) => isMenuActive(subItem.href));
   };
 
+  const buttonText = (data.buttonText || "").trim();
+  const buttonLink = (data.buttonLink || "").trim();
+  const showProfileButton = Boolean(buttonText && buttonLink && buttonLink !== "#");
+  const isFileDownload =
+    /\.(pdf|docx?|xlsx?|zip)(\?|$)/i.test(buttonLink) ||
+    buttonLink.includes("/files/") ||
+    buttonLink.includes("/api/uploads/");
+  const downloadHref = isFileDownload
+    ? buttonLink.includes("?")
+      ? `${buttonLink}&download=1`
+      : `${buttonLink}?download=1`
+    : buttonLink;
+
   return (
     <header
-      className={`header style-1 style-absolute header-fixed ${
+      className={`header style-1 style-absolute header-fixed header-centered-nav ${
         isFixed ? "is-fixed" : ""
       } `}
       id="header"
@@ -71,64 +84,100 @@ export default function HeaderCMS({ data }: Props) {
                       src={data.logo.imagePath}
                       width={data.logo.width}
                       height={40}
-                      style={{ height: '40px', width: 'auto' }}
+                      style={{ height: "40px", width: "auto" }}
                     />
                   </Link>
                 </div>
-                <nav className="main-menu">
-                  <ul className="menu-primary-menu">
-                    {activeMenuItems.map((item, index) => {
-                      const hasActiveDropdown = isMenuParentActive(item);
-                      const isActive = isMenuActive(item.href);
+              </div>
 
-                      if (item.hasDropdown && item.dropdownItems && item.dropdownItems.length > 0) {
-                        const activeDropdownItems = item.dropdownItems
-                          .filter(subItem => subItem.isActive)
-                          .sort((a, b) => (a.order || 0) - (b.order || 0));
+              <nav className="main-menu header-center-nav">
+                <ul className="menu-primary-menu">
+                  {activeMenuItems.map((item, index) => {
+                    const hasActiveDropdown = isMenuParentActive(item);
+                    const isActive = isMenuActive(item.href);
 
-                        return (
-                          <li
-                            key={item._id || index}
-                            className={`menu-item menu-item-has-children position-relative ${
-                              hasActiveDropdown || isActive ? "current-menu-item" : ""
-                            }`}
-                          >
-                            <Link href={addLanguagePrefix(item.href, pathname)} className="item-link" prefetch={true}>
-                              {item.title}
-                            </Link>
-                            <ul className="sub-menu">
-                              {activeDropdownItems.map((subItem, subIndex) => (
-                                <li
-                                  key={subItem._id || subIndex}
-                                  className={`sub-menu-item ${
-                                    isMenuActive(subItem.href) ? "current-item" : ""
-                                  }`}
-                                >
-                                  <Link href={addLanguagePrefix(subItem.href, pathname)} className="item-link-2" prefetch={true}>
-                                    {subItem.title}
-                                  </Link>
-                                </li>
-                              ))}
-                            </ul>
-                          </li>
-                        );
-                      }
+                    if (item.hasDropdown && item.dropdownItems && item.dropdownItems.length > 0) {
+                      const activeDropdownItems = item.dropdownItems
+                        .filter((subItem) => subItem.isActive)
+                        .sort((a, b) => (a.order || 0) - (b.order || 0));
 
                       return (
                         <li
                           key={item._id || index}
-                          className={`menu-item ${isActive ? "current-menu-item" : ""}`}
+                          className={`menu-item menu-item-has-children position-relative ${
+                            hasActiveDropdown || isActive ? "current-menu-item" : ""
+                          }`}
                         >
-                          <Link href={addLanguagePrefix(item.href, pathname)} className="item-link" prefetch={true}>
+                          <Link
+                            href={addLanguagePrefix(item.href, pathname)}
+                            className="item-link"
+                            prefetch={true}
+                          >
                             {item.title}
                           </Link>
+                          <ul className="sub-menu">
+                            {activeDropdownItems.map((subItem, subIndex) => (
+                              <li
+                                key={subItem._id || subIndex}
+                                className={`sub-menu-item ${
+                                  isMenuActive(subItem.href) ? "current-item" : ""
+                                }`}
+                              >
+                                <Link
+                                  href={addLanguagePrefix(subItem.href, pathname)}
+                                  className="item-link-2"
+                                  prefetch={true}
+                                >
+                                  {subItem.title}
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
                         </li>
                       );
-                    })}
-                  </ul>
-                </nav>
-              </div>
+                    }
+
+                    return (
+                      <li
+                        key={item._id || index}
+                        className={`menu-item ${isActive ? "current-menu-item" : ""}`}
+                      >
+                        <Link
+                          href={addLanguagePrefix(item.href, pathname)}
+                          className="item-link"
+                          prefetch={true}
+                        >
+                          {item.title}
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </nav>
+
               <div className="header-right">
+                {showProfileButton && (
+                  <div className="header-actions-tight">
+                    <div className="nav-btn">
+                      {isFileDownload ? (
+                        <a
+                          href={downloadHref}
+                          className="tf-btn bg-white style-1 hover-bg-primary"
+                          download
+                        >
+                          <span>{buttonText}</span>
+                        </a>
+                      ) : (
+                        <Link
+                          href={addLanguagePrefix(buttonLink, pathname)}
+                          className="tf-btn bg-white style-1 hover-bg-primary"
+                        >
+                          <span>{buttonText}</span>
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                )}
                 <div className="nav-icon">
                   <div className="mobile-button">
                     <a href="#canvasMobile" data-bs-toggle="offcanvas" aria-label="Open mobile menu">

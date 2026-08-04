@@ -90,7 +90,7 @@ export async function POST(
   }
 }
 
-// PUT - Update a specific brand in the brands array
+// PUT - Update a specific brand in the brands array, or reorder brands
 export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ operation: string }> }
@@ -98,6 +98,48 @@ export async function PUT(
   try {
     const { operation } = await params;
     const body = await request.json();
+
+    const client = await clientPromise;
+    const db = client.db(DB_NAME);
+    const collection = db.collection(COLLECTION_NAME);
+
+    if (operation === 'reorder') {
+      const { brands } = body;
+      if (!Array.isArray(brands)) {
+        return NextResponse.json({
+          success: false,
+          message: 'Brands array is required',
+        }, { status: 400 });
+      }
+
+      const result = await collection.findOneAndUpdate(
+        { language: 'ltr' },
+        {
+          $set: {
+            brands: brands.map((brand: Brand) => normalizeBrand(brand)),
+            updatedAt: new Date(),
+          },
+        },
+        { returnDocument: 'after' }
+      );
+
+      if (!result) {
+        return NextResponse.json({
+          success: false,
+          message: 'Brands content not found',
+        }, { status: 404 });
+      }
+
+      revalidatePath('/brands');
+      revalidatePath('/');
+
+      return NextResponse.json({
+        success: true,
+        message: 'Brands reordered successfully',
+        data: result,
+      });
+    }
+
     const { brandIndex, brand } = body;
 
     if (operation !== 'update') {
@@ -121,10 +163,6 @@ export async function PUT(
         message: 'Brand image is required',
       }, { status: 400 });
     }
-
-    const client = await clientPromise;
-    const db = client.db(DB_NAME);
-    const collection = db.collection(COLLECTION_NAME);
 
     // Update the specific brand at the given index
     const result = await collection.findOneAndUpdate(

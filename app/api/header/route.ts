@@ -65,12 +65,7 @@ export async function POST(request: NextRequest) {
 
     const now = new Date();
     // Exclude _id so MongoDB can generate a proper ObjectId
-    const {
-      _id,
-      buttonText: _buttonText,
-      buttonLink: _buttonLink,
-      ...bodyWithoutId
-    } = body as HeaderContent & { buttonText?: string; buttonLink?: string };
+    const { _id, ...bodyWithoutId } = body;
     const newContent = {
       ...bodyWithoutId,
       createdAt: now,
@@ -112,13 +107,7 @@ export async function PUT(request: NextRequest) {
     const db = client.db(DB_NAME);
     const collection = db.collection(COLLECTION_NAME);
 
-    const {
-      _id,
-      createdAt,
-      buttonText: _buttonText,
-      buttonLink: _buttonLink,
-      ...updateData
-    } = body as HeaderContent & { buttonText?: string; buttonLink?: string };
+    const { _id, createdAt, ...updateData } = body;
     const updatedContent = {
       ...updateData,
       updatedAt: new Date(),
@@ -128,10 +117,6 @@ export async function PUT(request: NextRequest) {
       { language: body.language },
       {
         $set: updatedContent,
-        $unset: {
-          buttonText: '',
-          buttonLink: '',
-        },
       },
       { returnDocument: 'after', upsert: true }
     );

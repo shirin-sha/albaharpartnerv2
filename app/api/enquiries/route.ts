@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
+import { verifyCaptcha } from '@/lib/captcha';
 
 const DB_NAME = 'albaharpartners1';
 const COLLECTION_NAME = 'enquiries';
@@ -8,9 +9,12 @@ interface EnquiryPayload {
   name: string;
   email: string;
   phone: string;
-  country: string;
+  country?: string;
   subject: string;
   comment: string;
+  captchaToken?: string;
+  captchaAnswer?: string;
+  website?: string; // honeypot
 }
 
 // GET - List enquiries (simple pagination)
@@ -61,12 +65,32 @@ export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as EnquiryPayload;
 
-    const { name, email, phone, country, subject, comment } = body;
-    if (!name || !email || !phone || !country || !subject || !comment) {
+    // Honeypot: bots fill hidden fields — pretend success
+    if (body.website) {
+      return NextResponse.json(
+        { success: true, message: 'Enquiry submitted successfully' },
+        { status: 201 },
+      );
+    }
+
+    const { name, email, phone, subject, comment, captchaToken, captchaAnswer } = body;
+    const country = (body.country || 'Kuwait').trim();
+
+    if (!name || !email || !phone || !subject || !comment) {
       return NextResponse.json(
         {
           success: false,
           message: 'All fields are required',
+        },
+        { status: 400 },
+      );
+    }
+
+    if (!captchaToken || !captchaAnswer || !verifyCaptcha(captchaToken, captchaAnswer)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Invalid captcha. Please try again.',
         },
         { status: 400 },
       );
@@ -89,19 +113,23 @@ export async function POST(request: NextRequest) {
 
     const result = await collection.insertOne(newEnquiry as any);
 
-    // Best-effort: forward to existing external service (keeps current email behaviour)
-    try {
-      await fetch('https://express-brevomail.vercel.app/api/contacts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, email, phone, country, subject, comment }),
-      });
-    } catch (forwardError) {
-      console.error('Failed to forward enquiry to external service:', forwardError);
-      // Do not fail the request for admins if email forwarding fails
-    }
+    // Forward email in background — don't block the user response
+    const forwardPayload = JSON.stringify({ name, email, phone, country, subject, comment });
+    void (async () => {
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 8000);
+        await fetch('https://express-brevomail.vercel.app/api/contacts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: forwardPayload,
+          signal: controller.signal,
+        });
+        clearTimeout(timeout);
+      } catch (forwardError) {
+        console.error('Failed to forward enquiry to external service:', forwardError);
+      }
+    })();
 
     return NextResponse.json(
       {
@@ -122,4 +150,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-

@@ -3,10 +3,12 @@
 import { useState, useEffect } from 'react';
 import { HeaderContent, MenuItem } from '@/types/header';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
+import DocumentUpload from '@/components/admin/ui/DocumentUpload';
 
 const HEADER_SECTIONS = [
   { id: 'logo', label: 'Logo Settings', description: 'Logo image, link, alt, size (shared)' },
   { id: 'menu', label: 'Navigation Menu', description: 'Menu items + dropdown items (bilingual)' },
+  { id: 'button', label: 'Profile Button', description: 'Download / profile CTA on the right side of the header' },
 ] as const;
 
 type HeaderSectionId = (typeof HEADER_SECTIONS)[number]['id'];
@@ -509,6 +511,8 @@ export default function HeaderManager() {
       link: '/',
     },
     menuItems: [],
+    buttonText: lang === 'rtl' ? 'تحميل الملف التعريفي' : 'Download Profile',
+    buttonLink: '/files/company-profile.pdf',
   });
 
   const showMessage = (type: 'success' | 'error', text: string) => {
@@ -520,14 +524,6 @@ export default function HeaderManager() {
     if (!contentLtr || !contentRtl) return;
     setSaving(section);
     try {
-      const stripLegacyButton = <T extends HeaderContent>(content: T) => {
-        const { buttonText: _buttonText, buttonLink: _buttonLink, ...rest } = content as T & {
-          buttonText?: string;
-          buttonLink?: string;
-        };
-        return rest;
-      };
-
       if (section === 'logo') {
         const method = contentLtr._id ? 'PUT' : 'POST';
         // Logo is shared, so save using LTR content
@@ -535,13 +531,13 @@ export default function HeaderManager() {
           fetch('/api/header', {
             method,
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...stripLegacyButton(contentLtr), language: 'ltr' }),
+            body: JSON.stringify({ ...contentLtr, language: 'ltr' }),
           }),
           fetch('/api/header', {
             method: contentRtl._id ? 'PUT' : 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              ...stripLegacyButton(contentRtl),
+              ...contentRtl,
               logo: contentLtr.logo,
               language: 'rtl',
             }),
@@ -560,12 +556,12 @@ export default function HeaderManager() {
           fetch('/api/header', {
             method: contentLtr._id ? 'PUT' : 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...stripLegacyButton(contentLtr), language: 'ltr' }),
+            body: JSON.stringify({ ...contentLtr, language: 'ltr' }),
           }),
           fetch('/api/header', {
             method: contentRtl._id ? 'PUT' : 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...stripLegacyButton(contentRtl), language: 'rtl' }),
+            body: JSON.stringify({ ...contentRtl, language: 'rtl' }),
           }),
         ]);
         const [ltrResult, rtlResult] = await Promise.all([ltrRes.json(), rtlRes.json()]);
@@ -746,6 +742,72 @@ export default function HeaderManager() {
                 disabled={saving === 'menu'}
               >
                 {saving === 'menu' ? 'Saving...' : 'Save Menu'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {selectedSection === 'button' && (
+        <div className="admin-cms-section-card" style={{ marginBottom: 24 }}>
+          <div className="admin-cms-section-header" style={{ cursor: 'default' }}>
+            <h3>Profile Button</h3>
+            <button type="button" className="admin-btn admin-btn-delete" onClick={() => setSelectedSection(null)}>
+              Close
+            </button>
+          </div>
+          <div className="admin-cms-form">
+            <p style={{ marginBottom: 16, color: '#6b7280', fontSize: 14 }}>
+              Upload a company profile PDF. The header button will download this file on click.
+            </p>
+            <div className="form-row-bilingual-header">
+              <div className="form-label-header">English</div>
+              <div className="form-label-header">Arabic</div>
+            </div>
+            <div className="form-row-bilingual">
+              <div className="form-group">
+                <label>Button Text</label>
+                <input
+                  type="text"
+                  value={contentLtr.buttonText || ''}
+                  onChange={(e) => setContentLtr({ ...contentLtr, buttonText: e.target.value })}
+                  placeholder="Download Profile"
+                />
+              </div>
+              <div className="form-group">
+                <label>Button Text</label>
+                <input
+                  type="text"
+                  dir="rtl"
+                  value={contentRtl.buttonText || ''}
+                  onChange={(e) => setContentRtl({ ...contentRtl, buttonText: e.target.value })}
+                  placeholder="تحميل الملف التعريفي"
+                />
+              </div>
+            </div>
+            <div className="form-group">
+              <DocumentUpload
+                label="Profile File (PDF)"
+                value={contentLtr.buttonLink || ''}
+                onChange={(buttonLink) => {
+                  setContentLtr({ ...contentLtr, buttonLink });
+                  setContentRtl({ ...contentRtl, buttonLink });
+                }}
+                folder="files"
+                fileName="bpc-profile.pdf"
+                displayName="BPC Profile.pdf"
+              />
+              <small style={{ display: 'block', marginTop: 8 }}>
+                Shared for English and Arabic. Leave empty / remove file to hide the button. Click Save after uploading.
+              </small>
+            </div>
+            <div className="form-actions">
+              <button
+                className="button button-primary"
+                onClick={() => handleSaveSection('button')}
+                disabled={saving === 'button'}
+              >
+                {saving === 'button' ? 'Saving...' : 'Save Profile Button'}
               </button>
             </div>
           </div>

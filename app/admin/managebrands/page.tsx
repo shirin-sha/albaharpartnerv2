@@ -4,6 +4,24 @@ import { useState, useEffect, useRef } from 'react';
 import { Brand } from '@/types/brands';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
 
+function moveItem<T>(list: T[], fromIndex: number, toIndex: number): T[] {
+  if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0 || fromIndex >= list.length || toIndex >= list.length) {
+    return list;
+  }
+  const next = [...list];
+  const [item] = next.splice(fromIndex, 1);
+  next.splice(toIndex, 0, item);
+  return next;
+}
+
+function remapEditIndex(editingIndex: number | null, fromIndex: number, toIndex: number): number | null {
+  if (editingIndex === null) return null;
+  if (editingIndex === fromIndex) return toIndex;
+  if (fromIndex < editingIndex && toIndex >= editingIndex) return editingIndex - 1;
+  if (fromIndex > editingIndex && toIndex <= editingIndex) return editingIndex + 1;
+  return editingIndex;
+}
+
 export default function BrandsManagePage() {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -11,6 +29,9 @@ export default function BrandsManagePage() {
   const [brandsLtr, setBrandsLtr] = useState<Brand[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [dragIndex, setDragIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [reordering, setReordering] = useState(false);
   const formRef = useRef<HTMLDivElement>(null);
   const [formData, setFormData] = useState<{
     name: string;
@@ -56,6 +77,37 @@ export default function BrandsManagePage() {
   const showMessage = (type: 'success' | 'error', text: string) => {
     setMessage({ type, text });
     setTimeout(() => setMessage(null), 5000);
+  };
+
+  const handleReorder = async (fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex || reordering) return;
+
+    const previous = brandsLtr;
+    const next = moveItem(brandsLtr, fromIndex, toIndex);
+    setBrandsLtr(next);
+    setEditingIndex((current) => remapEditIndex(current, fromIndex, toIndex));
+    setReordering(true);
+
+    try {
+      const res = await fetch('/api/brands/reorder', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ brands: next }),
+      });
+      const result = await res.json();
+      if (!result.success) {
+        setBrandsLtr(previous);
+        setEditingIndex((current) => remapEditIndex(current, toIndex, fromIndex));
+        showMessage('error', result.message || 'Failed to reorder brands');
+      }
+    } catch (error) {
+      console.error('Error reordering brands:', error);
+      setBrandsLtr(previous);
+      setEditingIndex((current) => remapEditIndex(current, toIndex, fromIndex));
+      showMessage('error', 'Failed to reorder brands');
+    } finally {
+      setReordering(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -280,6 +332,7 @@ export default function BrandsManagePage() {
                       onChange={(value) => setFormData({ ...formData, imagePath: value })}
                       folder="brand"
                       required
+                      helperText="Recommended: transparent PNG/SVG logo. Displayed at 16:9, contained and centered (no crop)."
                     />
                   </div>
                   <div className="form-group">
@@ -404,6 +457,7 @@ export default function BrandsManagePage() {
       <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <p style={{ margin: 0, color: '#6b7280' }}>
           {brands.length} brand{brands.length !== 1 ? 's' : ''} listed
+          {brands.length > 1 ? ' · Drag rows to reorder' : ''}
         </p>
       </div>
 
@@ -428,8 +482,51 @@ export default function BrandsManagePage() {
               ) : (
               brands.map((brand, index) => {
                 const isEditing = editingIndex === index;
+                const isDragging = dragIndex === index;
+                const isDragOver = dragOverIndex === index && dragIndex !== index;
                 return (
-                  <tr key={index} className={isEditing ? 'admin-table-row-active' : ''}>
+                  <tr
+                    key={`${brand._id || brand.name}-${index}`}
+                    className={isEditing ? 'admin-table-row-active' : ''}
+                    draggable={!reordering}
+                    onDragStart={(e) => {
+                      const target = e.target as HTMLElement;
+                      if (target.closest('button, a, input, textarea, label')) {
+                        e.preventDefault();
+                        return;
+                      }
+                      setDragIndex(index);
+                      e.dataTransfer.effectAllowed = 'move';
+                      e.dataTransfer.setData('text/plain', String(index));
+                    }}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.dataTransfer.dropEffect = 'move';
+                      if (dragOverIndex !== index) setDragOverIndex(index);
+                    }}
+                    onDragLeave={() => {
+                      if (dragOverIndex === index) setDragOverIndex(null);
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      const from = dragIndex ?? Number(e.dataTransfer.getData('text/plain'));
+                      setDragIndex(null);
+                      setDragOverIndex(null);
+                      if (!Number.isNaN(from)) {
+                        void handleReorder(from, index);
+                      }
+                    }}
+                    onDragEnd={() => {
+                      setDragIndex(null);
+                      setDragOverIndex(null);
+                    }}
+                    style={{
+                      cursor: reordering ? 'wait' : 'grab',
+                      opacity: isDragging ? 0.5 : 1,
+                      outline: isDragOver ? '2px solid #9ca3af' : undefined,
+                      outlineOffset: isDragOver ? '-2px' : undefined,
+                    }}
+                  >
                     <td>
                       <div className="admin-section-thumb-brand">
                       {brand.imagePath ? (

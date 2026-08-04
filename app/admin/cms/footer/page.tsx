@@ -6,6 +6,7 @@ import ImageUpload from '@/components/admin/ui/ImageUpload';
 
 const FOOTER_SECTIONS = [
   { id: 'logo', label: 'Logo & Description', description: 'Logo image/link + bilingual description' },
+  { id: 'social', label: 'Social Links', description: 'Manage LinkedIn, Instagram, and other social profiles' },
   { id: 'newsletter', label: 'Newsletter Section', description: 'Title, description, placeholder (bilingual)' },
   { id: 'quickLinks', label: 'Quick Links', description: 'Manage column titles, link titles, and shared link paths' },
   { id: 'serviceAssistance', label: 'Service & Assistance', description: 'Manage title and simple items (text + shared value/path)' },
@@ -119,6 +120,64 @@ export default function FooterManager() {
       return {
         ltr: { ...ltr, quickLinks: [...ltr.quickLinks, newColumn] },
         rtl: { ...rtl, quickLinks: [...rtl.quickLinks, { ...newColumn, title: 'روابط سريعة' }] },
+      };
+    });
+  };
+
+  const addSocialLink = () => {
+    updateBothContents((ltr, rtl) => {
+      const order = Math.max(ltr.socialLinks?.length || 0, rtl.socialLinks?.length || 0);
+      const newLtr = {
+        name: '',
+        url: '',
+        icon: 'linkedin',
+        order,
+        isActive: true,
+      };
+      const newRtl = {
+        ...newLtr,
+        name: '',
+      };
+      return {
+        ltr: { ...ltr, socialLinks: [...(ltr.socialLinks || []), newLtr] },
+        rtl: { ...rtl, socialLinks: [...(rtl.socialLinks || []), newRtl] },
+      };
+    });
+  };
+
+  const removeSocialLink = (index: number) => {
+    updateBothContents((ltr, rtl) => ({
+      ltr: {
+        ...ltr,
+        socialLinks: (ltr.socialLinks || [])
+          .filter((_, i) => i !== index)
+          .map((item, i) => ({ ...item, order: i })),
+      },
+      rtl: {
+        ...rtl,
+        socialLinks: (rtl.socialLinks || [])
+          .filter((_, i) => i !== index)
+          .map((item, i) => ({ ...item, order: i })),
+      },
+    }));
+  };
+
+  const updateSocialLinkShared = (
+    index: number,
+    field: 'url' | 'icon' | 'isActive' | 'order',
+    value: string | boolean | number
+  ) => {
+    updateBothContents((ltr, rtl) => {
+      const ltrLinks = [...(ltr.socialLinks || [])];
+      const rtlLinks = [...(rtl.socialLinks || [])];
+      while (rtlLinks.length < ltrLinks.length) {
+        rtlLinks.push({ ...ltrLinks[rtlLinks.length], name: '' });
+      }
+      ltrLinks[index] = { ...ltrLinks[index], [field]: value };
+      rtlLinks[index] = { ...rtlLinks[index], [field]: value };
+      return {
+        ltr: { ...ltr, socialLinks: ltrLinks },
+        rtl: { ...rtl, socialLinks: rtlLinks },
       };
     });
   };
@@ -370,6 +429,140 @@ export default function FooterManager() {
                 </button>
               </div>
             </div>
+        </div>
+      )}
+
+      {selectedSection === 'social' && (
+        <div className="admin-cms-section-card" style={{ marginBottom: 24 }}>
+          <div className="admin-cms-section-header" style={{ cursor: 'default' }}>
+            <h3>Social Links</h3>
+            <button type="button" className="admin-btn admin-btn-delete" onClick={() => setSelectedSection(null)}>
+              Close
+            </button>
+          </div>
+          <div className="admin-cms-form">
+            <p style={{ marginBottom: 16, color: '#6b7280', fontSize: 14 }}>
+              Active links appear in the footer. Add more platforms anytime (Facebook, X, etc.).
+            </p>
+            <div className="form-actions" style={{ marginBottom: 16 }}>
+              <button type="button" className="button button-secondary" onClick={addSocialLink}>
+                Add Social Link
+              </button>
+            </div>
+
+            {(contentLtr.socialLinks || []).length === 0 ? (
+              <div style={{ padding: 16, background: '#f9fafb', borderRadius: 8, color: '#6b7280' }}>
+                No social links yet. Click &quot;Add Social Link&quot; to create one.
+              </div>
+            ) : (
+              (contentLtr.socialLinks || []).map((link, index) => {
+                const rtlLink = contentRtl.socialLinks?.[index] || link;
+                return (
+                  <div
+                    key={link._id || index}
+                    style={{ border: '1px solid #e5e7eb', borderRadius: 8, padding: 16, marginBottom: 16 }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+                      <strong>Link #{index + 1}</strong>
+                      <button
+                        type="button"
+                        className="button button-danger"
+                        onClick={() => removeSocialLink(index)}
+                        style={{ fontSize: 13, padding: '6px 12px' }}
+                      >
+                        Remove
+                      </button>
+                    </div>
+
+                    <div className="form-row-bilingual-header">
+                      <div className="form-label-header">English</div>
+                      <div className="form-label-header">Arabic</div>
+                    </div>
+                    <div className="form-row-bilingual">
+                      <div className="form-group">
+                        <label>Name</label>
+                        <input
+                          type="text"
+                          value={link.name || ''}
+                          onChange={(e) => {
+                            const socialLinks = [...(contentLtr.socialLinks || [])];
+                            socialLinks[index] = { ...socialLinks[index], name: e.target.value };
+                            setContentLtr({ ...contentLtr, socialLinks });
+                          }}
+                          placeholder="LinkedIn"
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label>Name</label>
+                        <input
+                          type="text"
+                          dir="rtl"
+                          value={rtlLink.name || ''}
+                          onChange={(e) => {
+                            const socialLinks = [...(contentRtl.socialLinks || [])];
+                            while (socialLinks.length <= index) {
+                              socialLinks.push({
+                                name: '',
+                                url: link.url || '',
+                                icon: link.icon || 'linkedin',
+                                order: socialLinks.length,
+                                isActive: true,
+                              });
+                            }
+                            socialLinks[index] = { ...socialLinks[index], name: e.target.value };
+                            setContentRtl({ ...contentRtl, socialLinks });
+                          }}
+                          placeholder="لينكد إن"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="form-group">
+                      <label>URL</label>
+                      <input
+                        type="text"
+                        value={link.url || ''}
+                        onChange={(e) => updateSocialLinkShared(index, 'url', e.target.value)}
+                        placeholder="https://linkedin.com/company/..."
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label>Platform / Icon</label>
+                      <select
+                        value={link.icon || 'linkedin'}
+                        onChange={(e) => updateSocialLinkShared(index, 'icon', e.target.value)}
+                      >
+                        <option value="linkedin">LinkedIn</option>
+                        <option value="instagram">Instagram</option>
+                        <option value="facebook">Facebook</option>
+                        <option value="x">X (Twitter)</option>
+                      </select>
+                    </div>
+
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={link.isActive !== false}
+                        onChange={(e) => updateSocialLinkShared(index, 'isActive', e.target.checked)}
+                      />
+                      <span>Active</span>
+                    </label>
+                  </div>
+                );
+              })
+            )}
+
+            <div className="form-actions">
+              <button
+                className="button button-primary"
+                onClick={() => handleSaveSection('social')}
+                disabled={saving === 'social'}
+              >
+                {saving === 'social' ? 'Saving...' : 'Save Social Links'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

@@ -665,21 +665,20 @@
     }
 
     &.h-7 {
-      flex-direction: row-reverse;
+      .section-about-h7-row {
+        flex-direction: row-reverse;
+      }
 
       .about-left {
-        padding: 99px 15px 82px 222px;
-       
-        @media (max-width: 991px) {
-        
-        }
+        padding: 80px 0 80px 40px;
+        align-items: flex-end;
       }
 
       .about-right {
-        padding: 81px 100px 82px 300px;
+        padding: 80px 40px 80px 0;
 
         .section-content {
-          margin-left: auto;
+          margin-left: 0;
           margin-right: 0;
           text-align: right;
           direction: rtl;
@@ -1375,9 +1374,13 @@
 
 @media (max-width: 1300px) {
   .rtl {
-    .section-about {
+    .section-about.h-7 {
+      .about-left {
+        padding: 80px 0 80px 30px;
+      }
+
       .about-right {
-        padding-right: 189px;
+        padding: 80px 30px 80px 0;
       }
     }
 

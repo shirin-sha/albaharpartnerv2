@@ -11,79 +11,42 @@ interface Props {
 export default function ServicesCMS({ data, language = 'ltr' }: Props) {
   if (!data.isActive) return null;
 
-  const solutions = data.solutions || [];
+  const solutions = (data.solutions || []).filter((solution) => solution.isActive);
   const detailsBasePath = language === 'rtl' ? '/ar/services-details-1' : '/services-details-1';
-  const viewServicesLabel = language === 'rtl' ? 'عرض الخدمات' : 'View Services';
+
+  if (solutions.length === 0) return null;
 
   return (
     <div className="tf-container">
       <div className="row">
         <div className="col-12">
-          <div className="list-section-services-item tf-spacing-2">
-            {solutions.map((solution, index) => {
-              if (!solution.isActive) return null;
-              
-              return (
-                <div className="section-services-item style-border" key={solution.id || index}>
-                  <div className="image tf-animate-1">
-                    <Link
-                      href={`${detailsBasePath}/${solution.id}`}
-                      className="link"
-                    >
-                      <span className="visually-hidden">{`View solution: ${solution.title}`}</span>
-                    </Link>
-                    <Image
-                      src={solution.imgSrc}
-                      alt={solution.title}
-                      className="lazyload"
-                      width={solution.imgWidth || 590}
-                      height={solution.imgHeight || 590}
-                    />
-                  </div>
-                  <div className="services-content">
-                    <div className="heading">
-                      <h3 className="wow fadeInUp">
-                        <Link
-                          href={`${detailsBasePath}/${solution.id}`}
-                          className="name-services"
-                        >
-                          {solution.title}
-                        </Link>
-                      </h3>
-                      <div
-                        className="sub-name body-2 wow fadeInUp"
-                        dangerouslySetInnerHTML={{ __html: solution.description }}
-                      ></div>
+          <div className="solutions-grid tf-spacing-2">
+            <div className="row g-4">
+              {solutions.map((solution, index) => (
+                <div
+                  className="col-lg-4 col-md-6 col-12"
+                  key={solution.id || index}
+                >
+                  <Link
+                    href={`${detailsBasePath}/${solution.id}`}
+                    className="solution-grid-card"
+                  >
+                    <div className="solution-grid-image">
+                      <Image
+                        src={solution.imgSrc}
+                        alt={solution.title}
+                        className="lazyload"
+                        width={solution.imgWidth || 640}
+                        height={solution.imgHeight || 400}
+                      />
                     </div>
-                    {solution.benefits && solution.benefits.length > 0 && (
-                      <div className="benefit-lists">
-                        {solution.benefits.map((benefit, bIndex) => (
-                          <div className="benefit-items" key={bIndex}>
-                            <div className="icon wow fadeInUp">
-                              <i className="icon-checkbox" />
-                            </div>
-                            <div
-                              className="title wow fadeInUp"
-                              data-wow-delay=".1s"
-                            >
-                              {benefit}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    <div className="wow fadeInUp">
-                      <Link
-                        href={`${detailsBasePath}/${solution.id}`}
-                        className="tf-btn style-1 bg-color-primary"
-                      >
-                        <span>{viewServicesLabel}</span>
-                      </Link>
+                    <div className="solution-grid-body">
+                      <h3 className="solution-grid-title">{solution.title}</h3>
                     </div>
-                  </div>
+                  </Link>
                 </div>
-              );
-            })}
+              ))}
+            </div>
           </div>
         </div>
       </div>

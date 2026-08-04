@@ -48,12 +48,12 @@ export default function BrandsSection({ content, language = 'ltr' }: BrandsSecti
                           <Image
                             alt=""
                             src={brand.imagePath}
-                            width={280}
-                            height={55}
+                            width={200}
+                            height={100}
                             className="brand-marquee-img"
                             loading="lazy"
                             quality={70}
-                            sizes="280px"
+                            sizes="200px"
                           />
                         </a>
                       ) : (
@@ -61,12 +61,12 @@ export default function BrandsSection({ content, language = 'ltr' }: BrandsSecti
                           <Image
                             alt={brand.name}
                             src={brand.imagePath}
-                            width={280}
-                            height={55}
+                            width={200}
+                            height={100}
                             className="brand-marquee-img"
                             loading="lazy"
                             quality={70}
-                            sizes="280px"
+                            sizes="200px"
                           />
                         </span>
                       )}

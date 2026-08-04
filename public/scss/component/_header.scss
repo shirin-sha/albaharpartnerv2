@@ -334,6 +334,7 @@
             @include mixin.d-flex();
             align-items: center;
             gap: 40px;
+            justify-content: flex-end;
 
             .header-actions-tight {
                 @include mixin.d-flex();
@@ -343,6 +344,43 @@
 
             &.gap-20 {
                 gap: 20px;
+            }
+        }
+    }
+
+    &.header-centered-nav {
+        .header-content {
+            display: grid;
+            grid-template-columns: minmax(120px, 1fr) auto minmax(120px, 1fr);
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-left {
+            justify-self: start;
+            gap: 0;
+        }
+
+        .header-center-nav {
+            justify-self: center;
+            max-width: 100%;
+        }
+
+        .header-right {
+            justify-self: end;
+            gap: 0;
+            margin: 0;
+            padding: 0;
+
+            // Mobile icon is display:none on desktop but still created a flex gap
+            .nav-icon {
+                display: none;
+            }
+
+            .header-actions-tight,
+            .nav-btn {
+                margin: 0;
+                padding: 0;
             }
         }
     }
@@ -915,7 +953,9 @@
 .sub-menu {
     position: absolute;
     background-color: var(--on-suface-container);
-    min-width: 220px;
+    min-width: 360px;
+    width: max-content;
+    max-width: min(420px, 90vw);
     left: -25px;
     top: 110%;
     opacity: 0;
@@ -926,13 +966,16 @@
     padding: 24px;
 
     .sub-menu-item {
-        padding: 6px 0;
+        padding: 8px 0;
 
         a {
-            display: inline-block;
+            display: block;
             color: var(--on-suface-variant-2);
             position: relative;
             font-weight: 500;
+            white-space: normal;
+            line-height: 1.4;
+            padding-right: 8px;
 
             &::after {
                 content: '';
@@ -993,6 +1036,16 @@ html[dir="rtl"] {
                     }
                 }
             }
+        }
+    }
+
+    .sub-menu {
+        left: auto;
+        right: -25px;
+
+        .sub-menu-item a {
+            padding-right: 0;
+            padding-left: 8px;
         }
     }
 }

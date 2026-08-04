@@ -328,7 +328,7 @@
   object-position: center;
 }
 
-/* Homepage partners marquee — fixed logo box */
+/* Homepage partners marquee — fixed logo box + continuous slow scroll */
 .section-brand {
   .brand-item {
     display: inline-flex;
@@ -345,6 +345,47 @@
     max-height: 100%;
     object-fit: contain;
     object-position: center;
+  }
+
+  .brands-marquee {
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .brands-marquee-track,
+  .brands-marquee .marquee-wrapper.brands-marquee-track {
+    display: flex !important;
+    width: max-content;
+    animation: brandsMarqueeScroll 90s linear infinite !important;
+    transform: translateX(0);
+
+    &:hover {
+      animation-play-state: paused;
+    }
+
+    .initial-child-container {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      align-items: center;
+      direction: ltr;
+    }
+
+    .marquee-child-item {
+      display: inline-flex;
+      flex-shrink: 0;
+      margin-right: 60px;
+      margin-left: 0;
+    }
+  }
+}
+
+@keyframes brandsMarqueeScroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
   }
 }
 

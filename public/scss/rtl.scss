@@ -829,6 +829,12 @@
     animation: infiniteScroll-rtl 70s linear infinite !important;
   }
 
+  /* Keep homepage brands marquee continuous + slow (do not use RTL reverse scroll) */
+  .section-brand .brands-marquee .brands-marquee-track,
+  .section-brand .marquee-wrapper.brands-marquee-track {
+    animation: brandsMarqueeScroll 90s linear infinite !important;
+  }
+
   .section-why-choose {
     .progress-box {
       right: auto !important;

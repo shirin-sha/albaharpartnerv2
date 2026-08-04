@@ -7,17 +7,64 @@ interface BrandsSectionProps {
   language?: 'ltr' | 'rtl';
 }
 
+function BrandLogo({
+  brand,
+}: {
+  brand: BrandsSectionType['brands'][number];
+}) {
+  if (brand.link && brand.link !== "#") {
+    return (
+      <a
+        href={brand.link}
+        className="brand-item"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={brand.name}
+      >
+        <span className="visually-hidden">{`Visit ${brand.name}`}</span>
+        <Image
+          alt=""
+          src={brand.imagePath}
+          width={200}
+          height={100}
+          className="brand-marquee-img"
+          loading="lazy"
+          quality={70}
+          sizes="200px"
+        />
+      </a>
+    );
+  }
+
+  return (
+    <span className="brand-item">
+      <Image
+        alt={brand.name}
+        src={brand.imagePath}
+        width={200}
+        height={100}
+        className="brand-marquee-img"
+        loading="lazy"
+        quality={70}
+        sizes="200px"
+      />
+    </span>
+  );
+}
+
 export default function BrandsSection({ content, language = 'ltr' }: BrandsSectionProps) {
   if (!content.isActive) {
     return null;
   }
 
-  const activeBrands = content.brands
-    .filter(brand => brand.isActive);
+  const activeBrands = content.brands.filter((brand) => brand.isActive);
 
   if (activeBrands.length === 0) {
     return null;
   }
+
+  // Duplicate for seamless continuous loop (translate -50%)
+  const loopBrands = [...activeBrands, ...activeBrands];
 
   return (
     <section className="section-brand h-7 tf-spacing-7 section-one-page" id="brands" dir={language}>
@@ -29,47 +76,12 @@ export default function BrandsSection({ content, language = 'ltr' }: BrandsSecti
                 <span>{content.heading}</span>
               </h2>
             </div>
-            <div className="tf-marquee tf-spacing-25">
-              <div className="marquee-wrapper">
+            <div className="tf-marquee brands-marquee tf-spacing-25" dir="ltr">
+              <div className="marquee-wrapper brands-marquee-track">
                 <div className="initial-child-container">
-                  {activeBrands.map((brand, index) => (
-                    <div className="marquee-child-item" style={{ marginRight: '60px' }} key={index}>
-                      {brand.link && brand.link !== "#" ? (
-                        <a
-                          href={brand.link}
-                          className="brand-item"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label={brand.name}
-                        >
-                          <span className="visually-hidden">
-                            {`Visit ${brand.name}`}
-                          </span>
-                          <Image
-                            alt=""
-                            src={brand.imagePath}
-                            width={200}
-                            height={100}
-                            className="brand-marquee-img"
-                            loading="lazy"
-                            quality={70}
-                            sizes="200px"
-                          />
-                        </a>
-                      ) : (
-                        <span className="brand-item">
-                          <Image
-                            alt={brand.name}
-                            src={brand.imagePath}
-                            width={200}
-                            height={100}
-                            className="brand-marquee-img"
-                            loading="lazy"
-                            quality={70}
-                            sizes="200px"
-                          />
-                        </span>
-                      )}
+                  {loopBrands.map((brand, index) => (
+                    <div className="marquee-child-item" key={`${brand.name}-${index}`}>
+                      <BrandLogo brand={brand} />
                     </div>
                   ))}
                 </div>

@@ -1,5 +1,10 @@
 'use client';
-import { useId, useRef, useState } from 'react';
+import { useId, useRef, useState, useEffect } from 'react';
+import {
+  stageUpload,
+  stageRemove,
+  getPendingPreview,
+} from '@/lib/pending-uploads';
 
 interface DocumentUploadProps {
   label?: string;
@@ -13,19 +18,6 @@ interface DocumentUploadProps {
   displayName?: string;
 }
 
-async function deleteStoredFile(filePath: string) {
-  if (!filePath || /^https?:\/\//i.test(filePath)) return;
-  try {
-    await fetch('/api/images/delete', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ imagePath: filePath }),
-    });
-  } catch (err) {
-    console.warn('Failed to delete previous file:', filePath, err);
-  }
-}
-
 export default function DocumentUpload({
   label = 'Profile PDF',
   value,
@@ -35,12 +27,24 @@ export default function DocumentUpload({
   fileName = 'bpc-profile.pdf',
   displayName = 'BPC Profile.pdf',
 }: DocumentUploadProps) {
-  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pendingName, setPendingName] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const inputId = useId();
+  const uploadId = `doc-${inputId}`;
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
+  const valueRef = useRef(value);
+  valueRef.current = value;
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    const pending = getPendingPreview(uploadId);
+    if (!pending && pendingName) {
+      setPendingName(null);
+    }
+  }, [value, uploadId, pendingName]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -62,52 +66,39 @@ export default function DocumentUpload({
     }
 
     setError(null);
-    setUploading(true);
-    const previousPath = value;
 
-    try {
-      // Remove previous file first so re-upload always replaces the old one
-      if (previousPath) {
-        await deleteStoredFile(previousPath);
-      }
+    stageUpload({
+      id: uploadId,
+      file,
+      folder,
+      previousPath: valueRef.current,
+      accept: 'document',
+      fileName,
+      applyPath: (path) => onChangeRef.current(path),
+    });
 
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('folder', folder);
-      formData.append('accept', 'document');
-      if (fileName) formData.append('fileName', fileName);
+    setPendingName(displayName || file.name);
 
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-      const result = await response.json();
-
-      if (result.success && result.path) {
-        onChange(result.path);
-      } else {
-        setError(result.message || 'Failed to upload file');
-      }
-    } catch (err) {
-      console.error('Document upload error:', err);
-      setError('Failed to upload file. Please try again.');
-    } finally {
-      setUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
-    }
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  const handleRemove = async () => {
-    const previousPath = value;
-    onChange('');
+  const handleRemove = () => {
     setError(null);
-    if (previousPath) await deleteStoredFile(previousPath);
+    setPendingName(null);
+    stageRemove({
+      id: uploadId,
+      previousPath: valueRef.current,
+      applyPath: (path) => onChangeRef.current(path),
+    });
   };
 
   const previewName =
+    pendingName ||
     displayName ||
     fileName ||
     (value ? decodeURIComponent(value.split('/').pop()?.split('?')[0] || 'document.pdf') : '');
+
+  const hasFile = Boolean(pendingName || value);
 
   return (
     <div>
@@ -124,7 +115,6 @@ export default function DocumentUpload({
             type="file"
             accept=".pdf,.doc,.docx,application/pdf"
             onChange={handleFileChange}
-            disabled={uploading}
             className="d-none"
             id={`doc-upload-${inputId}`}
           />
@@ -132,13 +122,13 @@ export default function DocumentUpload({
             htmlFor={`doc-upload-${inputId}`}
             className="btn btn-sm btn-secondary"
             style={{
-              cursor: uploading ? 'not-allowed' : 'pointer',
+              cursor: 'pointer',
               border: '1px solid #dee2e6',
               backgroundColor: '#f8f9fa',
               color: '#495057',
             }}
           >
-            {uploading ? 'Uploading...' : value ? 'Replace File' : 'Choose & Upload PDF'}
+            {hasFile ? 'Replace File' : 'Choose PDF'}
           </label>
         </div>
 
@@ -148,7 +138,7 @@ export default function DocumentUpload({
           </div>
         )}
 
-        {value && (
+        {hasFile && (
           <div
             className="mt-1"
             style={{
@@ -181,38 +171,50 @@ export default function DocumentUpload({
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm1 7V3.5L19.5 9H15zM8 13h8v2H8v-2zm0 4h8v2H8v-2zm0-8h5v2H8V9z" />
               </svg>
             </span>
-            <a
-              href={value}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                flex: 1,
-                minWidth: 0,
-                color: '#111827',
-                textDecoration: 'none',
-                fontSize: 14,
-                fontWeight: 500,
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-              }}
-              title={previewName}
-            >
-              {previewName}
-            </a>
-            <button
-              type="button"
-              className="btn btn-sm btn-outline-danger"
-              onClick={() => {
-                void handleRemove();
-              }}
-            >
+            {value && !pendingName ? (
+              <a
+                href={value}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  flex: 1,
+                  minWidth: 0,
+                  color: '#111827',
+                  textDecoration: 'none',
+                  fontSize: 14,
+                  fontWeight: 500,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+                title={previewName}
+              >
+                {previewName}
+              </a>
+            ) : (
+              <span
+                style={{
+                  flex: 1,
+                  minWidth: 0,
+                  color: '#111827',
+                  fontSize: 14,
+                  fontWeight: 500,
+                }}
+                title={previewName}
+              >
+                {previewName}
+                <span className="text-muted" style={{ display: 'block', fontSize: 12, fontWeight: 400 }}>
+                  Uploads on Save
+                </span>
+              </span>
+            )}
+            <button type="button" className="btn btn-sm btn-outline-danger" onClick={handleRemove}>
               Remove
             </button>
           </div>
         )}
 
-        {helperText && !value && <small className="text-muted">{helperText}</small>}
+        {helperText && !hasFile && <small className="text-muted">{helperText}</small>}
       </div>
     </div>
   );

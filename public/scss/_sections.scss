@@ -379,7 +379,8 @@
       position: relative;
       z-index: 2;
 
-      h1 {
+      h1,
+      .h1 {
         color: var(--white);
         margin-bottom: 16px;
       }

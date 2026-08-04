@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { commitPendingUploads, discardPendingUploads } from '@/lib/pending-uploads';
 import { Brand } from '@/types/brands';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
 
@@ -52,6 +53,8 @@ export default function BrandsManagePage() {
     products: [],
     isActive: true,
   });
+  const formDataRef = useRef(formData);
+  formDataRef.current = formData;
 
   useEffect(() => {
     loadBrands();
@@ -112,16 +115,27 @@ export default function BrandsManagePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSaving(true);
+    try {
+      await commitPendingUploads();
+    } catch (uploadErr) {
+      console.error('Upload error:', uploadErr);
+      showMessage('error', uploadErr instanceof Error ? uploadErr.message : 'Failed to upload files');
+      setSaving(false);
+      return;
+    }
+    const formData = formDataRef.current;
     if (!formData.name.trim()) {
       showMessage('error', 'Brand name (English) is required');
+      setSaving(false);
       return;
     }
     if (!formData.imagePath.trim()) {
       showMessage('error', 'Brand image is required');
+      setSaving(false);
       return;
     }
 
-    setSaving(true);
     try {
       const isNew = editingIndex === null;
       const index = isNew ? brandsLtr.length : editingIndex!;
@@ -202,6 +216,7 @@ export default function BrandsManagePage() {
   };
 
   const resetForm = () => {
+    discardPendingUploads();
     setFormData({
       name: '',
       nameAr: '',

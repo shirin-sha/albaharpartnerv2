@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
+import { verifyCaptcha } from "@/lib/captcha";
 
 const DB_NAME = "albaharpartners1";
 const COLLECTION_NAME = "career_applications";
@@ -14,6 +15,9 @@ interface CareerApplicationPayload {
   portfolioUrl?: string;
   resumeUrl?: string;
   coverLetter?: string;
+  captchaToken?: string;
+  captchaAnswer?: string;
+  website?: string; // honeypot
 }
 
 const isValidEmail = (value: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim());
@@ -51,6 +55,15 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as CareerApplicationPayload;
+
+    // Honeypot: bots fill hidden fields — pretend success
+    if (body.website) {
+      return NextResponse.json(
+        { success: true, message: "Application submitted successfully" },
+        { status: 201 },
+      );
+    }
+
     const {
       jobTitle,
       fullName,
@@ -61,7 +74,9 @@ export async function POST(request: NextRequest) {
       portfolioUrl,
       resumeUrl,
       coverLetter,
-    } = body || ({} as any);
+      captchaToken,
+      captchaAnswer,
+    } = body || ({} as CareerApplicationPayload);
 
     if (!jobTitle || !fullName || !email || !phone || !resumeUrl) {
       return NextResponse.json(
@@ -73,6 +88,13 @@ export async function POST(request: NextRequest) {
     if (!isValidEmail(email)) {
       return NextResponse.json(
         { success: false, message: "Invalid email address" },
+        { status: 400 },
+      );
+    }
+
+    if (!captchaToken || !captchaAnswer || !verifyCaptcha(captchaToken, captchaAnswer)) {
+      return NextResponse.json(
+        { success: false, message: "Invalid captcha. Please try again." },
         { status: 400 },
       );
     }

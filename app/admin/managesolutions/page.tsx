@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { commitPendingUploads, discardPendingUploads } from '@/lib/pending-uploads';
 import { SolutionItem } from '@/types/solutions';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
 import RichTextEditor from '@/components/admin/ui/RichTextEditor';
@@ -52,6 +53,8 @@ export default function SolutionsManagePage() {
     detailImgHeight: 512,
     isActive: true,
   });
+  const formDataRef = useRef(formData);
+  formDataRef.current = formData;
 
   useEffect(() => {
     loadSolutions();
@@ -81,16 +84,27 @@ export default function SolutionsManagePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSaving(true);
+    try {
+      await commitPendingUploads();
+    } catch (uploadErr) {
+      console.error('Upload error:', uploadErr);
+      showMessage('error', uploadErr instanceof Error ? uploadErr.message : 'Failed to upload files');
+      setSaving(false);
+      return;
+    }
+    const formData = formDataRef.current;
     if (!formData.title.trim()) {
       showMessage('error', 'Title (English) is required');
+      setSaving(false);
       return;
     }
     if (!formData.id.trim()) {
       showMessage('error', 'ID is required');
+      setSaving(false);
       return;
     }
 
-    setSaving(true);
     try {
       const isNew = editingIndex === null;
       const index = isNew ? solutionsLtr.length : editingIndex!;
@@ -191,6 +205,7 @@ export default function SolutionsManagePage() {
   };
 
   const resetForm = () => {
+    discardPendingUploads();
     setFormData({
       id: '',
       tabTitle: '',

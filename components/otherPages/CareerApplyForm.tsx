@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { useSearchParams } from "next/navigation";
 import type { Job } from "@/types/careers";
@@ -39,7 +39,7 @@ export default function CareerApplyForm({ jobs, language = "ltr" }: Props) {
     resume: isArabic ? "السيرة الذاتية*" : "Resume*",
     coverLetter: isArabic ? "رسالة التقديم / ملاحظات" : "Cover letter / message",
     submitting: isArabic ? "جاري الإرسال..." : "Submitting...",
-    submit: isArabic ? "إرسال الطلب" : "Submit Application",
+    submit: isArabic ? "يُقدِّم" : "Submit ",
     validationRole: isArabic ? "يرجى اختيار الوظيفة." : "Please select a job role.",
     validationName: isArabic ? "الاسم الكامل مطلوب." : "Full name is required.",
     validationEmail: isArabic ? "البريد الإلكتروني مطلوب." : "Email is required.",
@@ -50,6 +50,13 @@ export default function CareerApplyForm({ jobs, language = "ltr" }: Props) {
     submitSuccess: isArabic ? "تم إرسال طلب التوظيف بنجاح." : "Application submitted successfully.",
     submitError: isArabic ? "حدث خطأ ما. يرجى المحاولة مرة أخرى." : "Something went wrong. Please try again.",
     submitErrorFallback: isArabic ? "فشل إرسال الطلب." : "Failed to submit application.",
+    captchaLabel: isArabic ? "أدخل النص الظاهر في الصورة" : "Enter the text shown in the image",
+    captchaPlaceholder: isArabic ? "أدخل الأحرف" : "Type the characters",
+    captchaRequired: isArabic ? "يرجى إدخال النص الظاهر في الصورة." : "Please enter the text from the image.",
+    captchaInvalid: isArabic ? "رمز التحقق غير صحيح. حاول مرة أخرى." : "Invalid captcha. Try again.",
+    captchaLoadFailed: isArabic ? "تعذر تحميل رمز التحقق." : "Could not load captcha.",
+    captchaRefresh: isArabic ? "تحديث" : "Refresh",
+    captchaAlt: isArabic ? "صورة رمز التحقق" : "Captcha image",
   };
 
   const jobTitles = useMemo(() => (jobs || []).map((j) => j.title), [jobs]);
@@ -58,6 +65,10 @@ export default function CareerApplyForm({ jobs, language = "ltr" }: Props) {
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
   const [message, setMessage] = useState<string>("");
+  const [captchaImage, setCaptchaImage] = useState("");
+  const [captchaToken, setCaptchaToken] = useState("");
+  const [captchaAnswer, setCaptchaAnswer] = useState("");
+  const [captchaError, setCaptchaError] = useState("");
 
   const [form, setForm] = useState<FormState>({
     jobTitle: "",
@@ -70,12 +81,34 @@ export default function CareerApplyForm({ jobs, language = "ltr" }: Props) {
     coverLetter: "",
   });
 
+  const loadCaptcha = useCallback(async () => {
+    try {
+      const res = await axios.get("/api/captcha");
+      if (res.data?.success && res.data.image && res.data.token) {
+        setCaptchaImage(res.data.image);
+        setCaptchaToken(res.data.token);
+        setCaptchaAnswer("");
+        setCaptchaError("");
+      }
+    } catch {
+      setCaptchaImage("");
+      setCaptchaToken("");
+      setCaptchaError(
+        isArabic ? "تعذر تحميل رمز التحقق." : "Could not load captcha."
+      );
+    }
+  }, [isArabic]);
+
   // Preselect job from URL querystring if present
   useEffect(() => {
     if (!jobFromUrl) return;
     if (!jobTitles.includes(jobFromUrl)) return;
     setForm((prev) => ({ ...prev, jobTitle: jobFromUrl }));
   }, [jobFromUrl, jobTitles]);
+
+  useEffect(() => {
+    void loadCaptcha();
+  }, [loadCaptcha]);
 
   const setField = (key: keyof FormState, value: string) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -88,6 +121,7 @@ export default function CareerApplyForm({ jobs, language = "ltr" }: Props) {
     if (!isValidEmail(form.email)) return labels.validationEmailFormat;
     if (!form.phone.trim()) return labels.validationPhone;
     if (!resumeFile) return labels.validationResume;
+    if (!captchaToken || !captchaAnswer.trim()) return labels.captchaRequired;
     return null;
   };
 
@@ -95,11 +129,23 @@ export default function CareerApplyForm({ jobs, language = "ltr" }: Props) {
     e.preventDefault();
     setSuccess(null);
     setMessage("");
+    setCaptchaError("");
+
+    const formEl = e.currentTarget as HTMLFormElement;
+    const honeypot = new FormData(formEl).get("website");
+    if (String(honeypot || "").trim()) {
+      setSuccess(true);
+      setMessage(labels.submitSuccess);
+      setCaptchaAnswer("");
+      void loadCaptcha();
+      return;
+    }
 
     const error = validate();
     if (error) {
       setSuccess(false);
       setMessage(error);
+      if (error === labels.captchaRequired) setCaptchaError(error);
       return;
     }
 
@@ -130,9 +176,11 @@ export default function CareerApplyForm({ jobs, language = "ltr" }: Props) {
         linkedInUrl: form.linkedInUrl,
         resumeUrl: uploadedResumePath,
         coverLetter: form.coverLetter,
+        captchaToken,
+        captchaAnswer: captchaAnswer.trim(),
       });
 
-      if ([200, 201].includes(res.status)) {
+      if ([200, 201].includes(res.status) && res.data?.success !== false) {
         setSuccess(true);
         setMessage(labels.submitSuccess);
         setForm({
@@ -146,13 +194,21 @@ export default function CareerApplyForm({ jobs, language = "ltr" }: Props) {
           coverLetter: "",
         });
         setResumeFile(null);
+        setCaptchaAnswer("");
+        void loadCaptcha();
       } else {
         setSuccess(false);
         setMessage(labels.submitError);
+        void loadCaptcha();
       }
     } catch (err: any) {
+      const apiMessage = err?.response?.data?.message || labels.submitErrorFallback;
       setSuccess(false);
-      setMessage(err?.response?.data?.message || labels.submitErrorFallback);
+      setMessage(apiMessage);
+      if (String(apiMessage).toLowerCase().includes("captcha")) {
+        setCaptchaError(labels.captchaInvalid);
+      }
+      void loadCaptcha();
     } finally {
       setIsSubmitting(false);
     }
@@ -271,6 +327,85 @@ export default function CareerApplyForm({ jobs, language = "ltr" }: Props) {
             />
           </fieldset>
 
+          {/* Honeypot — hidden from users */}
+          <div
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              left: "-10000px",
+              top: "auto",
+              width: 1,
+              height: 1,
+              overflow: "hidden",
+            }}
+          >
+            <label htmlFor="career-website">Website</label>
+            <input
+              type="text"
+              id="career-website"
+              name="website"
+              tabIndex={-1}
+              autoComplete="off"
+            />
+          </div>
+
+          <fieldset className="contact-captcha-field career-apply-fieldset-sm">
+            <label htmlFor="career-captcha-answer" style={{ display: "block", marginBottom: 8 }}>
+              {labels.captchaLabel}
+            </label>
+            <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+              {captchaImage ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={captchaImage}
+                  alt={labels.captchaAlt}
+                  width={180}
+                  height={56}
+                  style={{
+                    borderRadius: 6,
+                    border: "1px solid #c5ccd4",
+                    background: "#eef1f4",
+                    userSelect: "none",
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: 180,
+                    height: 56,
+                    borderRadius: 6,
+                    background: "#eef1f4",
+                    border: "1px solid #c5ccd4",
+                  }}
+                />
+              )}
+              <button
+                type="button"
+                className="tf-btn style-2"
+                onClick={() => void loadCaptcha()}
+                disabled={isSubmitting}
+                aria-label={labels.captchaRefresh}
+              >
+                <span>{labels.captchaRefresh}</span>
+              </button>
+            </div>
+            <input
+              id="career-captcha-answer"
+              required
+              type="text"
+              autoComplete="off"
+              autoCapitalize="characters"
+              spellCheck={false}
+              value={captchaAnswer}
+              onChange={(e) => setCaptchaAnswer(e.target.value)}
+              placeholder={labels.captchaPlaceholder}
+              className="career-apply-captcha-input"
+            />
+            {captchaError && (
+              <p style={{ color: "red", marginTop: 8, marginBottom: 0 }}>{captchaError}</p>
+            )}
+          </fieldset>
+
           {success !== null && (
             <div className="tfSubscribeMsg footer-sub-element active career-apply-feedback">
               {success ? (
@@ -283,8 +418,8 @@ export default function CareerApplyForm({ jobs, language = "ltr" }: Props) {
 
           <button
             type="submit"
-            disabled={isSubmitting}
-            className="tf-btn style-1 w-full bg-color-primary text-center"
+            disabled={isSubmitting || !captchaToken}
+            className="tf-btn style-1 bg-color-primary text-center career-apply-submit"
           >
             <span>{isSubmitting ? labels.submitting : labels.submit}</span>
           </button>

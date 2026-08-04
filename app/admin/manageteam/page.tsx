@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef} from 'react';
+import { commitPendingUploads, discardPendingUploads } from '@/lib/pending-uploads';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
 import { AboutUsContent, TeamMember } from '@/types/aboutus';
 
@@ -30,6 +31,8 @@ export default function TeamManagePage() {
     position: '',
     positionAr: '',
   });
+  const formDataRef = useRef(formData);
+  formDataRef.current = formData;
 
   useEffect(() => {
     loadTeamMembers();
@@ -98,6 +101,7 @@ export default function TeamManagePage() {
   };
 
   const resetForm = () => {
+    discardPendingUploads();
     setFormData({
       imgSrc: '',
       name: '',
@@ -181,8 +185,19 @@ export default function TeamManagePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSaving(true);
+    try {
+      await commitPendingUploads();
+    } catch (uploadErr) {
+      console.error('Upload error:', uploadErr);
+      showToast('error', uploadErr instanceof Error ? uploadErr.message : 'Failed to upload files');
+      setSaving(false);
+      return;
+    }
+    const formData = formDataRef.current;
     if (!formData.name.trim()) {
       showToast('error', 'Name (English) is required');
+      setSaving(false);
       return;
     }
 

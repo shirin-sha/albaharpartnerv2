@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
+import { loadOdometerCss } from "@/lib/plugin-styles";
 
 interface OdometerProps {
   max: number;
@@ -20,14 +21,16 @@ export default function OdometerComponent({ max }: OdometerProps) {
   useEffect(() => {
     let mounted = true;
 
-    import("odometer").then((Odometer) => {
+    void (async () => {
+      await loadOdometerCss();
+      const Odometer = await import("odometer");
       if (mounted && odometerRef.current) {
         odometerInitRef.current = new Odometer.default({
           el: odometerRef.current,
           value,
         }) as unknown as OdometerInstance;
       }
-    });
+    })();
 
     return () => {
       mounted = false;

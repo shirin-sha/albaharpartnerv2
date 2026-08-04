@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { commitPendingUploads, discardPendingUploads } from '@/lib/pending-uploads';
 import { NewsPost } from '@/types/news-updates';
 import { newsMainImageSrc } from '@/lib/news-post-images';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
@@ -84,6 +85,8 @@ export default function NewsManagePage() {
     dateValue: '',
     isFeatured: false,
   });
+  const formDataRef = useRef(formData);
+  formDataRef.current = formData;
 
   useEffect(() => {
     loadPosts();
@@ -113,17 +116,28 @@ export default function NewsManagePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSaving(true);
+    try {
+      await commitPendingUploads();
+    } catch (uploadErr) {
+      console.error('Upload error:', uploadErr);
+      showMessage('error', uploadErr instanceof Error ? uploadErr.message : 'Failed to upload files');
+      setSaving(false);
+      return;
+    }
+    const formData = formDataRef.current;
     if (!formData.title.trim()) {
       showMessage('error', 'Title (English) is required');
+      setSaving(false);
       return;
     }
       const dateParts = parseDateValueToParts(formData.dateValue);
       if (!dateParts) {
         showMessage('error', 'Valid date is required');
+        setSaving(false);
         return;
       }
 
-    setSaving(true);
     try {
       const isNew = editingIndex === null;
       const index = isNew ? postsLtr.length : editingIndex!;
@@ -219,6 +233,7 @@ export default function NewsManagePage() {
   };
 
   const resetForm = () => {
+    discardPendingUploads();
     setFormData({
       title: '',
       titleAr: '',

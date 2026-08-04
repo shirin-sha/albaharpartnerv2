@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef} from 'react';
+import { commitPendingUploads, discardPendingUploads, queuePathForDelete } from '@/lib/pending-uploads';
 import { AboutUsContent } from '@/types/aboutus';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
 import RichTextEditor from '@/components/admin/ui/RichTextEditor';
@@ -23,7 +24,11 @@ export default function AboutUsManager() {
   const [saving, setSaving] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [contentLtr, setContentLtr] = useState<AboutUsContent | null>(null);
+  const contentLtrRef = useRef(contentLtr);
+  contentLtrRef.current = contentLtr;
   const [contentRtl, setContentRtl] = useState<AboutUsContent | null>(null);
+  const contentRtlRef = useRef(contentRtl);
+  contentRtlRef.current = contentRtl;
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     meta: false,
@@ -180,9 +185,12 @@ export default function AboutUsManager() {
   };
 
   const handleSaveSection = async (section: string) => {
-    if (!contentLtr || !contentRtl) return;
     setSaving(section);
     try {
+      await commitPendingUploads();
+      const contentLtr = contentLtrRef.current;
+      const contentRtl = contentRtlRef.current;
+      if (!contentLtr || !contentRtl) return;
       const normalizeAboutBPC = (content: AboutUsContent) => ({
         ...content,
         aboutBPC: {
@@ -403,7 +411,7 @@ export default function AboutUsManager() {
                 <button type="button" className="button button-primary" onClick={() => handleSaveSection('meta')} disabled={saving === 'meta'}>
                   {saving === 'meta' ? 'Saving...' : 'Save (English & Arabic)'}
                 </button>
-                <button type="button" className="admin-btn admin-btn-edit" onClick={() => setSelectedSection(null)}>
+                <button type="button" className="admin-btn admin-btn-edit" onClick={() => { discardPendingUploads(); setSelectedSection(null); }}>
                   Cancel
                 </button>
               </div>
@@ -1432,18 +1440,10 @@ export default function AboutUsManager() {
                                               <button
                                                 type="button"
                                                 className="hero-slide-remove"
-                                                onClick={async () => {
+                                                onClick={() => {
                                                   const removedLogo = (itemLtr.logos || [])[logoIndex];
                                                   if (removedLogo?.src) {
-                                                    try {
-                                                      await fetch('/api/images/delete', {
-                                                        method: 'DELETE',
-                                                        headers: { 'Content-Type': 'application/json' },
-                                                        body: JSON.stringify({ imagePath: removedLogo.src }),
-                                                      });
-                                                    } catch (err) {
-                                                      console.warn('Failed to delete logo file:', err);
-                                                    }
+                                                    queuePathForDelete(removedLogo.src);
                                                   }
                                                   const nextLogos = (itemLtr.logos || []).filter((_, i) => i !== logoIndex);
                                                   const newItemsLtr = [...(contentLtr.history.items || [])];

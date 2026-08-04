@@ -3,8 +3,10 @@ import { HeroSlide } from "@/types/homepage";
 import Link from "next/link";
 import React from "react";
 import Image from "next/image";
-import { Autoplay, EffectFade, Navigation } from "swiper/modules";
+import { Autoplay, Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/navigation";
 
 interface HeroSliderProps {
   slides: HeroSlide[];
@@ -21,26 +23,37 @@ export default function HeroSlider({ slides, language = 'ltr' }: HeroSliderProps
     return null;
   }
 
+  const multiSlide = activeSlides.length > 1;
+
   return (
     <Swiper
       className="page-title-home h-7 swiper sw-auto style-absolute"
-      loop
-      effect="slide"
-      modules={[EffectFade, Autoplay, Navigation]}
-      navigation={{
-        prevEl: ".snbp7",
-        nextEl: ".snbn7",
-      }}
-      autoplay={{
-        delay: 4000,
-        pauseOnMouseEnter: true,
-        disableOnInteraction: false,
-      }}
+      loop={multiSlide}
+      modules={multiSlide ? [Autoplay, Navigation] : []}
+      navigation={
+        multiSlide
+          ? {
+              prevEl: ".snbp7",
+              nextEl: ".snbn7",
+            }
+          : undefined
+      }
+      autoplay={
+        multiSlide
+          ? {
+              delay: 4000,
+              pauseOnMouseEnter: true,
+              disableOnInteraction: false,
+            }
+          : false
+      }
       dir={language}
     >
-      <button type="button" aria-label="Previous slide" className="tf-btn-arrow arrow-left sw-auto-next snbp7">
-        <i className="icon-arrow-left" />
-      </button>
+      {multiSlide && (
+        <button type="button" aria-label="Previous slide" className="tf-btn-arrow arrow-left sw-auto-next snbp7">
+          <i className="icon-arrow-left" />
+        </button>
+      )}
       {activeSlides.map((slide, index) => (
         <SwiperSlide className="swiper-slide" key={index}>
           <div className="page-title-inner">
@@ -50,9 +63,9 @@ export default function HeroSlider({ slides, language = 'ltr' }: HeroSliderProps
               className="hero-banner-image"
               fill
               priority={index === 0}
+              fetchPriority={index === 0 ? "high" : "auto"}
               loading={index === 0 ? "eager" : "lazy"}
-              quality={index === 0 ? 72 : 60}
-              unoptimized={index === 0}
+              quality={index === 0 ? 75 : 60}
               sizes="100vw"
               style={{ objectFit: "cover" }}
             />
@@ -61,19 +74,34 @@ export default function HeroSlider({ slides, language = 'ltr' }: HeroSliderProps
               <div className="row hero-row">
                 <div className="col-12 hero-col">
                   <div className={`page-title-content ${language === 'rtl' ? 'rtl-content' : ''}`}>
-                    <h1 
-                      className="tf-fade-top fade-item-1"
-                      dir={language === 'rtl' ? 'rtl' : 'ltr'}
-                      style={language === 'rtl' ? { textAlign: 'right' } : {}}
-                    >
-                      {slide.title.split("\n").map((line, i) => (
-                        <React.Fragment key={i}>
-                          {line}
-                          <br />
-                        </React.Fragment>
-                      ))}
-                    </h1>
-                    <div 
+                    {index === 0 ? (
+                      <h1
+                        className="tf-fade-top fade-item-1"
+                        dir={language === 'rtl' ? 'rtl' : 'ltr'}
+                        style={language === 'rtl' ? { textAlign: 'right' } : {}}
+                      >
+                        {slide.title.split("\n").map((line, i) => (
+                          <React.Fragment key={i}>
+                            {line}
+                            <br />
+                          </React.Fragment>
+                        ))}
+                      </h1>
+                    ) : (
+                      <p
+                        className="h1 tf-fade-top fade-item-1"
+                        dir={language === 'rtl' ? 'rtl' : 'ltr'}
+                        style={language === 'rtl' ? { textAlign: 'right' } : {}}
+                      >
+                        {slide.title.split("\n").map((line, i) => (
+                          <React.Fragment key={i}>
+                            {line}
+                            <br />
+                          </React.Fragment>
+                        ))}
+                      </p>
+                    )}
+                    <div
                       className="sub-title body-2 tf-fade-top fade-item-2"
                       dir={language === 'rtl' ? 'rtl' : 'ltr'}
                       style={language === 'rtl' ? { textAlign: 'right' } : {}}
@@ -95,9 +123,11 @@ export default function HeroSlider({ slides, language = 'ltr' }: HeroSliderProps
           </div>
         </SwiperSlide>
       ))}
-      <button type="button" aria-label="Next slide" className="tf-btn-arrow arrow-right sw-auto-prev snbn7">
-        <i className="icon-arrow-right1" />
-      </button>
+      {multiSlide && (
+        <button type="button" aria-label="Next slide" className="tf-btn-arrow arrow-right sw-auto-prev snbn7">
+          <i className="icon-arrow-right1" />
+        </button>
+      )}
     </Swiper>
   );
 }

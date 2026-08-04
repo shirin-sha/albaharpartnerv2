@@ -115,6 +115,11 @@ export default function ServicesSection({ content, language = 'ltr' }: ServicesS
                         <Link
                           href={detailsHref}
                           className="tf-btn style-1 bg-color-primary"
+                          aria-label={
+                            language === "rtl"
+                              ? `اعرف المزيد عن ${service.title}`
+                              : `Learn more about ${service.title}`
+                          }
                         >
                           <span>{learnMoreLabel}</span>
                         </Link>

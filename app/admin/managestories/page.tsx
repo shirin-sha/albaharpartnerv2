@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { commitPendingUploads, discardPendingUploads } from '@/lib/pending-uploads';
 import { CustomerStory } from '@/types/customer-stories';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
 
@@ -31,6 +32,8 @@ export default function StoriesManagePage() {
     order: 0,
     isActive: true,
   });
+  const formDataRef = useRef(formData);
+  formDataRef.current = formData;
 
   useEffect(() => {
     loadStories();
@@ -60,12 +63,22 @@ export default function StoriesManagePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSaving(true);
+    try {
+      await commitPendingUploads();
+    } catch (uploadErr) {
+      console.error('Upload error:', uploadErr);
+      showMessage('error', uploadErr instanceof Error ? uploadErr.message : 'Failed to upload files');
+      setSaving(false);
+      return;
+    }
+    const formData = formDataRef.current;
     if (!formData.title.trim()) {
       showMessage('error', 'Title (English) is required');
+      setSaving(false);
       return;
     }
 
-    setSaving(true);
     try {
       const isNew = editingIndex === null;
       const index = isNew ? storiesLtr.length : editingIndex!;
@@ -147,6 +160,7 @@ export default function StoriesManagePage() {
   };
 
   const resetForm = () => {
+    discardPendingUploads();
     setFormData({
       title: '',
       titleAr: '',

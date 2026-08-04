@@ -2,15 +2,46 @@
 
 import { usePathname } from "next/navigation";
 import React, { useEffect, useRef } from "react";
+import { loadAnimateCss, loadTextAnimationCss } from "@/lib/plugin-styles";
+
+function runWhenBrowserIdle(callback: () => void, timeout = 2500) {
+  if (typeof window === "undefined") return () => {};
+
+  let cancelled = false;
+  let idleId: number | null = null;
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
+
+  const run = () => {
+    if (cancelled) return;
+    callback();
+  };
+
+  const ric = window.requestIdleCallback?.bind(window);
+  if (ric) {
+    idleId = ric(run, { timeout });
+  } else {
+    timeoutId = setTimeout(run, Math.min(timeout, 1200));
+  }
+
+  return () => {
+    cancelled = true;
+    if (idleId != null && window.cancelIdleCallback) {
+      window.cancelIdleCallback(idleId);
+    }
+    if (timeoutId) clearTimeout(timeoutId);
+  };
+}
 
 export default function GlobalEffectsProvider() {
   const hasLoadedBootstrap = useRef(false);
   const bootstrapRef = useRef<{ Modal: any; Offcanvas: any } | null>(null);
-  const wowRef = useRef<any>(null); // Save WOW module (imported once)
+  const wowRef = useRef<any>(null);
   const gsapRef = useRef<any>(null);
   const scrollTriggerRef = useRef<any>(null);
   const splitTextRef = useRef<any>(null);
   const hasLoadedGsap = useRef(false);
+  const hasLoadedAnimateCss = useRef(false);
+  const hasLoadedTextAnimCss = useRef(false);
 
   const pathname = usePathname();
   const isMobileViewport = () =>
@@ -19,6 +50,11 @@ export default function GlobalEffectsProvider() {
   const ensureGsapLoaded = async () => {
     if (hasLoadedGsap.current && gsapRef.current && scrollTriggerRef.current && splitTextRef.current) {
       return true;
+    }
+
+    if (!hasLoadedTextAnimCss.current) {
+      await loadTextAnimationCss();
+      hasLoadedTextAnimCss.current = true;
     }
 
     const [{ gsap }, { ScrollTrigger }, splitTextModule] = await Promise.all([
@@ -38,16 +74,19 @@ export default function GlobalEffectsProvider() {
     return true;
   };
 
-  // Load Bootstrap JS only once on client
+  // Load Bootstrap JS only once on client (idle — not needed for first paint)
   useEffect(() => {
     if (typeof window === "undefined" || hasLoadedBootstrap.current) return;
 
-    import("bootstrap/dist/js/bootstrap.esm")
-      .then((module) => {
-        hasLoadedBootstrap.current = true;
-        bootstrapRef.current = module;
-      })
-      .catch((err) => {});
+    return runWhenBrowserIdle(() => {
+      if (hasLoadedBootstrap.current) return;
+      import("bootstrap/dist/js/bootstrap.esm")
+        .then((module) => {
+          hasLoadedBootstrap.current = true;
+          bootstrapRef.current = module;
+        })
+        .catch(() => {});
+    }, 3000);
   }, []);
 
   // Close any open modals/offcanvas on route change
@@ -56,107 +95,139 @@ export default function GlobalEffectsProvider() {
 
     const bootstrap = bootstrapRef.current;
 
-    // Close all open modals
     document.querySelectorAll(".modal.show").forEach((modal) => {
       const instance = bootstrap.Modal.getOrCreateInstance(modal);
       if (instance) instance.hide();
     });
 
-    // Close all open offcanvas
     document.querySelectorAll(".offcanvas.show").forEach((offcanvas) => {
       const instance = bootstrap.Offcanvas.getOrCreateInstance(offcanvas);
       if (instance) instance.hide();
     });
   }, [pathname]);
 
-  // WOW.js: import once, but init on every route change
+  // WOW.js — idle / first scroll (skip on mobile)
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (isMobileViewport()) return;
 
+    let started = false;
+    let cancelIdle: (() => void) | null = null;
+
     const initWow = async () => {
+      if (started) return;
+      started = true;
+
+      if (!hasLoadedAnimateCss.current) {
+        await loadAnimateCss();
+        hasLoadedAnimateCss.current = true;
+      }
+
       if (!wowRef.current) {
         const module = (await import("@/utils/wow")).default;
-
-        wowRef.current = new module({
-          mobile: false,
-        });
+        wowRef.current = new module({ mobile: false });
         wowRef.current.init();
       } else {
         wowRef.current.sync();
       }
     };
 
-    initWow();
+    const onScroll = () => {
+      void initWow();
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("pointerdown", onScroll);
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true, once: true });
+    window.addEventListener("pointerdown", onScroll, { once: true });
+    cancelIdle = runWhenBrowserIdle(() => {
+      void initWow();
+    }, 2800);
+
+    return () => {
+      cancelIdle?.();
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("pointerdown", onScroll);
+    };
   }, [pathname]);
 
+  // tf-animate visibility helpers — idle after route change
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (isMobileViewport()) return;
 
-    function debounce(fn: (...args: any[]) => void, delay: number) {
-      let timeoutId: ReturnType<typeof setTimeout>;
-      return (...args: any[]) => {
-        if (timeoutId) clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => fn(...args), delay);
+    let removeScroll: (() => void) | null = null;
+
+    const cancelIdle = runWhenBrowserIdle(() => {
+      function debounce(fn: (...args: any[]) => void, delay: number) {
+        let timeoutId: ReturnType<typeof setTimeout>;
+        return (...args: any[]) => {
+          if (timeoutId) clearTimeout(timeoutId);
+          timeoutId = setTimeout(() => fn(...args), delay);
+        };
+      }
+
+      const elements = document.querySelectorAll(
+        ".tf-animate-1, .tf-animate-2, .tf-animate-3, .tf-animate-4"
+      );
+
+      const checkVisible = () => {
+        const scrollPosition = window.scrollY;
+        const windowHeight = window.innerHeight;
+
+        elements.forEach((el) => {
+          if (el.classList.contains("active-animate")) return;
+
+          const rect = el.getBoundingClientRect();
+          const elementTop = rect.top + scrollPosition;
+          const elementBottom = elementTop + (el as HTMLElement).offsetHeight;
+
+          if (
+            scrollPosition + windowHeight * 0.9 > elementTop &&
+            scrollPosition < elementBottom
+          ) {
+            const delay = parseFloat(el.getAttribute("data-delay") ?? "0") || 0;
+            setTimeout(() => {
+              el.classList.add("active-animate");
+            }, delay * 1000);
+          }
+        });
       };
-    }
 
-    const elements = document.querySelectorAll(
-      ".tf-animate-1, .tf-animate-2, .tf-animate-3, .tf-animate-4"
-    );
-
-    const checkVisible = () => {
-      const scrollPosition = window.scrollY;
-      const windowHeight = window.innerHeight;
-
-      elements.forEach((el) => {
-        if (el.classList.contains("active-animate")) return;
-
-        const rect = el.getBoundingClientRect();
-        const elementTop = rect.top + scrollPosition;
-        const elementBottom = elementTop + (el as HTMLElement).offsetHeight;
-
-        if (
-          scrollPosition + windowHeight * 0.9 > elementTop &&
-          scrollPosition < elementBottom
-        ) {
-          const delay = parseFloat(el.getAttribute("data-delay") ?? "0") || 0;
-          setTimeout(() => {
-            el.classList.add("active-animate");
-          }, delay * 1000);
-        }
-      });
-    };
-
-    const debouncedScroll = debounce(checkVisible, 50); // tweak as needed
-
-    checkVisible(); // initial
-    window.addEventListener("scroll", debouncedScroll);
+      const debouncedScroll = debounce(checkVisible, 50);
+      checkVisible();
+      window.addEventListener("scroll", debouncedScroll);
+      removeScroll = () => window.removeEventListener("scroll", debouncedScroll);
+    }, 2000);
 
     return () => {
-      window.removeEventListener("scroll", debouncedScroll);
+      cancelIdle();
+      removeScroll?.();
     };
   }, [pathname]);
+
+  // GSAP text / scroll effects — idle or first scroll
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (isMobileViewport()) return;
 
     let isCancelled = false;
+    let started = false;
 
     const runAnimations = async () => {
+      if (started || isCancelled) return;
+      started = true;
+
       await ensureGsapLoaded();
       if (isCancelled || !gsapRef.current || !scrollTriggerRef.current || !splitTextRef.current) return;
 
       const gsap = gsapRef.current;
-      const ScrollTrigger = scrollTriggerRef.current;
       const SplitText = splitTextRef.current;
 
       if (window.innerWidth <= 550) {
         const animatedTextElements = document.querySelectorAll(
           ".text-anime-wave, .text-anime-wave-1, .text-anime-wave-2"
         );
-
         animatedTextElements.forEach((el) => {
           const animEl = el as Element & { animation?: any };
           if (animEl.animation) {
@@ -164,11 +235,9 @@ export default function GlobalEffectsProvider() {
           }
           gsap.set(animEl, { clearProps: "all" });
         });
-
         return;
       }
 
-      // ✅ Animate Wave Text
       const waveElements = document.querySelectorAll(
         ".text-anime-wave, .text-anime-wave-1, .text-anime-wave-2, .text-anime-wave-3"
       );
@@ -210,7 +279,6 @@ export default function GlobalEffectsProvider() {
         });
       });
 
-      // ✅ Animate Color Change Text
       const colorElements = document.querySelectorAll(".text-color-change");
 
       colorElements.forEach((el) => {
@@ -257,34 +325,46 @@ export default function GlobalEffectsProvider() {
       });
     };
 
-    runAnimations();
+    const onInteract = () => {
+      void runAnimations();
+      window.removeEventListener("scroll", onInteract);
+      window.removeEventListener("pointerdown", onInteract);
+    };
+
+    window.addEventListener("scroll", onInteract, { passive: true, once: true });
+    window.addEventListener("pointerdown", onInteract, { once: true });
+    const cancelIdle = runWhenBrowserIdle(() => {
+      void runAnimations();
+    }, 3200);
 
     return () => {
       isCancelled = true;
+      cancelIdle();
+      window.removeEventListener("scroll", onInteract);
+      window.removeEventListener("pointerdown", onInteract);
       if (scrollTriggerRef.current) {
         scrollTriggerRef.current.getAll().forEach((st: any) => st.kill());
       }
     };
   }, [pathname]);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (isMobileViewport()) return;
     let isCancelled = false;
+    let started = false;
 
     const run = async () => {
+      if (started || isCancelled) return;
+      started = true;
       await ensureGsapLoaded();
       if (isCancelled || !gsapRef.current) return;
       const gsap = gsapRef.current;
 
-      const isLargeScreen = window.matchMedia("(min-width: 992px)").matches;
+      if (!window.matchMedia("(min-width: 992px)").matches) return;
 
-      if (!isLargeScreen) return;
-
-      const scrollTriggers: any[] = [];
-
-      // Animate scroll-tranform
       if (document.querySelector(".scroll-tranform")) {
-        const st1 = gsap.to(".scroll-tranform", {
+        gsap.to(".scroll-tranform", {
           y: -100,
           scrollTrigger: {
             trigger: ".scroll-tranform-section",
@@ -293,12 +373,10 @@ export default function GlobalEffectsProvider() {
             scrub: 3,
           },
         });
-        scrollTriggers.push(st1.scrollTrigger);
       }
 
-      // Animate scroll-tranform-up
       if (document.querySelector(".scroll-tranform-up")) {
-        const st2 = gsap.to(".scroll-tranform-up", {
+        gsap.to(".scroll-tranform-up", {
           y: 100,
           scrollTrigger: {
             trigger: ".scroll-tranform-section",
@@ -307,30 +385,39 @@ export default function GlobalEffectsProvider() {
             scrub: 3,
           },
         });
-        scrollTriggers.push(st2.scrollTrigger);
       }
     };
 
-    run();
+    const onInteract = () => {
+      void run();
+      window.removeEventListener("scroll", onInteract);
+    };
+    window.addEventListener("scroll", onInteract, { passive: true, once: true });
+    const cancelIdle = runWhenBrowserIdle(() => {
+      void run();
+    }, 3500);
+
     return () => {
       isCancelled = true;
+      cancelIdle();
+      window.removeEventListener("scroll", onInteract);
     };
   }, [pathname]);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (isMobileViewport()) return;
     let isCancelled = false;
+    let started = false;
 
     const run = async () => {
+      if (started || isCancelled) return;
+      started = true;
       await ensureGsapLoaded();
       if (isCancelled || !gsapRef.current) return;
       const gsap = gsapRef.current;
 
-      const isTabletUp = window.matchMedia("(min-width: 768px)").matches;
-
-      if (!isTabletUp) return;
-
-      const triggers: any[] = [];
+      if (!window.matchMedia("(min-width: 768px)").matches) return;
 
       const images = gsap.utils.toArray(".img-paralax");
       images.forEach((img: any) => {
@@ -348,16 +435,24 @@ export default function GlobalEffectsProvider() {
           { yPercent: 0, ease: "none" },
           { yPercent: -10, ease: "none" }
         );
-
-        triggers.push(tl.scrollTrigger);
       });
     };
 
-    run();
+    const onInteract = () => {
+      void run();
+      window.removeEventListener("scroll", onInteract);
+    };
+    window.addEventListener("scroll", onInteract, { passive: true, once: true });
+    const cancelIdle = runWhenBrowserIdle(() => {
+      void run();
+    }, 3500);
+
     return () => {
       isCancelled = true;
+      cancelIdle();
+      window.removeEventListener("scroll", onInteract);
     };
   }, [pathname]);
 
-  return <></>;
+  return null;
 }

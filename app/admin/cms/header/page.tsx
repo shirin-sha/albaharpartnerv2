@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef} from 'react';
+import { commitPendingUploads, discardPendingUploads } from '@/lib/pending-uploads';
 import { HeaderContent, MenuItem } from '@/types/header';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
 import DocumentUpload from '@/components/admin/ui/DocumentUpload';
@@ -461,7 +462,11 @@ export default function HeaderManager() {
   const [saving, setSaving] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [contentLtr, setContentLtr] = useState<HeaderContent | null>(null);
+  const contentLtrRef = useRef(contentLtr);
+  contentLtrRef.current = contentLtr;
   const [contentRtl, setContentRtl] = useState<HeaderContent | null>(null);
+  const contentRtlRef = useRef(contentRtl);
+  contentRtlRef.current = contentRtl;
   const [selectedSection, setSelectedSection] = useState<HeaderSectionId | null>(null);
 
   useEffect(() => {
@@ -521,9 +526,12 @@ export default function HeaderManager() {
   };
 
   const handleSaveSection = async (section: string) => {
-    if (!contentLtr || !contentRtl) return;
     setSaving(section);
     try {
+      await commitPendingUploads();
+      const contentLtr = contentLtrRef.current;
+      const contentRtl = contentRtlRef.current;
+      if (!contentLtr || !contentRtl) return;
       if (section === 'logo') {
         const method = contentLtr._id ? 'PUT' : 'POST';
         // Logo is shared, so save using LTR content
@@ -609,7 +617,7 @@ export default function HeaderManager() {
         <div className="admin-cms-section-card" style={{ marginBottom: 24 }}>
           <div className="admin-cms-section-header" style={{ cursor: 'default' }}>
             <h3>Logo Settings</h3>
-            <button type="button" className="admin-btn admin-btn-delete" onClick={() => setSelectedSection(null)}>
+            <button type="button" className="admin-btn admin-btn-delete" onClick={() => { discardPendingUploads(); setSelectedSection(null); }}>
               Close
             </button>
           </div>
@@ -723,7 +731,7 @@ export default function HeaderManager() {
         <div className="admin-cms-section-card" style={{ marginBottom: 24 }}>
           <div className="admin-cms-section-header" style={{ cursor: 'default' }}>
             <h3>Navigation Menu</h3>
-            <button type="button" className="admin-btn admin-btn-delete" onClick={() => setSelectedSection(null)}>
+            <button type="button" className="admin-btn admin-btn-delete" onClick={() => { discardPendingUploads(); setSelectedSection(null); }}>
               Close
             </button>
           </div>
@@ -753,7 +761,7 @@ export default function HeaderManager() {
         <div className="admin-cms-section-card" style={{ marginBottom: 24 }}>
           <div className="admin-cms-section-header" style={{ cursor: 'default' }}>
             <h3>Profile Button</h3>
-            <button type="button" className="admin-btn admin-btn-delete" onClick={() => setSelectedSection(null)}>
+            <button type="button" className="admin-btn admin-btn-delete" onClick={() => { discardPendingUploads(); setSelectedSection(null); }}>
               Close
             </button>
           </div>

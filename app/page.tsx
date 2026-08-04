@@ -1,17 +1,12 @@
 import FooterCMS from "@/components/footers/FooterCMS";
 import { FooterContent } from "@/types/footer";
 import HeaderCMS from "@/components/headers/HeaderCMS";
-import Header7 from "@/components/headers/Header7";
 import React from "react";
 import { Metadata } from "next";
 import HeroSlider from "@/components/homes/cms/HeroSlider";
 import AboutSection from "@/components/homes/cms/AboutSection";
 import ProcessSection from "@/components/homes/cms/ProcessSection";
-import ServicesSection from "@/components/homes/cms/ServicesSection";
-import TestimonialSection from "@/components/homes/cms/TestimonialSection";
-import BrandsSection from "@/components/homes/cms/BrandsSection";
-import FeaturesSection from "@/components/homes/cms/FeaturesSection";
-import CtaSection from "@/components/homes/cms/CtaSection";
+import DeferredHomepageSections from "@/components/homes/cms/DeferredHomepageSections";
 import { ServicesSection as ServicesSectionType } from "@/types/homepage";
 import {
   getHomepageContent,
@@ -25,9 +20,9 @@ import Topbar1 from "@/components/headers/Topbar1";
 export async function generateMetadata(): Promise<Metadata> {
   const language: 'ltr' | 'rtl' = 'ltr';
   const content = await getHomepageContent(language);
-  const title = content?.seo?.title || "Al bahar partners";
+  const title = content?.seo?.title?.trim() || "Al Bahar & Partners - Technology Solutions";
   const description =
-    content?.seo?.description ||
+    content?.seo?.description?.trim() ||
     "Al Bahar & Partners delivers enterprise technology solutions, consulting, and managed services across Kuwait and the GCC.";
   const keywords = content?.seo?.keywords || [];
 
@@ -35,7 +30,19 @@ export async function generateMetadata(): Promise<Metadata> {
     title,
     description,
     keywords,
+    alternates: {
+      canonical: "/",
+      languages: { en: "/", ar: "/ar" },
+    },
     openGraph: {
+      title,
+      description,
+      url: "/",
+      type: "website",
+      locale: "en_US",
+    },
+    twitter: {
+      card: "summary_large_image",
       title,
       description,
     },
@@ -80,94 +87,74 @@ export default async function Page() {
       )}
       
       <div className="main-content">
-        {/* Debug: Show if content exists */}
-    
-        {/* CMS-driven About Section */}
         {content?.aboutSection && (
           <AboutSection content={content.aboutSection} language={language} />
         )}
-        
-        {/* CMS-driven Process Section */}
+
         {content?.processSection && (
           <ProcessSection content={content.processSection} language={language} />
         )}
-        
-        {/* CMS-driven Services Section (Solutions preview from single Solutions CMS) */}
-        {content?.servicesSection && (() => {
-          const baseSection: ServicesSectionType = content.servicesSection;
 
-          // Build services array from Solutions CMS (single source of truth)
-          const mappedServices = solutionsContent?.solutions
-            ?.filter((s) => s.isActive)
-            .map((s, index) => ({
-              _id: s.id,
-              id: s.id,
-              tabTitle: s.tabTitle,
-              title: s.title,
-              description: s.description,
-              benefits: s.benefits || [],
-              imgSrc: s.imgSrc,
-              order: index,
-              language: baseSection.language,
-              isActive: s.isActive,
-            })) || [];
+        {(() => {
+          const baseSection = content?.servicesSection;
+          if (!baseSection) return null;
+
+          const mappedServices =
+            solutionsContent?.solutions
+              ?.filter((s) => s.isActive)
+              .map((s, index) => ({
+                _id: s.id,
+                id: s.id,
+                tabTitle: s.tabTitle,
+                title: s.title,
+                description: s.description,
+                benefits: s.benefits || [],
+                imgSrc: s.imgSrc,
+                order: index,
+                language: baseSection.language,
+                isActive: s.isActive,
+              })) || [];
 
           const servicesSectionForHome: ServicesSectionType = {
             ...baseSection,
             services: mappedServices,
           };
 
-          if (servicesSectionForHome.services.length === 0) {
-            return null;
-          }
+          const baseBrands = content?.brandsSection;
+          const mappedBrands =
+            brandsContent?.brands
+              ?.filter((b) => b.isActive)
+              .map((b) => ({
+                _id: b._id,
+                name: b.name,
+                imagePath: b.imagePath,
+                link: b.link,
+                isActive: b.isActive,
+              })) || [];
+
+          const brandsSectionForHome = baseBrands
+            ? { ...baseBrands, brands: mappedBrands }
+            : null;
 
           return (
-            <ServicesSection content={servicesSectionForHome} language={language} />
+            <DeferredHomepageSections
+              language={language}
+              servicesSection={
+                servicesSectionForHome.services.length > 0
+                  ? servicesSectionForHome
+                  : null
+              }
+              testimonialSection={content?.testimonialSection ?? null}
+              featuresSection={content?.featuresSection ?? null}
+              brandsSection={
+                brandsSectionForHome && brandsSectionForHome.brands.length > 0
+                  ? brandsSectionForHome
+                  : null
+              }
+              ctaSection={content?.ctaSection ?? null}
+            />
           );
         })()}
-        
-        {/* CMS-driven Testimonial Section */}
-        {content?.testimonialSection && (
-          <TestimonialSection content={content.testimonialSection} language={language} />
-        )}
-        
-      
-        {/* CMS-driven Features Section */}
-        {content?.featuresSection && (
-          <FeaturesSection content={content.featuresSection} language={language} />
-        )}
-          {/* CMS-driven Brands Section (Brands preview from single Brands CMS) */}
-          {content?.brandsSection && (() => {
-          const baseSection = content.brandsSection;
-
-          // Build brands array from Brands CMS (single source of truth)
-          const mappedBrands = brandsContent?.brands
-            ?.filter((b) => b.isActive)
-            .map((b) => ({
-              _id: b._id,
-              name: b.name,
-              imagePath: b.imagePath,
-              link: b.link,
-              isActive: b.isActive,
-            })) || [];
-
-          const brandsSectionForHome = {
-            ...baseSection,
-            brands: mappedBrands,
-          };
-
-          if (brandsSectionForHome.brands.length === 0) {
-            return null;
-          }
-
-          return (
-            <BrandsSection content={brandsSectionForHome} language={language} />
-          );
-        })()}
-        {/* CMS-driven CTA Section */}
-        {content?.ctaSection && (
-          <CtaSection content={content.ctaSection} language={language} />
-        )}
       </div>
       
       {footerContent && <FooterCMS data={footerContent} />}

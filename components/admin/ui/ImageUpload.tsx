@@ -1,5 +1,10 @@
 'use client';
-import { useState, useRef, useId } from 'react';
+import { useState, useRef, useId, useEffect } from 'react';
+import {
+  stageUpload,
+  stageRemove,
+  getPendingPreview,
+} from '@/lib/pending-uploads';
 
 interface ImageUploadProps {
   label?: string;
@@ -7,8 +12,8 @@ interface ImageUploadProps {
   onChange: (value: string) => void;
   helperText?: string;
   className?: string;
-  folder?: string; // Optional folder path (e.g., 'hero', 'blog', 'brand')
-  required?: boolean; // Make the field required
+  folder?: string;
+  required?: boolean;
 }
 
 function normalizeUploadFolder(pathValue: string, fallbackFolder?: string): string {
@@ -33,20 +38,6 @@ function normalizeUploadFolder(pathValue: string, fallbackFolder?: string): stri
   return parts[0] || fallbackFolder || 'general';
 }
 
-async function deleteStoredImage(imagePath: string) {
-  if (!imagePath || /^https?:\/\//i.test(imagePath)) return;
-
-  try {
-    await fetch('/api/images/delete', {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ imagePath }),
-    });
-  } catch (err) {
-    console.warn('Failed to delete old image file:', imagePath, err);
-  }
-}
-
 export default function ImageUpload({
   label,
   value,
@@ -56,89 +47,84 @@ export default function ImageUpload({
   folder,
   required = false,
 }: ImageUploadProps) {
-  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const inputId = useId();
+  const uploadId = `img-${inputId}`;
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
+  const valueRef = useRef(value);
+  valueRef.current = value;
 
-  // Extract folder from existing value if not provided
-  const getFolderFromValue = (path: string): string => {
-    return normalizeUploadFolder(path, folder);
-  };
+  useEffect(() => {
+    // Sync preview if parent discarded pending uploads (e.g. Cancel)
+    const pending = getPendingPreview(uploadId);
+    if (!pending && previewUrl?.startsWith('blob:')) {
+      setPreviewUrl(null);
+    }
+  }, [value, uploadId, previewUrl]);
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+    const allowedTypes = [
+      'image/jpeg',
+      'image/jpg',
+      'image/png',
+      'image/gif',
+      'image/webp',
+      'image/svg+xml',
+    ];
     if (!allowedTypes.includes(file.type)) {
       setError('Invalid file type. Only images (JPEG, PNG, GIF, WebP, SVG) are allowed.');
       return;
     }
 
-    // Validate file size (max 10MB)
-    const maxSize = 10 * 1024 * 1024; // 10MB
-    if (file.size > maxSize) {
+    if (file.size > 10 * 1024 * 1024) {
       setError('File size exceeds 10MB limit.');
       return;
     }
 
     setError(null);
-    setUploading(true);
 
-    const previousPath = value;
+    const uploadFolder =
+      folder || normalizeUploadFolder(valueRef.current) || 'general';
 
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
+    const blobUrl = stageUpload({
+      id: uploadId,
+      file,
+      folder: uploadFolder,
+      previousPath: valueRef.current,
+      accept: 'image',
+      applyPath: (path) => onChangeRef.current(path),
+    });
 
-      // Determine folder: use prop, or extract from existing value, or default to 'general'
-      const uploadFolder = folder || getFolderFromValue(value) || 'general';
-      formData.append('folder', uploadFolder);
+    setPreviewUrl(blobUrl);
 
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        onChange(result.path);
-        setError(null);
-
-        // Remove previous file after successful replace
-        if (previousPath && previousPath !== result.path) {
-          await deleteStoredImage(previousPath);
-        }
-      } else {
-        setError(result.message || 'Failed to upload image');
-      }
-    } catch (err) {
-      console.error('Upload error:', err);
-      setError('Failed to upload image. Please try again.');
-    } finally {
-      setUploading(false);
-      // Reset file input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
-  const handleRemove = async () => {
-    const previousPath = value;
-    onChange('');
+  const handleRemove = () => {
     setError(null);
-    if (previousPath) {
-      await deleteStoredImage(previousPath);
-    }
+    setPreviewUrl(null);
+    stageRemove({
+      id: uploadId,
+      previousPath: valueRef.current,
+      applyPath: (path) => onChangeRef.current(path),
+    });
   };
 
-  const resolvedImageSrc = value.startsWith('/image/')
-    ? value.replace('/image/', '/api/uploads/')
-    : value;
+  const displaySrc =
+    previewUrl ||
+    (value.startsWith('/image/')
+      ? value.replace('/image/', '/api/uploads/')
+      : value);
+
+  const hasImage = Boolean(previewUrl || value);
 
   return (
     <div className={className}>
@@ -150,55 +136,51 @@ export default function ImageUpload({
       )}
 
       <div className="d-flex flex-column gap-2">
-        {/* File Upload Button */}
         <div>
           <input
             ref={fileInputRef}
             type="file"
             accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,image/svg+xml"
             onChange={handleFileChange}
-            disabled={uploading}
             className="d-none"
             id={`file-upload-${label?.replace(/\s+/g, '-') || 'image'}-${inputId}`}
           />
           <label
             htmlFor={`file-upload-${label?.replace(/\s+/g, '-') || 'image'}-${inputId}`}
-            className={`btn btn-sm btn-secondary`}
+            className="btn btn-sm btn-secondary"
             style={{
-              cursor: uploading ? 'not-allowed' : 'pointer',
+              cursor: 'pointer',
               border: '1px solid #dee2e6',
               backgroundColor: '#f8f9fa',
               color: '#495057',
             }}
           >
-            {uploading ? (
-              <>
-                <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                Uploading...
-              </>
-            ) : (
-              value ? 'Replace Image' : 'Choose & Upload Image'
-            )}
+            {hasImage ? 'Replace Image' : 'Choose Image'}
           </label>
         </div>
 
-        {/* Error Message */}
         {error && (
           <div className="alert alert-danger py-2 px-3 mb-0" style={{ fontSize: '0.875rem' }}>
             {error}
           </div>
         )}
 
-        {/* Current Image Display */}
-        {value && (
+        {hasImage && displaySrc && (
           <div className="mt-2">
             <div className="d-flex align-items-center gap-2 mb-2">
-              <span className="text-muted small">Current image:</span>
-              <code className="small px-2 py-1 rounded">{value}</code>
+              <span className="text-muted small">
+                {previewUrl ? 'Selected (uploads on Save):' : 'Current image:'}
+              </span>
+              {!previewUrl && value && (
+                <code className="small px-2 py-1 rounded">{value}</code>
+              )}
+              {previewUrl && (
+                <span className="small text-muted">Not saved to server yet</span>
+              )}
             </div>
             <div style={{ maxWidth: '300px', position: 'relative', display: 'inline-block' }}>
               <img
-                src={resolvedImageSrc}
+                src={displaySrc}
                 alt="Preview"
                 className="img-fluid rounded"
                 style={{ maxHeight: '200px', width: 'auto' }}
@@ -209,9 +191,7 @@ export default function ImageUpload({
               />
               {!required && (
                 <div
-                  onClick={() => {
-                    void handleRemove();
-                  }}
+                  onClick={handleRemove}
                   title="Remove image"
                   style={{
                     position: 'absolute',
@@ -249,10 +229,7 @@ export default function ImageUpload({
           </div>
         )}
 
-        {/* Helper Text — always visible so recommended sizes stay after upload */}
-        {helperText && (
-          <small className="text-muted">{helperText}</small>
-        )}
+        {helperText && <small className="text-muted">{helperText}</small>}
       </div>
     </div>
   );

@@ -1,26 +1,27 @@
 import RtlToggler from "@/components/common/RtlToggler";
 import "../public/scss/main.scss";
-import "rc-slider/assets/index.css";
 import { siteFontVariablesClassName } from "@/lib/fonts";
 
 import GlobalEffectsProvider from "@/components/common/GlobalEffectsProvider";
 import ScrollTop from "@/components/common/ScrollTop";
-import MobileMenu from "@/components/modals/MobileMenu";
 import Context from "@/context/Context";
-import LoginModal from "@/components/modals/LoginModal";
 import { rtlInitScript } from "@/lib/rtl-init";
 import DeferredGlobalOverlays from "@/components/common/DeferredGlobalOverlays";
+import DeferredMobileMenu from "@/components/common/DeferredMobileMenu";
 
 import { Metadata } from "next";
+import { ReactNode } from "react";
+
 export const metadata: Metadata = {
   title: "Al Bahar & Partners - Technology Solutions",
+  description:
+    "Al Bahar & Partners delivers enterprise technology solutions, consulting, and managed services across Kuwait and the GCC.",
   icons: {
     icon: "/image/logo/favicon.png",
     shortcut: "/image/logo/favicon.png",
     apple: "/image/logo/favicon.png",
   },
 };
-import { ReactNode } from "react";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
@@ -37,8 +38,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <Context>
             <RtlToggler />
             <main id="main-content">{children}</main>
-            <MobileMenu />
-            {/* <LoginModal /> */}
+            <DeferredMobileMenu />
             <DeferredGlobalOverlays />
             <ScrollTop />{" "}
           </Context>

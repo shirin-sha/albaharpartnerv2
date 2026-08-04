@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef} from 'react';
+import { commitPendingUploads, discardPendingUploads } from '@/lib/pending-uploads';
 import { FooterContent } from '@/types/footer';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
 
@@ -21,7 +22,11 @@ export default function FooterManager() {
   const [saving, setSaving] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [contentLtr, setContentLtr] = useState<FooterContent | null>(null);
+  const contentLtrRef = useRef(contentLtr);
+  contentLtrRef.current = contentLtr;
   const [contentRtl, setContentRtl] = useState<FooterContent | null>(null);
+  const contentRtlRef = useRef(contentRtl);
+  contentRtlRef.current = contentRtl;
   const [selectedSection, setSelectedSection] = useState<FooterSectionId | null>(null);
 
   useEffect(() => {
@@ -283,9 +288,12 @@ export default function FooterManager() {
   };
 
   const handleSaveSection = async (section: string) => {
-    if (!contentLtr || !contentRtl) return;
     setSaving(section);
     try {
+      await commitPendingUploads();
+      const contentLtr = contentLtrRef.current;
+      const contentRtl = contentRtlRef.current;
+      if (!contentLtr || !contentRtl) return;
       // Save both LTR and RTL in parallel
       const [ltrRes, rtlRes] = await Promise.all([
         fetch('/api/footer', {
@@ -345,7 +353,7 @@ export default function FooterManager() {
         <div className="admin-cms-section-card" style={{ marginBottom: 24 }}>
           <div className="admin-cms-section-header" style={{ cursor: 'default' }}>
             <h3>Logo & Description</h3>
-            <button type="button" className="admin-btn admin-btn-delete" onClick={() => setSelectedSection(null)}>
+            <button type="button" className="admin-btn admin-btn-delete" onClick={() => { discardPendingUploads(); setSelectedSection(null); }}>
               Close
             </button>
           </div>
@@ -437,7 +445,7 @@ export default function FooterManager() {
         <div className="admin-cms-section-card" style={{ marginBottom: 24 }}>
           <div className="admin-cms-section-header" style={{ cursor: 'default' }}>
             <h3>Social Links</h3>
-            <button type="button" className="admin-btn admin-btn-delete" onClick={() => setSelectedSection(null)}>
+            <button type="button" className="admin-btn admin-btn-delete" onClick={() => { discardPendingUploads(); setSelectedSection(null); }}>
               Close
             </button>
           </div>
@@ -571,7 +579,7 @@ export default function FooterManager() {
         <div className="admin-cms-section-card" style={{ marginBottom: 24 }}>
           <div className="admin-cms-section-header" style={{ cursor: 'default' }}>
             <h3>Newsletter Section</h3>
-            <button type="button" className="admin-btn admin-btn-delete" onClick={() => setSelectedSection(null)}>
+            <button type="button" className="admin-btn admin-btn-delete" onClick={() => { discardPendingUploads(); setSelectedSection(null); }}>
               Close
             </button>
           </div>
@@ -687,7 +695,7 @@ export default function FooterManager() {
         <div className="admin-cms-section-card" style={{ marginBottom: 24 }}>
           <div className="admin-cms-section-header" style={{ cursor: 'default' }}>
             <h3>Footer Bottom</h3>
-            <button type="button" className="admin-btn admin-btn-delete" onClick={() => setSelectedSection(null)}>
+            <button type="button" className="admin-btn admin-btn-delete" onClick={() => { discardPendingUploads(); setSelectedSection(null); }}>
               Close
             </button>
           </div>
@@ -743,7 +751,7 @@ export default function FooterManager() {
         <div className="admin-cms-section-card" style={{ marginBottom: 24 }}>
           <div className="admin-cms-section-header" style={{ cursor: 'default' }}>
             <h3>Quick Links</h3>
-            <button type="button" className="admin-btn admin-btn-delete" onClick={() => setSelectedSection(null)}>
+            <button type="button" className="admin-btn admin-btn-delete" onClick={() => { discardPendingUploads(); setSelectedSection(null); }}>
               Close
             </button>
           </div>
@@ -879,7 +887,7 @@ export default function FooterManager() {
         <div className="admin-cms-section-card" style={{ marginBottom: 24 }}>
           <div className="admin-cms-section-header" style={{ cursor: 'default' }}>
             <h3>Service & Assistance</h3>
-            <button type="button" className="admin-btn admin-btn-delete" onClick={() => setSelectedSection(null)}>
+            <button type="button" className="admin-btn admin-btn-delete" onClick={() => { discardPendingUploads(); setSelectedSection(null); }}>
               Close
             </button>
           </div>
@@ -987,7 +995,7 @@ export default function FooterManager() {
         <div className="admin-cms-section-card" style={{ marginBottom: 24 }}>
           <div className="admin-cms-section-header" style={{ cursor: 'default' }}>
             <h3>Contact Us</h3>
-            <button type="button" className="admin-btn admin-btn-delete" onClick={() => setSelectedSection(null)}>
+            <button type="button" className="admin-btn admin-btn-delete" onClick={() => { discardPendingUploads(); setSelectedSection(null); }}>
               Close
             </button>
           </div>

@@ -73,9 +73,9 @@ export default function TestimonialSection({ content, language = 'ltr' }: Testim
                       {content.tag}
                     </span>
                   </div>
-                  <h3 className="title-section wow fadeInUp mb-12">
+                  <h2 className="title-section wow fadeInUp mb-12">
                     {content.heading}
-                  </h3>
+                  </h2>
                   <div
                     className="sub-title body-2 wow fadeInUp cms-rich-text"
                     dangerouslySetInnerHTML={{ __html: content.description }}
@@ -86,7 +86,7 @@ export default function TestimonialSection({ content, language = 'ltr' }: Testim
                     href={testimonialContent.buttonLink || "/about-us"}
                     className="tf-btn style-1 bg-color-primary"
                   >
-                    <span>{testimonialContent.buttonText || "Learn More"}</span>
+                    <span>{testimonialContent.buttonText || (language === "rtl" ? "عن البحار وشركاه" : "About Al Bahar & Partners")}</span>
                   </Link>
                 </div>
               </div>

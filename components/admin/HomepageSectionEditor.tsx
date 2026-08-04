@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { SectionData, SectionEditorProps, SectionFormData } from '@/app/admin/homepage/types';
 import { SECTION_FIELD_RENDERERS } from './homepage-section-fields';
+import { commitPendingUploads, discardPendingUploads } from '@/lib/pending-uploads';
 
 export default function HomepageSectionEditor({
   sectionId,
@@ -15,6 +16,9 @@ export default function HomepageSectionEditor({
     ltr: section?.ltr ?? {},
     rtl: section?.rtl ?? {},
   });
+  const [saving, setSaving] = useState(false);
+  const formDataRef = useRef(formData);
+  formDataRef.current = formData;
 
   useEffect(() => {
     if (section) {
@@ -86,15 +90,30 @@ export default function HomepageSectionEditor({
     }
   }, [section, sectionId]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleCancel = () => {
+    discardPendingUploads();
+    onToggle();
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const updateData: Partial<SectionData> = {
-      enabled: section?.enabled ?? true,
-      order: section?.order ?? 0,
-      ltr: formData.ltr,
-      rtl: formData.rtl,
-    };
-    onSave(sectionId, updateData);
+    setSaving(true);
+    try {
+      await commitPendingUploads();
+      const latest = formDataRef.current;
+      const updateData: Partial<SectionData> = {
+        enabled: section?.enabled ?? true,
+        order: section?.order ?? 0,
+        ltr: latest.ltr,
+        rtl: latest.rtl,
+      };
+      await onSave(sectionId, updateData);
+    } catch (err) {
+      console.error('Failed to upload pending images:', err);
+      alert(err instanceof Error ? err.message : 'Failed to upload images');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const updateField = (lang: 'ltr' | 'rtl', path: string, value: unknown) => {
@@ -121,7 +140,7 @@ export default function HomepageSectionEditor({
     <div className="admin-cms-section-card" style={{ background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '8px' }}>
       <div
         className="admin-cms-section-header"
-        onClick={onToggle}
+        onClick={handleCancel}
         style={{ background: '#ffffff', borderBottom: '1px solid #e5e7eb', padding: '16px 24px' }}
       >
         <h3 style={{ color: '#1f2937', fontWeight: '600', margin: 0, textTransform: 'capitalize' }}>{sectionId}</h3>
@@ -131,10 +150,10 @@ export default function HomepageSectionEditor({
         <form onSubmit={handleSubmit} className="admin-cms-form">
           {fields}
           <div className="form-actions">
-            <button type="submit" className="button button-primary">
-              Save (English & Arabic)
+            <button type="submit" className="button button-primary" disabled={saving}>
+              {saving ? 'Saving...' : 'Save (English & Arabic)'}
             </button>
-            <button type="button" className="admin-btn admin-btn-edit" onClick={onToggle}>
+            <button type="button" className="admin-btn admin-btn-edit" onClick={handleCancel} disabled={saving}>
               Cancel
             </button>
           </div>

@@ -6,11 +6,7 @@ import { Metadata } from "next";
 import HeroSlider from "@/components/homes/cms/HeroSlider";
 import AboutSection from "@/components/homes/cms/AboutSection";
 import ProcessSection from "@/components/homes/cms/ProcessSection";
-import ServicesSection from "@/components/homes/cms/ServicesSection";
-import TestimonialSection from "@/components/homes/cms/TestimonialSection";
-import BrandsSection from "@/components/homes/cms/BrandsSection";
-import FeaturesSection from "@/components/homes/cms/FeaturesSection";
-import CtaSection from "@/components/homes/cms/CtaSection";
+import DeferredHomepageSections from "@/components/homes/cms/DeferredHomepageSections";
 import {
   ServicesSection as ServicesSectionType,
 } from "@/types/homepage";
@@ -23,10 +19,37 @@ import {
 } from "@/lib/data-fetch";
 import Topbar1 from "@/components/headers/Topbar1";
 
-export const metadata: Metadata = {
-  title: "البحار وشركاه - حلول تقنية المعلومات",
-  description: "البحار وشركاه تقدم حلول تقنية المعلومات للمؤسسات والاستشارات والخدمات المُدارة في الكويت ومنطقة الخليج العربي.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const content = await getHomepageContent("rtl");
+  const title =
+    content?.seo?.title?.trim() || "البحار وشركاه - حلول تقنية المعلومات";
+  const description =
+    content?.seo?.description?.trim() ||
+    "البحار وشركاه تقدم حلول تقنية المعلومات للمؤسسات والاستشارات والخدمات المُدارة في الكويت ومنطقة الخليج العربي.";
+  const keywords = content?.seo?.keywords || [];
+
+  return {
+    title,
+    description,
+    keywords,
+    alternates: {
+      canonical: "/ar",
+      languages: { en: "/", ar: "/ar" },
+    },
+    openGraph: {
+      title,
+      description,
+      url: "/ar",
+      type: "website",
+      locale: "ar_KW",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
+  };
+}
 
 // Arabic / RTL homepage — section order matches English homepage
 export default async function Page() {
@@ -56,19 +79,27 @@ export default async function Page() {
       )}
 
       <div className="main-content">
-        {/* CMS-driven About Section */}
         {content?.aboutSection && (
           <AboutSection content={content.aboutSection} language={language} />
         )}
 
-        {/* CMS-driven Process Section */}
         {content?.processSection && (
           <ProcessSection content={content.processSection} language={language} />
         )}
 
-        {/* CMS-driven Services Section (Solutions preview from single Solutions CMS) */}
-        {content?.servicesSection && (() => {
-          const baseSection: ServicesSectionType = content.servicesSection;
+        {(() => {
+          const baseSection = content?.servicesSection;
+          if (!baseSection) {
+            return (
+              <DeferredHomepageSections
+                language={language}
+                testimonialSection={content?.testimonialSection ?? null}
+                featuresSection={content?.featuresSection ?? null}
+                brandsSection={null}
+                ctaSection={content?.ctaSection ?? null}
+              />
+            );
+          }
 
           const mappedServices =
             solutionsContent?.solutions
@@ -91,29 +122,7 @@ export default async function Page() {
             services: mappedServices,
           };
 
-          if (servicesSectionForHome.services.length === 0) {
-            return null;
-          }
-
-          return (
-            <ServicesSection content={servicesSectionForHome} language={language} />
-          );
-        })()}
-
-        {/* CMS-driven Testimonial Section */}
-        {content?.testimonialSection && (
-          <TestimonialSection content={content.testimonialSection} language={language} />
-        )}
-
-        {/* CMS-driven Features Section */}
-        {content?.featuresSection && (
-          <FeaturesSection content={content.featuresSection} language={language} />
-        )}
-
-        {/* CMS-driven Brands Section (Brands preview from single Brands CMS) */}
-        {content?.brandsSection && (() => {
-          const baseSection = content.brandsSection;
-
+          const baseBrands = content?.brandsSection;
           const mappedBrands =
             brandsContent?.brands
               ?.filter((b) => b.isActive)
@@ -125,24 +134,29 @@ export default async function Page() {
                 isActive: b.isActive,
               })) || [];
 
-          const brandsSectionForHome = {
-            ...baseSection,
-            brands: mappedBrands,
-          };
-
-          if (brandsSectionForHome.brands.length === 0) {
-            return null;
-          }
+          const brandsSectionForHome = baseBrands
+            ? { ...baseBrands, brands: mappedBrands }
+            : null;
 
           return (
-            <BrandsSection content={brandsSectionForHome} language={language} />
+            <DeferredHomepageSections
+              language={language}
+              servicesSection={
+                servicesSectionForHome.services.length > 0
+                  ? servicesSectionForHome
+                  : null
+              }
+              testimonialSection={content?.testimonialSection ?? null}
+              featuresSection={content?.featuresSection ?? null}
+              brandsSection={
+                brandsSectionForHome && brandsSectionForHome.brands.length > 0
+                  ? brandsSectionForHome
+                  : null
+              }
+              ctaSection={content?.ctaSection ?? null}
+            />
           );
         })()}
-
-        {/* CMS-driven CTA Section */}
-        {content?.ctaSection && (
-          <CtaSection content={content.ctaSection} language={language} />
-        )}
       </div>
 
       {footerContent && <FooterCMS data={footerContent} />}

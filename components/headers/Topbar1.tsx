@@ -29,8 +29,8 @@ export default function Topbar1() {
                 </div>
                 <div className="top-bar-content">
                   <i className="icon-Envelope" />
-                  <a href="mailto:info@albahargroup.com" className="caption-1 color-white" aria-label="Email Al Bahar and Partners">
-                  info@albaharpartner.com
+                  <a href="mailto:bpc.info@albahargroup.com" className="caption-1 color-white" aria-label="Email Al Bahar and Partners">
+                  bpc.info@albahargroup.com
                   </a>
                 </div>
               </div>
@@ -50,7 +50,7 @@ export default function Topbar1() {
                 <div className="tf-tb-social">
                   <ul className="tf-social">
                     <li className="item">
-                      <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="Al Bahar & Partners on LinkedIn">
+                      <a href="https://www.linkedin.com/company/bahar-and-partners/posts/?feedView=all" target="_blank" rel="noopener noreferrer" aria-label="Al Bahar & Partners on LinkedIn">
                         <span className="visually-hidden">Al Bahar & Partners on LinkedIn</span>
                         <div className="icon" aria-hidden={true}>
                           <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -60,7 +60,7 @@ export default function Topbar1() {
                       </a>
                     </li>
                     <li className="item">
-                      <a href="https://www.instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Al Bahar & Partners on Instagram">
+                      <a href="https://www.instagram.com/albaharandpartnersco/?hl=en" target="_blank" rel="noopener noreferrer" aria-label="Al Bahar & Partners on Instagram">
                         <span className="visually-hidden">Al Bahar & Partners on Instagram</span>
                         <div className="icon" aria-hidden={true}>
                           <i className="icon-ig1" />

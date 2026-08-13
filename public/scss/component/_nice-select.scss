@@ -2,9 +2,25 @@
 @use "../abstracts/variable";
 
 .nice-select {
-    border: unset !important;
+    -webkit-tap-highlight-color: transparent;
+    background-color: #fff;
+    border: 1px solid #E5E5EA !important;
+    border-radius: 4px;
+    padding: 10px 20px;
+    box-sizing: border-box;
+    clear: both;
+    cursor: pointer;
+    display: block;
+    font-size: 16px;
+    font-weight: 400;
+    outline: none;
     position: relative;
-    &::before{
+    transition: all linear .2s;
+    user-select: none;
+    white-space: nowrap;
+    width: 100%;
+
+    &::before {
         content: '\e90f';
         font-family: variable.$fontIcon;
         position: absolute;
@@ -13,26 +29,47 @@
         transform: translateY(-50%);
         font-weight: 400;
         @include mixin.transition3();
+        pointer-events: none;
+        z-index: 1;
     }
+
     &::after {
         display: none;
     }
 
-    >span {
+    > span {
         font-weight: 400;
         font-size: 16px;
         line-height: 26px;
         color: var(--color-text);
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        padding-right: 28px;
     }
 
-    >.list {
+    > .list {
+        background-color: #fff;
         margin-top: 10px;
         border-radius: 16px;
-        max-height: unset;
-        border: unset !important;
+        max-height: 220px;
+        overflow: auto;
+        border: 1px solid var(--Line) !important;
         top: 110%;
-        border: 1px solid var(--Line);
+        left: 0;
+        width: 100%;
         box-shadow: 0px 5px 18px 5px #40485726;
+        box-sizing: border-box;
+        opacity: 0;
+        pointer-events: none;
+        position: absolute;
+        transform-origin: 50% 0;
+        transform: scale(0.95) translateY(-8px);
+        transition: all 0.2s cubic-bezier(0.5, 0, 0, 1.25), opacity 0.15s ease-out;
+        z-index: 50;
+        padding: 8px;
+        margin: 0;
+
         .option {
             height: 41px;
             padding: 0 15px;
@@ -42,23 +79,42 @@
             line-height: 41px;
             color: var(--secondary);
             position: relative;
+            cursor: pointer;
+            list-style: none;
+            outline: none;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+
+            &:hover,
+            &.focus {
+                background-color: #f6f6f6;
+            }
 
             &.selected {
                 color: var(--secondary);
-                font-weight: 400;
+                font-weight: 600;
             }
         }
-    }
-    &.no-border{
-        border: none !important;
-        padding: 0 !important;
     }
 
     &.open {
         z-index: 50;
-        &::before{
+
+        &::before {
             transform: translateY(-50%) rotate(180deg);
         }
+
+        > .list {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1) translateY(0);
+        }
+    }
+
+    &.no-border {
+        border: none !important;
+        padding: 0 !important;
     }
 
     &.default {
@@ -78,5 +134,4 @@
             left: unset;
         }
     }
-    
 }

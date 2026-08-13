@@ -183,9 +183,9 @@
 }
 
 .career-apply-select {
-  min-height: 56px;
+  /* Matches .form-contact-us inputs (url/text/tel/email) */
+  min-height: 44px;
   width: 100%;
-  padding: 0 16px;
 }
 
 .career-apply-fieldset-sm {

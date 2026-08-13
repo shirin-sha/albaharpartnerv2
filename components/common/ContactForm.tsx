@@ -191,11 +191,13 @@ export default function ContactForm({
         />
       </div>
 
-      <DropdownSelect
-        options={helpOptions}
-        selectedValue={subject}
-        onChange={(value) => setSubject(value)}
-      />
+      <fieldset>
+        <DropdownSelect
+          options={helpOptions}
+          selectedValue={subject}
+          onChange={(value) => setSubject(value)}
+        />
+      </fieldset>
       <fieldset>
         <textarea
           required
@@ -206,34 +208,21 @@ export default function ContactForm({
       </fieldset>
 
       <fieldset className="contact-captcha-field">
-        <label htmlFor="captcha-answer" style={{ display: "block", marginBottom: 8 }}>
+        <label htmlFor="captcha-answer">
           {isRtl ? "أدخل النص الظاهر في الصورة" : "Enter the text shown in the image"}
         </label>
-        <div style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+        <div className="contact-captcha-row">
           {captchaImage ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={captchaImage}
               alt={isRtl ? "صورة رمز التحقق" : "Captcha image"}
               width={180}
-              height={56}
-              style={{
-                borderRadius: 6,
-                border: "1px solid #c5ccd4",
-                background: "#eef1f4",
-                userSelect: "none",
-              }}
+              height={44}
+              className="contact-captcha-image"
             />
           ) : (
-            <div
-              style={{
-                width: 180,
-                height: 56,
-                borderRadius: 6,
-                background: "#eef1f4",
-                border: "1px solid #c5ccd4",
-              }}
-            />
+            <span className="contact-captcha-placeholder" aria-hidden="true" />
           )}
           <button
             type="button"
@@ -255,10 +244,9 @@ export default function ContactForm({
           value={captchaAnswer}
           onChange={(e) => setCaptchaAnswer(e.target.value)}
           placeholder={isRtl ? "أدخل الأحرف" : "Type the characters"}
-          style={{ marginTop: 10, width: "100%" }}
         />
         {captchaError && (
-          <p style={{ color: "red", marginTop: 8, marginBottom: 0 }}>{captchaError}</p>
+          <p className="contact-captcha-error">{captchaError}</p>
         )}
       </fieldset>
 

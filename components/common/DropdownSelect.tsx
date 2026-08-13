@@ -20,12 +20,22 @@ export default function DropdownSelect({
   addtionalParentClass = "",
 }: DropdownSelectProps) {
   const selectRef = useRef<HTMLDivElement | null>(null);
-  const optionsRef = useRef<HTMLUListElement | null>(null);
-  const [selected, setSelected] = useState<string>(options[0]);
+  const [selected, setSelected] = useState<string>(
+    selectedValue || defaultOption || options[0] || ""
+  );
+  const [isOpen, setIsOpen] = useState(false);
 
-  const toggleDropdown = () => {
-    selectRef.current?.classList.toggle("open");
-  };
+  useEffect(() => {
+    if (selectedValue) {
+      setSelected(selectedValue);
+    }
+  }, [selectedValue]);
+
+  useEffect(() => {
+    if (!selectedValue && options[0] && !options.includes(selected)) {
+      setSelected(options[0]);
+    }
+  }, [options, selected, selectedValue]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -33,7 +43,7 @@ export default function DropdownSelect({
         selectRef.current &&
         !selectRef.current.contains(event.target as Node)
       ) {
-        selectRef.current.classList.remove("open");
+        setIsOpen(false);
       }
     };
 
@@ -43,47 +53,43 @@ export default function DropdownSelect({
     };
   }, []);
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        selectRef.current &&
-        selectRef.current.contains(event.target as Node) &&
-        optionsRef.current &&
-        !optionsRef.current.contains(event.target as Node)
-      ) {
-        toggleDropdown();
-      }
-    };
-
-    document.addEventListener("click", handleClickOutside);
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, []);
+  const displayValue = selectedValue || selected || defaultOption || options[0];
 
   return (
-    <div className={`nice-select ${addtionalParentClass}`} ref={selectRef}>
-      <span className="current">
-        {selectedValue || selected || defaultOption || options[0]}
-      </span>
-      <ul className="list" ref={optionsRef}>
+    <div
+      className={["nice-select", addtionalParentClass, isOpen ? "open" : ""]
+        .filter(Boolean)
+        .join(" ")}
+      ref={selectRef}
+      onClick={() => setIsOpen((open) => !open)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          setIsOpen((open) => !open);
+        }
+      }}
+      aria-expanded={isOpen}
+      aria-haspopup="listbox"
+    >
+      <span className="current">{displayValue}</span>
+      <ul
+        className="list"
+        role="listbox"
+        onClick={(event) => event.stopPropagation()}
+      >
         {options.map((elm, i) => (
           <li
             key={i}
             onClick={() => {
               setSelected(elm);
               onChange(elm);
-              toggleDropdown();
+              setIsOpen(false);
             }}
-            className={`option ${
-              !selectedValue
-                ? selected === elm
-                  ? "selected"
-                  : ""
-                : selectedValue === elm
-                ? "selected"
-                : ""
-            }  text text-1`}
+            className={`option ${displayValue === elm ? "selected" : ""} text text-1`}
+            role="option"
+            aria-selected={displayValue === elm}
           >
             {elm}
           </li>

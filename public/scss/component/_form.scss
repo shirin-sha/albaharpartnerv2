@@ -175,7 +175,8 @@ input[type="checkbox"] {
 
     input[type="text"],
     input[type="number"],
-    input[type="email"] {
+    input[type="email"],
+    input[type="tel"] {
         background-color: var(--bg-1);
         border: 1px solid var(--bg-1);
         border-radius: 4px;
@@ -199,10 +200,13 @@ input[type="checkbox"] {
         background-color: var(--bg-1);
         border-color: var(--bg-1) !important;
         margin-bottom: 12px;
-        padding: 10px 16px;
+        padding: 11px 16px;
+        min-height: 44px;
+        box-sizing: border-box;
 
         &::before {
             color: var(--white);
+            right: 16px;
         }
 
         >span {
@@ -210,12 +214,17 @@ input[type="checkbox"] {
             font-weight: 400;
             font-size: 14px;
             line-height: 22px;
+            display: block;
+            padding-right: 24px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
     }
 
     textarea {
         border: 1px solid var(--bg-1);
-        margin-bottom: 24px;
+        margin-bottom: 12px;
         height: 86px;
         background-color: var(--bg-1);
         color: var(--white);
@@ -229,6 +238,52 @@ input[type="checkbox"] {
             font-weight: 400;
             font-size: 14px;
             line-height: 22px;
+        }
+    }
+
+    .contact-captcha-field {
+        margin-bottom: 12px;
+
+        > label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--white);
+            font-size: 14px;
+            line-height: 22px;
+        }
+
+        .contact-captcha-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .contact-captcha-image,
+        .contact-captcha-placeholder {
+            width: 180px;
+            height: 44px;
+            border-radius: 4px;
+            border: 1px solid var(--bg-1);
+            background: #eef1f4;
+            object-fit: cover;
+            user-select: none;
+        }
+
+        .contact-captcha-placeholder {
+            display: block;
+        }
+
+        input[type="text"] {
+            margin-bottom: 0;
+        }
+
+        .contact-captcha-error {
+            color: #ff6b6b;
+            margin-top: 8px;
+            margin-bottom: 0;
+            font-size: 14px;
         }
     }
 
@@ -248,23 +303,21 @@ input[type="checkbox"] {
 
         input[type="text"],
         input[type="number"],
-        input[type="email"] {
+        input[type="email"],
+        input[type="tel"] {
             background-color: var(--white);
             border: 1px solid var(--outline);
             color: var(--on-suface-container);
 
             &::placeholder {
                 color: var(--on-suface-variant-2);
-
-
             }
         }
 
         .nice-select {
             background-color: var(--white);
-            border:1px solid var(--outline) !important;
+            border: 1px solid var(--outline) !important;
             margin-bottom: 12px;
-
 
             &::before {
                 color: var(--on-suface-container);
@@ -273,7 +326,6 @@ input[type="checkbox"] {
             >span {
                 color: var(--on-suface-container);
             }
-
         }
 
         textarea {
@@ -283,7 +335,21 @@ input[type="checkbox"] {
 
             &::placeholder {
                 color: var(--on-suface-variant-2);
+            }
+        }
 
+        .contact-captcha-field {
+            > label {
+                color: var(--on-suface-container);
+            }
+
+            .contact-captcha-image,
+            .contact-captcha-placeholder {
+                border: 1px solid var(--outline);
+            }
+
+            .contact-captcha-error {
+                color: red;
             }
         }
     }
@@ -338,28 +404,63 @@ input[type="checkbox"] {
     input[type="text"],
     input[type="number"],
     input[type="email"],
-    input[type="tel"] {
+    input[type="tel"],
+    input[type="url"],
+    select {
         background-color: var(--white);
         border: 1px solid var(--outline);
         border-radius: 4px;
         color: var(--on-suface-container);
         padding: 9px 16px;
+        width: 100%;
+        min-height: 44px;
+        box-sizing: border-box;
+        font-size: 16px;
+        font-weight: 400;
+        line-height: 26px;
+        outline: none;
 
         &::placeholder {
             color: var(--on-suface-variant-2);
         }
     }
 
+    select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        cursor: pointer;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2324283e' d='M1.4 0.6 6 5.2 10.6.6 12 2 6 8 0 2z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 16px center;
+        padding-right: 40px;
+
+        &:invalid,
+        &:required:invalid {
+            color: var(--on-suface-variant-2);
+        }
+
+        option {
+            color: var(--on-suface-container);
+        }
+    }
+
     .nice-select {
         background-color: var(--white);
         border: 1px solid var(--outline) !important;
-        padding: 11px 16px;
+        padding: 9px 16px;
+        min-height: 44px;
+        box-sizing: border-box;
+
         &::before {
             color: var(--on-suface-container);
+            right: 16px;
         }
 
         >span {
             color: var(--on-suface-container);
+            font-size: 16px;
+            line-height: 26px;
         }
     }
 

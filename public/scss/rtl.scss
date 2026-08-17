@@ -87,6 +87,10 @@
     display: inline-block;
   }
 
+  .footer .support-item-footer .ltr-inline {
+    unicode-bidi: plaintext;
+  }
+
   #toggle-rtl {
     left: 15px;
     right: auto;

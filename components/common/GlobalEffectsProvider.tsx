@@ -32,6 +32,54 @@ function runWhenBrowserIdle(callback: () => void, timeout = 2500) {
   };
 }
 
+/**
+ * Wait until React has finished hydrating nested Suspense / next/dynamic
+ * trees before mutating the DOM (GSAP, WOW). Scroll restoration can fire
+ * during hydration and would otherwise write inline styles onto SSR HTML
+ * that React has not claimed yet.
+ */
+function runAfterHydration(callback: () => void, extraDelayMs = 150) {
+  if (typeof window === "undefined") return () => {};
+
+  let cancelled = false;
+  let scheduled = false;
+  let raf1 = 0;
+  let raf2 = 0;
+  let delayId: ReturnType<typeof setTimeout> | null = null;
+  let fallbackId: ReturnType<typeof setTimeout> | null = null;
+
+  const run = () => {
+    if (cancelled) return;
+    callback();
+  };
+
+  const schedule = () => {
+    if (cancelled || scheduled) return;
+    scheduled = true;
+    raf1 = window.requestAnimationFrame(() => {
+      raf2 = window.requestAnimationFrame(() => {
+        delayId = setTimeout(run, extraDelayMs);
+      });
+    });
+  };
+
+  if (document.readyState === "complete") {
+    schedule();
+  } else {
+    window.addEventListener("load", schedule, { once: true });
+    fallbackId = setTimeout(schedule, 400);
+  }
+
+  return () => {
+    cancelled = true;
+    window.removeEventListener("load", schedule);
+    window.cancelAnimationFrame(raf1);
+    window.cancelAnimationFrame(raf2);
+    if (delayId) clearTimeout(delayId);
+    if (fallbackId) clearTimeout(fallbackId);
+  };
+}
+
 export default function GlobalEffectsProvider() {
   const hasLoadedBootstrap = useRef(false);
   const bootstrapRef = useRef<{ Modal: any; Offcanvas: any } | null>(null);
@@ -106,13 +154,14 @@ export default function GlobalEffectsProvider() {
     });
   }, [pathname]);
 
-  // WOW.js — idle / first scroll (skip on mobile)
+  // WOW.js — after hydration, then idle / first scroll (skip on mobile)
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (isMobileViewport()) return;
 
     let started = false;
     let cancelIdle: (() => void) | null = null;
+    let removeInteract: (() => void) | null = null;
 
     const initWow = async () => {
       if (started) return;
@@ -132,22 +181,29 @@ export default function GlobalEffectsProvider() {
       }
     };
 
-    const onScroll = () => {
-      void initWow();
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("pointerdown", onScroll);
-    };
+    const cancelHydrationWait = runAfterHydration(() => {
+      const onScroll = () => {
+        void initWow();
+        window.removeEventListener("scroll", onScroll);
+        window.removeEventListener("pointerdown", onScroll);
+      };
 
-    window.addEventListener("scroll", onScroll, { passive: true, once: true });
-    window.addEventListener("pointerdown", onScroll, { once: true });
-    cancelIdle = runWhenBrowserIdle(() => {
-      void initWow();
-    }, 2800);
+      window.addEventListener("scroll", onScroll, { passive: true, once: true });
+      window.addEventListener("pointerdown", onScroll, { once: true });
+      removeInteract = () => {
+        window.removeEventListener("scroll", onScroll);
+        window.removeEventListener("pointerdown", onScroll);
+      };
+
+      cancelIdle = runWhenBrowserIdle(() => {
+        void initWow();
+      }, 2800);
+    });
 
     return () => {
+      cancelHydrationWait();
       cancelIdle?.();
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("pointerdown", onScroll);
+      removeInteract?.();
     };
   }, [pathname]);
 
@@ -325,23 +381,42 @@ export default function GlobalEffectsProvider() {
       });
     };
 
-    const onInteract = () => {
-      void runAnimations();
-      window.removeEventListener("scroll", onInteract);
-      window.removeEventListener("pointerdown", onInteract);
-    };
+    let removeInteract: (() => void) | null = null;
+    let cancelIdle: (() => void) | null = null;
 
-    window.addEventListener("scroll", onInteract, { passive: true, once: true });
-    window.addEventListener("pointerdown", onInteract, { once: true });
-    const cancelIdle = runWhenBrowserIdle(() => {
-      void runAnimations();
-    }, 3200);
+    const cancelHydrationWait = runAfterHydration(() => {
+      const onInteract = () => {
+        void runAnimations();
+        window.removeEventListener("scroll", onInteract);
+        window.removeEventListener("pointerdown", onInteract);
+      };
+
+      window.addEventListener("scroll", onInteract, { passive: true, once: true });
+      window.addEventListener("pointerdown", onInteract, { once: true });
+      removeInteract = () => {
+        window.removeEventListener("scroll", onInteract);
+        window.removeEventListener("pointerdown", onInteract);
+      };
+
+      cancelIdle = runWhenBrowserIdle(() => {
+        void runAnimations();
+      }, 3200);
+    });
 
     return () => {
       isCancelled = true;
-      cancelIdle();
-      window.removeEventListener("scroll", onInteract);
-      window.removeEventListener("pointerdown", onInteract);
+      cancelHydrationWait();
+      cancelIdle?.();
+      removeInteract?.();
+      if (gsapRef.current) {
+        document
+          .querySelectorAll(
+            ".text-anime-wave, .text-anime-wave-1, .text-anime-wave-2, .text-anime-wave-3"
+          )
+          .forEach((el) => {
+            gsapRef.current.set(el, { clearProps: "all" });
+          });
+      }
       if (scrollTriggerRef.current) {
         scrollTriggerRef.current.getAll().forEach((st: any) => st.kill());
       }
@@ -388,19 +463,26 @@ export default function GlobalEffectsProvider() {
       }
     };
 
-    const onInteract = () => {
-      void run();
-      window.removeEventListener("scroll", onInteract);
-    };
-    window.addEventListener("scroll", onInteract, { passive: true, once: true });
-    const cancelIdle = runWhenBrowserIdle(() => {
-      void run();
-    }, 3500);
+    let removeInteract: (() => void) | null = null;
+    let cancelIdle: (() => void) | null = null;
+
+    const cancelHydrationWait = runAfterHydration(() => {
+      const onInteract = () => {
+        void run();
+        window.removeEventListener("scroll", onInteract);
+      };
+      window.addEventListener("scroll", onInteract, { passive: true, once: true });
+      removeInteract = () => window.removeEventListener("scroll", onInteract);
+      cancelIdle = runWhenBrowserIdle(() => {
+        void run();
+      }, 3500);
+    });
 
     return () => {
       isCancelled = true;
-      cancelIdle();
-      window.removeEventListener("scroll", onInteract);
+      cancelHydrationWait();
+      cancelIdle?.();
+      removeInteract?.();
     };
   }, [pathname]);
 
@@ -438,19 +520,26 @@ export default function GlobalEffectsProvider() {
       });
     };
 
-    const onInteract = () => {
-      void run();
-      window.removeEventListener("scroll", onInteract);
-    };
-    window.addEventListener("scroll", onInteract, { passive: true, once: true });
-    const cancelIdle = runWhenBrowserIdle(() => {
-      void run();
-    }, 3500);
+    let removeInteract: (() => void) | null = null;
+    let cancelIdle: (() => void) | null = null;
+
+    const cancelHydrationWait = runAfterHydration(() => {
+      const onInteract = () => {
+        void run();
+        window.removeEventListener("scroll", onInteract);
+      };
+      window.addEventListener("scroll", onInteract, { passive: true, once: true });
+      removeInteract = () => window.removeEventListener("scroll", onInteract);
+      cancelIdle = runWhenBrowserIdle(() => {
+        void run();
+      }, 3500);
+    });
 
     return () => {
       isCancelled = true;
-      cancelIdle();
-      window.removeEventListener("scroll", onInteract);
+      cancelHydrationWait();
+      cancelIdle?.();
+      removeInteract?.();
     };
   }, [pathname]);
 

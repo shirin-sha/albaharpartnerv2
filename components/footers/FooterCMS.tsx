@@ -155,6 +155,30 @@ export default function FooterCMS({ data, parentClass = "footer style-2", light 
     return "";
   };
 
+  const isLtrContactValue = (value: string) => {
+    const trimmed = (value || "").trim();
+    if (!trimmed) return false;
+    if (/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(trimmed)) return true;
+    if (/^\+?[0-9()\-\s]{7,}$/.test(trimmed)) return true;
+    return false;
+  };
+
+  const renderContactValue = (value: string) => {
+    if (!isLtrContactValue(value)) return value;
+    return (
+      <span dir="ltr" className="ltr-inline">
+        {value}
+      </span>
+    );
+  };
+
+  const renderContactItemContent = (item: { label: string; value: string }) => (
+    <>
+      {item.label ? `${item.label}: ` : null}
+      {renderContactValue(item.value)}
+    </>
+  );
+
   return (
     <footer className={parentClass} id="footer">
       <div className="tf-container position-relative z-5">
@@ -263,13 +287,11 @@ export default function FooterCMS({ data, parentClass = "footer style-2", light 
                             <li key={item._id || index} className="support-item-footer caption-1">
                               {getContactItemHref(item) ? (
                                 <Link href={getContactItemHref(item)}>
-                                  {item.label && `${item.label}: `}
-                                  {item.value}
+                                  {renderContactItemContent(item)}
                                 </Link>
                               ) : (
                                 <span>
-                                  {item.label && `${item.label}: `}
-                                  {item.value}
+                                  {renderContactItemContent(item)}
                                 </span>
                               )}
                             </li>
@@ -290,13 +312,11 @@ export default function FooterCMS({ data, parentClass = "footer style-2", light 
                             <li key={item._id || index} className="support-item-footer caption-1">
                               {getContactItemHref(item) ? (
                                 <Link href={getContactItemHref(item)}>
-                                  {item.label && `${item.label}: `}
-                                  {item.value}
+                                  {renderContactItemContent(item)}
                                 </Link>
                               ) : (
                                 <span>
-                                  {item.label && `${item.label}: `}
-                                  {item.value}
+                                  {renderContactItemContent(item)}
                                 </span>
                               )}
                             </li>

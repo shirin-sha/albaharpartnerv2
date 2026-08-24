@@ -13,6 +13,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/career",
     "/contact-us",
     "/support",
+    "/customer-care-center",
     "/ar",
   ];
 

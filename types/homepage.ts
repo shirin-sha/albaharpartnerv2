@@ -76,6 +76,7 @@ export interface ProcessSection {
   subheading: string;
   buttonText: string;
   buttonLink: string;
+  imagePath?: string;
   steps: ProcessStep[];
   language: 'ltr' | 'rtl';
   isActive: boolean;

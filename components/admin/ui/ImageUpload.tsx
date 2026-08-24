@@ -118,11 +118,7 @@ export default function ImageUpload({
     });
   };
 
-  const displaySrc =
-    previewUrl ||
-    (value.startsWith('/image/')
-      ? value.replace('/image/', '/api/uploads/')
-      : value);
+  const displaySrc = previewUrl || value;
 
   const hasImage = Boolean(previewUrl || value);
 

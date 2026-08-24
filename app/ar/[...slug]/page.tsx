@@ -6,7 +6,7 @@ import React from "react";
 import { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { getHeaderContent, getFooterContent, getAboutUsContent, getSolutionsContent, getContactUsContent, getSupportContent, getCareersContent, getCustomerStoriesContent, getNewsUpdatesContent, getBrandsContent } from "@/lib/data-fetch";
+import { getHeaderContent, getFooterContent, getAboutUsContent, getSolutionsContent, getContactUsContent, getSupportContent, getCareersContent, getCustomerStoriesContent, getNewsUpdatesContent, getBrandsContent, getCustomerCareContent } from "@/lib/data-fetch";
 import Breadcumb from "@/components/common/Breadcumb";
 import AboutAlBaharCMS from "@/components/otherPages/AboutAlBaharCMS";
 import VisionMissionValuesCMS from "@/components/otherPages/VisionMissionValuesCMS";
@@ -19,6 +19,7 @@ import ContactCMS from "@/components/otherPages/ContactCMS";
 import MapCMS from "@/components/otherPages/MapCMS";
 import SupportServicesCMS from "@/components/otherPages/SupportServicesCMS";
 import SupportContactCMS from "@/components/otherPages/SupportContactCMS";
+import CustomerCareCMS from "@/components/otherPages/CustomerCareCMS";
 import CareerCMS from "@/components/otherPages/CareerCMS";
 import CustomerStoriesCMS from "@/components/case-studies/CustomerStoriesCMS";
 import NewsUpdatesCMS from "@/components/blogs/NewsUpdatesCMS";
@@ -335,6 +336,50 @@ export default async function ArabicPage({ params, searchParams }: PageProps) {
                 <SupportContactCMS data={content} />
               </>
             )}
+          </div>
+        </>
+      );
+      break;
+    }
+
+    case 'customer-care-center': {
+      const content = await getCustomerCareContent(language);
+      const header = content?.header;
+      pageContent = (
+        <>
+          {header?.isActive !== false && (
+            <div className="ccc-hero">
+              {header?.imagePath && (
+                <Image
+                  src={header.imagePath}
+                  alt={header.title || "Customer Care Center"}
+                  fill
+                  priority
+                  quality={75}
+                  sizes="100vw"
+                  className="ccc-hero-image"
+                  style={{ objectFit: "cover" }}
+                />
+              )}
+              <div className="ccc-hero-overlay" aria-hidden="true" />
+              <div className="tf-container ccc-hero-inner">
+                <div className="ccc-hero-content">
+                  <Breadcumb pageName={header?.breadcrumb || "مركز خدمة العملاء"} />
+                  {header?.tag && (
+                    <span className="ccc-hero-tag text-btn-uppercase">{header.tag}</span>
+                  )}
+                  <h1 className="ccc-hero-title">
+                    {header?.title || "مركز خدمة العملاء لدى البحر"}
+                  </h1>
+                  {header?.subtitle && (
+                    <p className="ccc-hero-subtitle body-2">{header.subtitle}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+          <div className="main-content">
+            {content && <CustomerCareCMS data={content} language="rtl" />}
           </div>
         </>
       );

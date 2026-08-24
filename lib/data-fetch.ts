@@ -16,6 +16,7 @@ import { ContactUsContent } from '@/types/contact-us';
 import { SupportContent } from '@/types/support';
 import { CareersContent } from '@/types/careers';
 import { BrandsContent } from '@/types/brands';
+import { CustomerCareContent } from '@/types/customer-care-center';
 import { unstable_cache } from 'next/cache';
 
 const DB_NAME = 'albaharpartners1';
@@ -366,6 +367,36 @@ export async function getSupportContent(language: 'ltr' | 'rtl' = 'ltr'): Promis
     [`support-${language}`],
     {
       tags: [`${CACHE_TAG_PREFIX}-support-${language}`],
+      revalidate: CACHE_REVALIDATE,
+    }
+  )();
+}
+
+/**
+ * Fetch Customer Care Center content directly from database (cached)
+ */
+export async function getCustomerCareContent(
+  language: 'ltr' | 'rtl' = 'ltr'
+): Promise<CustomerCareContent | null> {
+  return unstable_cache(
+    async () => {
+      try {
+        const db = await getDatabase(DB_NAME);
+        const collection = db.collection<CustomerCareContent>('customer-care-center');
+        const content = await collection.findOne({ language });
+        if (!content) return null;
+        return {
+          ...content,
+          _id: content._id?.toString(),
+        } as CustomerCareContent;
+      } catch (error) {
+        console.error('Error fetching customer care content:', error);
+        return null;
+      }
+    },
+    [`customer-care-center-${language}`],
+    {
+      tags: [`${CACHE_TAG_PREFIX}-customer-care-center-${language}`],
       revalidate: CACHE_REVALIDATE,
     }
   )();

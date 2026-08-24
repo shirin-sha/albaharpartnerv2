@@ -60,6 +60,7 @@ export async function revalidateByContentType(contentType: string): Promise<void
     aboutus: ['/about-us'],
     'contact-us': ['/contact-us'],
     support: ['/support'],
+    'customer-care-center': ['/customer-care-center', '/ar/customer-care-center'],
     careers: ['/career'],
     brands: ['/brands'],
   };

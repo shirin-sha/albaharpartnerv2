@@ -33,6 +33,7 @@ function getEmptyContent(lang: 'ltr' | 'rtl'): HomepageContent {
       subheading: '',
       buttonText: '',
       buttonLink: '',
+      imagePath: '',
       steps: [],
       language: lang,
       isActive: true,

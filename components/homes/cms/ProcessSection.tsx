@@ -1,77 +1,100 @@
 import Link from "next/link";
+import Image from "next/image";
 import React from "react";
 import { ProcessSection as ProcessSectionType } from "@/types/homepage";
 
+const DEFAULT_BANNER = "/image/section/bg-section-process-h8.jpg";
+
 interface ProcessSectionProps {
   content: ProcessSectionType;
-  language?: 'ltr' | 'rtl';
+  language?: "ltr" | "rtl";
 }
 
-export default function ProcessSection({ content, language = 'ltr' }: ProcessSectionProps) {
+export default function ProcessSection({
+  content,
+  language = "ltr",
+}: ProcessSectionProps) {
   if (!content.isActive) {
     return null;
   }
 
-  const activeSteps = content.steps
-    .filter(step => step.isActive)
+  const activeSteps = (content.steps || [])
+    .filter((step) => step.isActive)
     .sort((a, b) => a.order - b.order);
 
-  if (activeSteps.length === 0) {
-    return null;
-  }
+  const bannerSrc = content.imagePath?.trim() || DEFAULT_BANNER;
+  const rawHref = content.buttonLink || "/contact-us";
+  const buttonHref =
+    language === "rtl" &&
+    rawHref.startsWith("/") &&
+    !rawHref.startsWith("/ar")
+      ? rawHref === "/"
+        ? "/ar"
+        : `/ar${rawHref}`
+      : rawHref;
 
   return (
-    <section className="section-process h-8 tf-spacing-2 hover-active-step" dir={language}>
-      <div className="tf-container position-relative">
-        <div className="row">
-          <div className="col-12">
-            <div className="heading-section style-2 style-color-white">
-              <div className="left">
-                <div className="text-anime-wave">
-                  <span className="tag label text-btn-uppercase color-white">
-                    {content.tag}
-                  </span>
-                </div>
-                <h2 className="title-section mb-12 text-anime-wave">
-                  {content.heading}
-                </h2>
-                <div className="sub-title body-2 text-anime-wave">
-                  {content.subheading}
-                </div>
+    <section className="section-advantage" dir={language}>
+      <div className="advantage-banner">
+        <Image
+          src={bannerSrc}
+          alt={content.heading}
+          className="advantage-banner-image"
+          fill
+          loading="eager"
+          quality={75}
+          sizes="100vw"
+          style={{ objectFit: "cover" }}
+        />
+        <div className="advantage-banner-overlay" aria-hidden="true" />
+        <div className="tf-container advantage-banner-inner">
+          <div className="advantage-banner-content">
+            {content.tag && (
+              <div className="advantage-tag-wrap">
+                <span className="advantage-tag text-btn-uppercase">
+                  {content.tag}
+                </span>
               </div>
-              <div className="text-anime-wave-2">
-                <Link href={content.buttonLink || '/contact-us'} className="tf-btn style-1 bg-white">
-                  <span>{content.buttonText}</span>
-                </Link>
-              </div>
-            </div>
-            <div
-              className="sw-case-studies sw-layout"
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
-                gap: "20px",
-              }}
-            >
+            )}
+            <h2 className="advantage-heading">{content.heading}</h2>
+            {content.subheading && (
+              <p className="advantage-desc body-2">{content.subheading}</p>
+            )}
+            {content.buttonText && (
+              <Link
+                href={buttonHref}
+                className="tf-btn style-1 bg-white hover-bg-primary advantage-cta"
+              >
+                <span>{content.buttonText}</span>
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {activeSteps.length > 0 && (
+        <div className="advantage-features">
+          <div className="tf-container">
+            <div className="advantage-features-grid">
               {activeSteps.map((step, index) => (
-                <div key={index}>
-                  <div className="process-item bg-1 bg-1-style-2 step-hover">
-                    <div className="process-top">
-                      <span className="label text-btn-uppercase">{step.title}</span>
-                    </div>
-                    <div className="process-content">
-                      <div
-                        className="desc cms-rich-text"
-                        dangerouslySetInnerHTML={{ __html: step.description }}
-                      />
-                    </div>
-                  </div>
+                <div
+                  className="advantage-feature-item"
+                  key={step._id || `${step.order}-${index}`}
+                >
+                  <h5 className="advantage-feature-title text-btn-uppercase">
+                    {step.title}
+                  </h5>
+                  <div className="advantage-feature-line" aria-hidden="true" />
+                  <div
+                    className="advantage-feature-text"
+                    dangerouslySetInnerHTML={{ __html: step.description }}
+                  />
                 </div>
               ))}
             </div>
           </div>
         </div>
-      </div>
+      )}
     </section>
   );
 }

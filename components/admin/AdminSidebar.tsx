@@ -176,6 +176,12 @@ export default function AdminSidebar() {
                 <span className="admin-sidebar-label"><span className="admin-sidebar-icon"><SidebarIcon name="support" /></span><span>Support</span></span>
               </Link>
               <Link
+                href="/admin/cms/customer-care-center"
+                className={`admin-sidebar-link admin-sidebar-sublink ${isActive('/admin/cms/customer-care-center') ? 'active' : ''}`}
+              >
+                <span className="admin-sidebar-label"><span className="admin-sidebar-icon"><SidebarIcon name="support" /></span><span>Customer Care</span></span>
+              </Link>
+              <Link
                 href="/admin/cms/contact-us"
                 className={`admin-sidebar-link admin-sidebar-sublink ${isActive('/admin/cms/contact-us') ? 'active' : ''}`}
               >

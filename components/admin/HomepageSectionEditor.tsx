@@ -67,7 +67,17 @@ export default function HomepageSectionEditor({
           : sectionId === 'services'
             ? { tag: '', heading: '', subheading: '', language: 'ltr', isActive: true }
             : sectionId === 'process'
-              ? { steps: [], tag: '', heading: '', subheading: '', buttonText: '', buttonLink: '', language: 'ltr', isActive: true }
+              ? {
+                  steps: [],
+                  tag: '',
+                  heading: '',
+                  subheading: '',
+                  buttonText: '',
+                  buttonLink: '',
+                  imagePath: '',
+                  language: 'ltr',
+                  isActive: true,
+                }
               : sectionId === 'caseStudies'
                 ? { caseStudies: [], tag: '', heading: '', subheading: '', language: 'ltr', isActive: true }
                 : sectionId === 'features'
@@ -143,7 +153,13 @@ export default function HomepageSectionEditor({
         onClick={handleCancel}
         style={{ background: '#ffffff', borderBottom: '1px solid #e5e7eb', padding: '16px 24px' }}
       >
-        <h3 style={{ color: '#1f2937', fontWeight: '600', margin: 0, textTransform: 'capitalize' }}>{sectionId}</h3>
+        <h3 style={{ color: '#1f2937', fontWeight: '600', margin: 0 }}>
+          {sectionId === 'process'
+            ? 'Our Advantage'
+            : sectionId === 'features'
+              ? 'Why Choose Us'
+              : sectionId.charAt(0).toUpperCase() + sectionId.slice(1)}
+        </h3>
         <span className="admin-cms-toggle">{isOpen ? '−' : '+'}</span>
       </div>
       {isOpen && (

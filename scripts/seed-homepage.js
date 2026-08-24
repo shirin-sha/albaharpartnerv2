@@ -59,10 +59,11 @@ const defaultLTRContent = {
 
   processSection: {
     tag: "OUR ADVANTAGE",
-    heading: "Partnership That Delivers Results",
-    subheading: "A structured approach, strong partnerships, and reliable support—built to keep your business moving.",
+    heading: "A Partnership That Delivers Results",
+    subheading: "A structured approach, strong partnerships, and reliable support built to keep your business moving.",
     buttonText: "Schedule A Consultation",
     buttonLink: "/contact-us",
+    imagePath: "/image/section/bg-section-process-h8.jpg",
     steps: [
       {
         title: "Trusted Partnerships",
@@ -360,6 +361,7 @@ const defaultRTLContent = {
     subheading: "نهج منظم وشراكات قوية ودعم موثوق - مصمم للحفاظ على عملك في حركة مستمرة.",
     buttonText: "حجز استشارة",
     buttonLink: "/contact-us",
+    imagePath: "/image/section/bg-section-process-h8.jpg",
     steps: [
       {
         title: "شراكات موثوقة",

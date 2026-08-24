@@ -1,6 +1,7 @@
 'use client';
 
 import { ProcessStep } from '@/types/homepage';
+import ImageUpload from '@/components/admin/ui/ImageUpload';
 import RichTextEditor from '@/components/admin/ui/RichTextEditor';
 import type { SectionFieldsProps } from '@/app/admin/homepage/types';
 
@@ -13,6 +14,22 @@ export function ProcessFields({ formData, setFormData, updateField }: SectionFie
 
   return (
     <>
+      <div className="form-group">
+        <ImageUpload
+          label="Banner Background Image"
+          value={String(
+            (ltr?.imagePath as string) ||
+              (rtl?.imagePath as string) ||
+              ''
+          )}
+          onChange={(value) => {
+            updateField('ltr', 'imagePath', value);
+            updateField('rtl', 'imagePath', value);
+          }}
+          folder="section"
+          helperText="Full-width banner behind the purple overlay. Recommended: 1920 × 900 px ."
+        />
+      </div>
       <div>
         <div className="form-row-bilingual-header">
           <div className="form-label-header">English</div>
@@ -89,7 +106,7 @@ export function ProcessFields({ formData, setFormData, updateField }: SectionFie
         />
       </div>
       <div className="form-group">
-        <label>Steps</label>
+        <label>Advantage Items</label>
         <div className="hero-slides-container">
           {Array.from({ length: maxSteps }).map((_, index: number) => {
             const stepLtr = stepsLtr[index] ?? { title: '', description: '', order: index, language: 'ltr', isActive: true };

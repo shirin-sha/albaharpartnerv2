@@ -115,7 +115,7 @@ export default function CustomerCareCMS({ data, language = "ltr" }: Props) {
           <div className="tf-container">
             <div className="heading-section text-center">
               <div className="text-anime-wave-1">
-                <span className="tag label text-btn-uppercase">
+                <span className="tag label text-btn-uppercase bg-white">
                   {data.servicesSection.tag}
                 </span>
               </div>
@@ -192,7 +192,7 @@ export default function CustomerCareCMS({ data, language = "ltr" }: Props) {
               <div className="col-lg-6">
                 <div className="heading-section mb-0">
                   <div className="text-anime-wave-1">
-                    <span className="tag label text-btn-uppercase">
+                    <span className="tag label text-btn-uppercase bg-white">
                       {data.whySection.tag}
                     </span>
                   </div>

@@ -9,26 +9,26 @@ $font-main7: var(--font-archivo), sans-serif;
 $fontIcon: "icomoon";
 
 :root {
-    --primary: #6d2c84;
+    --primary: #6D2C84;
     --white: #ffffff;
     --black: #000000;
     --error: #C72929;
-    --on-suface-container: #24283E;
-    --on-suface-variant-1: #6D7074;
-    --on-suface-variant-2: #A2A3AB;
-    --surface: #F3F5F5;
-    --outline: #E4E4E4;
+    --on-suface-container: #2F123C;
+    --on-suface-variant-1: #6B5474;
+    --on-suface-variant-2: #A894B0;
+    --surface: #F7F2F9;
+    --outline: #E8DDEF;
     --line-1: #FFFFFF26;
     --bg-1: #FFFFFF26;
-    --bg-2: #ECF2F2;
-    --bg-3: rgba(0, 0, 0, 0.15);
+    --bg-2: #EFE4F4;
+    --bg-3: rgba(47, 18, 60, 0.15);
     --bg-4: #6d2c8466;
-    --bg-5: #24283E1A;
-    --bg-6: #F7F7F7;
-    --color-text-1: #ADF9EB;
-    --color-text-2: #636666;
-    --color-text-3: #858585;
+    --bg-5: #2F123C1A;
+    --bg-6: #FBF8FC;
+    --color-text-1: #E8D4F2;
+    --color-text-2: #6B5474;
+    --color-text-3: #8C7396;
     --color-text-4: #;
-    --border-1: rgba(36, 40, 62, 0.2);
-
+    --border-1: rgba(47, 18, 60, 0.18);
+    --overlay-dark: #2F123C;
 }

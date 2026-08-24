@@ -370,7 +370,7 @@ export default function GlobalEffectsProvider() {
             toggleActions: "play none none reverse",
             scrub: true,
           },
-          color: "#24283E",
+          color: "#2F123C",
           stagger: {
             each: 0.05,
             from: "start",

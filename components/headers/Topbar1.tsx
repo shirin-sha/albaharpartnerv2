@@ -21,11 +21,31 @@ export default function Topbar1() {
           <div className="col-12">
             <div className="top-bar-inner">
               <div className="tf-tb-left">
-                <div className="top-bar-content">
-                  <i className="icon-MapPin" />
-                  <p className="caption-1">
-                  Kuwait City, Kuwait
-                  </p>
+                <div className="top-bar-content top-bar-locations">
+                  <a
+                    href="https://www.google.com/maps?q=29.362696,47.962198"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="caption-1 color-white top-bar-location-link"
+                    aria-label={isArabic ? "موقع المقر الرئيسي على الخريطة" : "Head Office location on Google Maps"}
+                  >
+                    <i className="icon-MapPin" aria-hidden="true" />
+                    {isArabic ? "المقر الرئيسي" : "Head Office"}
+                  </a>
+                  <a
+                    href="https://maps.app.goo.gl/A1NYpV7HUB2gmMGW6"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="caption-1 color-white top-bar-location-link"
+                    aria-label={
+                      isArabic
+                        ? "موقع مركز خدمة العملاء على الخريطة"
+                        : "Customer Care Center location on Google Maps"
+                    }
+                  >
+                    <i className="icon-MapPin" aria-hidden="true" />
+                    {isArabic ? "مركز خدمة العملاء" : "Customer Care Center"}
+                  </a>
                 </div>
                 <div className="top-bar-content">
                   <i className="icon-Envelope" />

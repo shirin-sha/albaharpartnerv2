@@ -58,8 +58,8 @@ export default function CustomerCareCMS({ data, language = "ltr" }: Props) {
                     <div className="ccc-info-icon">
                       <i className={item.iconClass || "icon-MapPin"} aria-hidden />
                     </div>
-                    <div>
-                      <span className="ccc-info-label text-btn-uppercase">{item.label}</span>
+                    <div className="ccc-info-text">
+                      <span className="ccc-info-label">{item.label}</span>
                       {valueNode}
                     </div>
                   </div>
@@ -318,7 +318,7 @@ export default function CustomerCareCMS({ data, language = "ltr" }: Props) {
                 <p className="sub-title body-2 mb-0">{data.ctaSection.subheading}</p>
               </div>
               <div className="ccc-cta-actions">
-                <Link href={primaryHref} className="tf-btn style-1 bg-color-primary">
+                <Link href={primaryHref} className="tf-btn style-1 bg-white">
                   <span>{data.ctaSection.primaryButtonText}</span>
                 </Link>
                 <a

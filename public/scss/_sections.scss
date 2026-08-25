@@ -3183,27 +3183,66 @@
 .section-ccc {
   .ccc-info-bar {
     background-color: var(--white);
-    border-bottom: 1px solid var(--outline);
-    padding: 28px 0;
+    padding: 32px 0 0;
   }
 
   .ccc-info-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 24px;
+    gap: 0;
+    position: relative;
+    padding-bottom: 32px;
+
+    // Bottom horizontal line — inset, not full bleed
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 32px;
+      right: 32px;
+      height: 1px;
+      background-color: var(--outline);
+      pointer-events: none;
+    }
   }
 
   .ccc-info-item {
     display: flex;
-    align-items: flex-start;
-    gap: 14px;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+    padding: 12px 24px;
+
+    &:first-child {
+      padding-inline-start: 0;
+    }
+
+    &:last-child {
+      padding-inline-end: 0;
+    }
+
+    // Vertical divider between columns — short / not full height
+    &:not(:last-child)::before {
+      content: "";
+      position: absolute;
+      top: 50%;
+      inset-inline-end: 0;
+      transform: translateY(-50%);
+      width: 1px;
+      height: 52%;
+      min-height: 40px;
+      max-height: 72px;
+      background-color: var(--outline);
+      pointer-events: none;
+    }
   }
 
   .ccc-info-icon {
-    width: 42px;
-    height: 42px;
+    width: 52px;
+    height: 52px;
     border-radius: 50%;
     background-color: var(--surface);
+    border: none;
     color: var(--primary);
     display: inline-flex;
     align-items: center;
@@ -3211,16 +3250,23 @@
     flex-shrink: 0;
 
     i {
-      font-size: 18px;
+      font-size: 24px;
+      line-height: 1;
     }
+  }
+
+  .ccc-info-text {
+    min-width: 0;
   }
 
   .ccc-info-label {
     display: block;
-    color: var(--primary);
-    font-size: 12px;
+    color: var(--on-suface-container);
+    font-size: 15px;
     font-weight: 600;
-    letter-spacing: 0.06em;
+    line-height: 1.35;
+    letter-spacing: 0;
+    text-transform: none;
     margin-bottom: 4px;
   }
 
@@ -3228,8 +3274,10 @@
     display: block;
     color: var(--on-suface-container);
     font-size: 14px;
-    line-height: 1.5;
+    font-weight: 400;
+    line-height: 1.45;
     text-decoration: none;
+    white-space: pre-line;
 
     &:hover {
       color: var(--primary);
@@ -3413,8 +3461,36 @@
   }
 
   .ccc-cta {
-    background-color: var(--on-suface-container);
+    background-color: var(--primary);
     padding: 64px 0;
+
+    // Solid buttons on primary bg: white default, dark hover (not primary — would blend)
+    .tf-btn.bg-white {
+      color: var(--on-suface-container);
+
+      span {
+        color: var(--on-suface-container);
+      }
+
+      &::before {
+        background-color: var(--on-suface-container);
+      }
+
+      &:hover,
+      &:focus-visible {
+        background-color: var(--on-suface-container) !important;
+        border-color: var(--on-suface-container) !important;
+        color: var(--white) !important;
+
+        span {
+          color: var(--white) !important;
+        }
+
+        &::before {
+          background-color: var(--on-suface-container);
+        }
+      }
+    }
   }
 
   .ccc-cta-inner {
@@ -3436,15 +3512,31 @@
     background: transparent !important;
     border: 1px solid var(--white) !important;
     color: var(--white) !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 
     span,
     i {
       color: var(--white) !important;
+      position: relative;
+      z-index: 2;
     }
 
-    &:hover {
-      background-color: var(--primary) !important;
-      border-color: var(--primary) !important;
+    &::before {
+      background-color: var(--white) !important;
+    }
+
+    &:hover,
+    &:focus-visible {
+      background-color: var(--white) !important;
+      border-color: var(--white) !important;
+      color: var(--on-suface-container) !important;
+
+      span,
+      i {
+        color: var(--on-suface-container) !important;
+      }
     }
   }
 
@@ -3464,6 +3556,30 @@
   .section-ccc {
     .ccc-info-grid {
       grid-template-columns: repeat(2, 1fr);
+
+      .ccc-info-item {
+        // Only draw vertical line between columns in each row (1|2 and 3|4)
+        &:nth-child(2n)::before {
+          display: none;
+        }
+
+        // Short horizontal divider between the two rows
+        &:nth-child(-n + 2)::after {
+          content: "";
+          position: absolute;
+          left: 28px;
+          right: 28px;
+          bottom: 0;
+          height: 1px;
+          background-color: var(--outline);
+          pointer-events: none;
+        }
+
+        &:nth-child(-n + 2) {
+          padding-bottom: 28px;
+          margin-bottom: 12px;
+        }
+      }
     }
 
     .ccc-process-track {
@@ -3498,6 +3614,31 @@
   .section-ccc {
     .ccc-info-grid {
       grid-template-columns: 1fr;
+
+      .ccc-info-item {
+        padding: 18px 16px;
+
+        &::before {
+          display: none;
+        }
+
+        // Short horizontal dividers between stacked items
+        &:not(:last-child)::after {
+          content: "";
+          position: absolute;
+          left: 16px;
+          right: 16px;
+          bottom: 0;
+          height: 1px;
+          background-color: var(--outline);
+          pointer-events: none;
+        }
+
+        &:nth-child(-n + 2) {
+          padding-bottom: 18px;
+          margin-bottom: 0;
+        }
+      }
     }
 
     .ccc-process-track {

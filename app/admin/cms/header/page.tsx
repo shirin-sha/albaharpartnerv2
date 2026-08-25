@@ -516,7 +516,7 @@ export default function HeaderManager() {
       link: '/',
     },
     menuItems: [],
-    buttonText: lang === 'rtl' ? 'تحميل الملف التعريفي' : 'Download Profile',
+    buttonText: lang === 'rtl' ? 'الملف التعريفي' : 'Company Profile',
     buttonLink: '/files/company-profile.pdf',
   });
 
@@ -780,7 +780,7 @@ export default function HeaderManager() {
                   type="text"
                   value={contentLtr.buttonText || ''}
                   onChange={(e) => setContentLtr({ ...contentLtr, buttonText: e.target.value })}
-                  placeholder="Download Profile"
+                  placeholder="Company Profile"
                 />
               </div>
               <div className="form-group">
@@ -790,7 +790,7 @@ export default function HeaderManager() {
                   dir="rtl"
                   value={contentRtl.buttonText || ''}
                   onChange={(e) => setContentRtl({ ...contentRtl, buttonText: e.target.value })}
-                  placeholder="تحميل الملف التعريفي"
+                  placeholder="الملف التعريفي"
                 />
               </div>
             </div>

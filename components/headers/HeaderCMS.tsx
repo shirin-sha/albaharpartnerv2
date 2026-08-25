@@ -162,17 +162,63 @@ export default function HeaderCMS({ data }: Props) {
                       {isFileDownload ? (
                         <a
                           href={downloadHref}
-                          className="tf-btn bg-white style-1 hover-bg-primary"
+                          className="tf-btn bg-white style-1 hover-bg-primary header-profile-btn"
                           download
                         >
                           <span>{buttonText}</span>
+                          <svg
+                            className="header-download-icon"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                            aria-hidden
+                          >
+                            <path
+                              d="M12 3v12m0 0l4-4m-4 4l-4-4"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M5 19h14"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                            />
+                          </svg>
                         </a>
                       ) : (
                         <Link
                           href={addLanguagePrefix(buttonLink, pathname)}
-                          className="tf-btn bg-white style-1 hover-bg-primary"
+                          className="tf-btn bg-white style-1 hover-bg-primary header-profile-btn"
                         >
                           <span>{buttonText}</span>
+                          <svg
+                            className="header-download-icon"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                            aria-hidden
+                          >
+                            <path
+                              d="M12 3v12m0 0l4-4m-4 4l-4-4"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                            <path
+                              d="M5 19h14"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                            />
+                          </svg>
                         </Link>
                       )}
                     </div>

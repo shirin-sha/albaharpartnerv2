@@ -414,11 +414,24 @@
             }
 
             .nav-btn .tf-btn {
-                padding: 5px 12px;
+                padding: 8px 16px;
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
 
                 span {
-                    font-size: 12px;
-                    line-height: 18px;
+                    font-size: 15px;
+                    line-height: 22px;
+                    font-weight: 500;
+                }
+
+                .header-download-icon {
+                    width: 16px;
+                    height: 16px;
+                    flex-shrink: 0;
+                    position: relative;
+                    z-index: 2;
+                    color: inherit;
                 }
             }
         }
@@ -1477,12 +1490,20 @@ html[dir="rtl"] {
                     color: var(--white);
                 }
 
+                .header-download-icon {
+                    color: var(--white);
+                }
+
                 &:hover,
                 &:focus-visible {
                     background-color: var(--white) !important;
                     color: var(--on-suface-container) !important;
 
                     span {
+                        color: var(--on-suface-container) !important;
+                    }
+
+                    .header-download-icon {
                         color: var(--on-suface-container) !important;
                     }
                 }

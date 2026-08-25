@@ -192,18 +192,21 @@ export function InfoBarFields({ formData, setFormData }: CccSectionFieldsProps) 
               <div className="form-row-bilingual">
                 <div className="form-group">
                   <label>Value</label>
-                  <input
+                  <textarea
+                    rows={3}
                     value={itemLtr.value}
                     onChange={(e) => {
                       const next = [...itemsLtr];
                       next[index] = { ...itemLtr, value: e.target.value };
                       setFormData({ ...formData, ltr: { ...ltr, items: next } });
                     }}
+                    placeholder="Press Enter for a new line"
                   />
                 </div>
                 <div className="form-group">
                   <label>Value</label>
-                  <input
+                  <textarea
+                    rows={3}
                     dir="rtl"
                     value={itemRtl.value}
                     onChange={(e) => {
@@ -211,6 +214,7 @@ export function InfoBarFields({ formData, setFormData }: CccSectionFieldsProps) 
                       next[index] = { ...itemRtl, value: e.target.value };
                       setFormData({ ...formData, rtl: { ...rtl, items: next } });
                     }}
+                    placeholder="اضغط Enter لسطر جديد"
                   />
                 </div>
               </div>

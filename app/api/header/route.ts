@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { HeaderContent } from '@/types/header';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 
 const DB_NAME = 'albaharpartners1';
 const COLLECTION_NAME = 'header';
+const CACHE_TAG_PREFIX = 'cms-content';
+
+function revalidateHeader() {
+  revalidatePath('/', 'layout');
+  revalidateTag(`${CACHE_TAG_PREFIX}-header-ltr`);
+  revalidateTag(`${CACHE_TAG_PREFIX}-header-rtl`);
+}
 
 // GET - Fetch Header content
 export async function GET(request: NextRequest) {
@@ -74,8 +81,7 @@ export async function POST(request: NextRequest) {
 
     const result = await collection.insertOne(newContent);
 
-    // Revalidate homepage (header affects all pages)
-    revalidatePath('/', 'layout');
+    revalidateHeader();
 
     return NextResponse.json({
       success: true,
@@ -128,8 +134,7 @@ export async function PUT(request: NextRequest) {
       }, { status: 500 });
     }
 
-    // Revalidate homepage (header affects all pages)
-    revalidatePath('/', 'layout');
+    revalidateHeader();
 
     return NextResponse.json({
       success: true,

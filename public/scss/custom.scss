@@ -688,6 +688,46 @@ html[dir="rtl"] {
       white-space: nowrap;
     }
   }
+
+  /* Homepage About: readable heading + full-bleed surface on phones */
+  .section-about.h-7 {
+    overflow: visible;
+
+    .about-left {
+      background-color: var(--surface);
+      margin-inline: -15px;
+      padding-inline: 15px;
+      width: calc(100% + 30px);
+      max-width: none;
+      overflow: visible;
+
+      &::before {
+        display: none !important;
+      }
+
+      .heading-section {
+        overflow: visible;
+        max-width: 100%;
+      }
+
+      h2,
+      .about-h7-heading {
+        font-size: 28px !important;
+        line-height: 1.3 !important;
+        max-width: 100%;
+        overflow: visible;
+        overflow-wrap: break-word;
+        word-break: normal;
+        transform: none !important;
+        opacity: 1 !important;
+
+        .about-h7-break,
+        br {
+          display: none;
+        }
+      }
+    }
+  }
 }
 
 /* Mobile top bar: email + language share the row */

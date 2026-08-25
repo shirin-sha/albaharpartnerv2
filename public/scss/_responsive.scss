@@ -1443,6 +1443,14 @@
         }
       }
 
+      .about-albahar-title {
+        font-size: 28px !important;
+        line-height: 36px !important;
+        padding-right: 0 !important;
+        max-width: 100%;
+        overflow-wrap: break-word;
+      }
+
       .flat-animate-tab {
         margin-top: 20px !important;
         padding-top: 20px !important;
@@ -1501,18 +1509,42 @@
       .about-left,
       .about-right {
         flex: 1 1 100%;
-        padding: 60px 0;
+        padding: 48px 0;
       }
 
       .about-left {
         align-items: flex-start;
+        // Solid full-bleed surface (pseudo 50vw breaks when stacked)
+        background-color: var(--surface);
+        margin-inline: -15px;
+        padding-inline: 15px;
+        width: calc(100% + 30px);
+        max-width: none;
+        box-sizing: border-box;
 
-        // Full-width grey when stacked
         &::before {
-          left: 50%;
-          right: auto;
-          width: 100vw;
-          transform: translateX(-50%);
+          display: none;
+        }
+
+        .heading-section {
+          max-width: 100%;
+          width: 100%;
+        }
+
+        h2 {
+          font-size: 32px !important;
+          line-height: 1.3 !important;
+          max-width: 100%;
+          overflow-wrap: break-word;
+          word-wrap: break-word;
+          overflow: visible;
+          transform: none !important;
+          opacity: 1 !important;
+
+          // Let CMS <br/> wrap naturally on small screens
+          br {
+            display: none;
+          }
         }
       }
 

@@ -21,11 +21,11 @@ export default function AboutSection({ content, language = 'ltr' }: AboutSection
             {content.tag}
           </span>
         </div>
-        <h2 className="mb-0 text-anime-wave">
-          {content.heading.split('<br/>').map((line, index, array) => (
+        <h2 className="mb-0 about-h7-heading">
+          {content.heading.split(/<br\s*\/?>/i).map((line, index, array) => (
             <React.Fragment key={index}>
               {line}
-              {index < array.length - 1 && <br />}
+              {index < array.length - 1 && <br className="about-h7-break" />}
             </React.Fragment>
           ))}
         </h2>

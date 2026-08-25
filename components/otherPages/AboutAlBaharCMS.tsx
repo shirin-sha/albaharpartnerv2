@@ -47,7 +47,7 @@ export default function AboutAlBaharCMS({ data }: Props) {
               {data.tabs && data.tabs.length > 0 && (
                 <div className="flat-animate-tab">
                   <div className="wg-tab style-small">
-                    <ul className="tab-product min-w-366" role="tablist">
+                    <ul className="tab-product" role="tablist">
                       {data.tabs.map((tab, index) => (
                         <li key={tab.id} className="nav-tab-item" role="presentation">
                           <h6>

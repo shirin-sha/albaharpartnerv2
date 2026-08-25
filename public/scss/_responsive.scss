@@ -986,30 +986,43 @@
   }
 
   .top-bar {
-    .tf-tb-left {
-      .top-bar-content {
-        border: none;
+    .top-bar-inner {
+      padding-inline-end: 0;
+      gap: 10px;
 
-        &:nth-child(1) {
-          display: none;
-        }
+      .tf-tb-left {
+        flex: 1 1 auto;
+        min-width: 0;
+        gap: 12px;
+      }
+
+      .tf-tb-right {
+        display: none;
+      }
+
+      > .tf-language,
+      > .top-bar-language {
+        position: static;
+        transform: none;
+        flex-shrink: 0;
       }
     }
 
-    .tf-tb-right {
-      .top-bar-content {
-        border: none;
+    .tf-tb-left {
+      .top-bar-locations {
+        display: none;
+      }
 
-        &:nth-child(1) {
-          display: none;
-        }
+      .top-bar-email {
+        border: none;
       }
     }
   }
 
   .header {
     &.style-absolute {
-      margin-bottom: -80px !important;
+      /* Header height only — do not pull hero into the top bar */
+      margin-bottom: -56px !important;
     }
 
     .header-content {
@@ -2478,19 +2491,6 @@
         flex: 1 1 auto;
         max-width: 100%;
       }
-    }
-  }
-
-  .top-bar {
-    .tf-tb-right {
-      .tf-phone-topbar,
-      .tf-tb-social {
-        display: none !important;
-      }
-    }
-
-    .top-bar-inner {
-      padding-right: 100px;
     }
   }
 }

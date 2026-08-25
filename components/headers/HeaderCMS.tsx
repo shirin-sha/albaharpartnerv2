@@ -82,9 +82,9 @@ export default function HeaderCMS({ data }: Props) {
                     <Image
                       alt=""
                       src={data.logo.imagePath}
-                      width={data.logo.width}
-                      height={56}
-                      style={{ height: "56px", width: "auto" }}
+                      width={data.logo.width || 169}
+                      height={data.logo.height || 40}
+                      style={{ height: "40px", width: "auto" }}
                     />
                   </Link>
                 </div>

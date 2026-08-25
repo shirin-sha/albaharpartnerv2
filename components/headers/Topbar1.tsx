@@ -47,10 +47,10 @@ export default function Topbar1() {
                     {isArabic ? "مركز خدمة العملاء" : "Customer Care Center"}
                   </a>
                 </div>
-                <div className="top-bar-content">
+                <div className="top-bar-content top-bar-email">
                   <i className="icon-Envelope" />
                   <a href="mailto:bpc.info@albahargroup.com" className="caption-1 color-white" aria-label="Email Al Bahar and Partners">
-                  bpc.info@albahargroup.com
+                    bpc.info@albahargroup.com
                   </a>
                 </div>
               </div>
@@ -108,14 +108,19 @@ export default function Topbar1() {
                   </ul>
                 </div>
               </div>
-              <div className="tf-language">
+              <div className="tf-language top-bar-language">
                 <Link
                   href={languageSwitchHref}
                   className="tf-btn bg-white style-1 hover-bg-primary"
                   aria-label={isArabic ? "Switch to English" : "Switch to Arabic"}
                 >
-                  <span className={!isArabic ? "font-noto-arabic" : ""}>
+                  <span
+                    className={`top-bar-lang-full${!isArabic ? " font-noto-arabic" : ""}`}
+                  >
                     {isArabic ? "English" : "العربية"}
+                  </span>
+                  <span className="top-bar-lang-short" aria-hidden="true">
+                    {isArabic ? "EN" : "AR"}
                   </span>
                 </Link>
               </div>

@@ -17,6 +17,28 @@ const solutionsDataLTR = {
     isActive: true,
   },
 
+  detailPage: {
+    homeBreadcrumb: "Homepage",
+    solutionsBreadcrumb: "Solutions",
+    imagePath: "",
+    isActive: true,
+    contact: {
+      tag: "Contact US",
+      title: "Get In Touch",
+      subtitle: "Reach out today to discuss how we can\nsupport your business goals.",
+      addressTitle: "Address Business",
+      address: "P.O.Box 148 Safat 13002 - Kuwait, Block 1, Street 3, Shuwaikh Industrial 1",
+      directionLabel: "Get direction",
+      mapUrl: "https://maps.google.com/?q=Al+Bahar+and+Partners+Kuwait",
+      phoneTitle: "Contact Us",
+      phones: ["+965 184 8848", "+965 184 8848"],
+      emailTitle: "Email Us",
+      emails: ["bpc.sales@albahargroup.com", "bpc.info@albahargroup.com"],
+      ctaLabel: "Contact Us",
+      ctaHref: "/contact-us",
+    },
+  },
+
   solutions: [
     {
       id: "banking-payment-identity",
@@ -111,6 +133,28 @@ const solutionsDataRTL = {
     subtitle: "",
     language: "rtl",
     isActive: true,
+  },
+
+  detailPage: {
+    homeBreadcrumb: "الرئيسية",
+    solutionsBreadcrumb: "الحلول",
+    imagePath: "",
+    isActive: true,
+    contact: {
+      tag: "اتصل بنا",
+      title: "تواصل معنا",
+      subtitle: "تواصل معنا اليوم لمناقشة كيف يمكننا\nدعم أهداف عملك.",
+      addressTitle: "عنوان الشركة",
+      address: "ص.ب 148 الصفاة 13002 - الكويت، قطعة 1، شارع 3، الشويخ الصناعية 1",
+      directionLabel: "الاتجاهات",
+      mapUrl: "https://maps.google.com/?q=Al+Bahar+and+Partners+Kuwait",
+      phoneTitle: "اتصل بنا",
+      phones: ["+965 184 8848", "+965 184 8848"],
+      emailTitle: "راسلنا",
+      emails: ["bpc.sales@albahargroup.com", "bpc.info@albahargroup.com"],
+      ctaLabel: "اتصل بنا",
+      ctaHref: "/ar/contact-us",
+    },
   },
 
   solutions: [

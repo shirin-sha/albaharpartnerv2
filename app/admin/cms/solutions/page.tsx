@@ -4,11 +4,16 @@ import { useState, useEffect, useRef } from 'react';
 import { commitPendingUploads } from '@/lib/pending-uploads';
 import PageHeaderBackgroundField from '@/components/admin/PageHeaderBackgroundField';
 import Link from 'next/link';
-import { SolutionsContent } from '@/types/solutions';
+import { SolutionsContent, defaultSolutionsDetailPage } from '@/types/solutions';
 
 const SOLUTIONS_SECTIONS = [
   { id: 'meta', label: 'Meta (SEO)', description: 'Title, description, keywords (English & Arabic)' },
-  { id: 'header', label: 'Page Header', description: 'Breadcrumb, title, subtitle, background image' },
+  { id: 'header', label: 'Page Header', description: 'Solutions listing breadcrumb, title, subtitle, background image' },
+  {
+    id: 'detailPage',
+    label: 'Solutions Detail Page',
+    description: 'Detail page title banner crumbs + sidebar contact card (English & Arabic)',
+  },
 ] as const;
 
 type SolutionsSectionId = (typeof SOLUTIONS_SECTIONS)[number]['id'];
@@ -41,13 +46,19 @@ export default function SolutionsManager() {
       const [ltrResult, rtlResult] = await Promise.all([ltrRes.json(), rtlRes.json()]);
       
       if (ltrResult.success && ltrResult.data) {
-        setContentLtr(ltrResult.data);
+        setContentLtr({
+          ...ltrResult.data,
+          detailPage: ltrResult.data.detailPage || defaultSolutionsDetailPage('ltr'),
+        });
       } else {
         setContentLtr(getEmptyContent('ltr'));
       }
       
       if (rtlResult.success && rtlResult.data) {
-        setContentRtl(rtlResult.data);
+        setContentRtl({
+          ...rtlResult.data,
+          detailPage: rtlResult.data.detailPage || defaultSolutionsDetailPage('rtl'),
+        });
       } else {
         setContentRtl(getEmptyContent('rtl'));
       }
@@ -77,6 +88,7 @@ export default function SolutionsManager() {
       language: lang,
       isActive: true,
     },
+    detailPage: defaultSolutionsDetailPage(lang),
     solutions: [],
   });
 
@@ -398,6 +410,409 @@ export default function SolutionsManager() {
             </div>
           </div>
         );
+      case 'detailPage': {
+        const detailLtr = contentLtr.detailPage || defaultSolutionsDetailPage('ltr');
+        const detailRtl = contentRtl.detailPage || defaultSolutionsDetailPage('rtl');
+        const updateDetail = (
+          lang: 'ltr' | 'rtl',
+          patch: Partial<typeof detailLtr> & { contact?: Partial<typeof detailLtr.contact> }
+        ) => {
+          if (lang === 'ltr') {
+            setContentLtr((prev) => {
+              if (!prev) return prev;
+              const base = prev.detailPage || defaultSolutionsDetailPage('ltr');
+              const next = {
+                ...prev,
+                detailPage: {
+                  ...base,
+                  ...patch,
+                  contact: {
+                    ...base.contact,
+                    ...(patch.contact || {}),
+                  },
+                },
+              };
+              contentLtrRef.current = next;
+              return next;
+            });
+          } else {
+            setContentRtl((prev) => {
+              if (!prev) return prev;
+              const base = prev.detailPage || defaultSolutionsDetailPage('rtl');
+              const next = {
+                ...prev,
+                detailPage: {
+                  ...base,
+                  ...patch,
+                  contact: {
+                    ...base.contact,
+                    ...(patch.contact || {}),
+                  },
+                },
+              };
+              contentRtlRef.current = next;
+              return next;
+            });
+          }
+        };
+        const listToText = (items: string[]) => items.join('\n');
+        const textToList = (value: string) =>
+          value
+            .split('\n')
+            .map((line) => line.trim())
+            .filter(Boolean);
+
+        return (
+          <div className="admin-cms-section-card" style={{ marginBottom: 24 }}>
+            <div className="admin-cms-section-header" style={{ cursor: 'default' }}>
+              <div>
+                <h3 style={{ margin: 0 }}>Editing: Solutions Detail Page</h3>
+                <div style={{ fontSize: 13, opacity: 0.8 }}>
+                  Shared across all /services-details-1/[id] pages — banner crumbs + contact card
+                </div>
+              </div>
+              <button type="button" className="button" onClick={() => setSelectedSection(null)}>
+                Close
+              </button>
+            </div>
+
+            <div className="admin-cms-form">
+              <div className="form-row-bilingual-header">
+                <div className="form-label-header">English</div>
+                <div className="form-label-header">Arabic</div>
+              </div>
+
+              <h4 style={{ margin: '8px 0 12px' }}>Page title banner</h4>
+              <div className="form-row-bilingual">
+                <div className="form-group">
+                  <label>Home breadcrumb label</label>
+                  <input
+                    type="text"
+                    value={detailLtr.homeBreadcrumb}
+                    onChange={(e) => updateDetail('ltr', { homeBreadcrumb: e.target.value })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Home breadcrumb label</label>
+                  <input
+                    type="text"
+                    dir="rtl"
+                    value={detailRtl.homeBreadcrumb}
+                    onChange={(e) => updateDetail('rtl', { homeBreadcrumb: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <div className="form-row-bilingual">
+                <div className="form-group">
+                  <label>Solutions breadcrumb label</label>
+                  <input
+                    type="text"
+                    value={detailLtr.solutionsBreadcrumb}
+                    onChange={(e) => updateDetail('ltr', { solutionsBreadcrumb: e.target.value })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Solutions breadcrumb label</label>
+                  <input
+                    type="text"
+                    dir="rtl"
+                    value={detailRtl.solutionsBreadcrumb}
+                    onChange={(e) => updateDetail('rtl', { solutionsBreadcrumb: e.target.value })}
+                  />
+                </div>
+              </div>
+
+              <PageHeaderBackgroundField
+                value={detailLtr.imagePath || detailRtl.imagePath || ''}
+                onChange={(value) => {
+                  updateDetail('ltr', { imagePath: value });
+                  updateDetail('rtl', { imagePath: value });
+                }}
+              />
+
+              <h4 style={{ margin: '24px 0 12px' }}>Contact us card (sidebar)</h4>
+              <div className="form-row-bilingual">
+                <div className="form-group">
+                  <label>Tag</label>
+                  <input
+                    type="text"
+                    value={detailLtr.contact.tag}
+                    onChange={(e) => updateDetail('ltr', { contact: { tag: e.target.value } })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Tag</label>
+                  <input
+                    type="text"
+                    dir="rtl"
+                    value={detailRtl.contact.tag}
+                    onChange={(e) => updateDetail('rtl', { contact: { tag: e.target.value } })}
+                  />
+                </div>
+              </div>
+
+              <div className="form-row-bilingual">
+                <div className="form-group">
+                  <label>Title</label>
+                  <input
+                    type="text"
+                    value={detailLtr.contact.title}
+                    onChange={(e) => updateDetail('ltr', { contact: { title: e.target.value } })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Title</label>
+                  <input
+                    type="text"
+                    dir="rtl"
+                    value={detailRtl.contact.title}
+                    onChange={(e) => updateDetail('rtl', { contact: { title: e.target.value } })}
+                  />
+                </div>
+              </div>
+
+              <div className="form-row-bilingual">
+                <div className="form-group">
+                  <label>Subtitle (use new line for break)</label>
+                  <textarea
+                    rows={3}
+                    value={detailLtr.contact.subtitle}
+                    onChange={(e) => updateDetail('ltr', { contact: { subtitle: e.target.value } })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Subtitle (use new line for break)</label>
+                  <textarea
+                    rows={3}
+                    dir="rtl"
+                    value={detailRtl.contact.subtitle}
+                    onChange={(e) => updateDetail('rtl', { contact: { subtitle: e.target.value } })}
+                  />
+                </div>
+              </div>
+
+              <div className="form-row-bilingual">
+                <div className="form-group">
+                  <label>Address title</label>
+                  <input
+                    type="text"
+                    value={detailLtr.contact.addressTitle}
+                    onChange={(e) =>
+                      updateDetail('ltr', { contact: { addressTitle: e.target.value } })
+                    }
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Address title</label>
+                  <input
+                    type="text"
+                    dir="rtl"
+                    value={detailRtl.contact.addressTitle}
+                    onChange={(e) =>
+                      updateDetail('rtl', { contact: { addressTitle: e.target.value } })
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="form-row-bilingual">
+                <div className="form-group">
+                  <label>Address</label>
+                  <textarea
+                    rows={3}
+                    value={detailLtr.contact.address}
+                    onChange={(e) => updateDetail('ltr', { contact: { address: e.target.value } })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Address</label>
+                  <textarea
+                    rows={3}
+                    dir="rtl"
+                    value={detailRtl.contact.address}
+                    onChange={(e) => updateDetail('rtl', { contact: { address: e.target.value } })}
+                  />
+                </div>
+              </div>
+
+              <div className="form-row-bilingual">
+                <div className="form-group">
+                  <label>Directions label</label>
+                  <input
+                    type="text"
+                    value={detailLtr.contact.directionLabel}
+                    onChange={(e) =>
+                      updateDetail('ltr', { contact: { directionLabel: e.target.value } })
+                    }
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Directions label</label>
+                  <input
+                    type="text"
+                    dir="rtl"
+                    value={detailRtl.contact.directionLabel}
+                    onChange={(e) =>
+                      updateDetail('rtl', { contact: { directionLabel: e.target.value } })
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Map URL (shared)</label>
+                <input
+                  type="text"
+                  value={detailLtr.contact.mapUrl || detailRtl.contact.mapUrl || ''}
+                  onChange={(e) => {
+                    updateDetail('ltr', { contact: { mapUrl: e.target.value } });
+                    updateDetail('rtl', { contact: { mapUrl: e.target.value } });
+                  }}
+                />
+              </div>
+
+              <div className="form-row-bilingual">
+                <div className="form-group">
+                  <label>Phone title</label>
+                  <input
+                    type="text"
+                    value={detailLtr.contact.phoneTitle}
+                    onChange={(e) =>
+                      updateDetail('ltr', { contact: { phoneTitle: e.target.value } })
+                    }
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Phone title</label>
+                  <input
+                    type="text"
+                    dir="rtl"
+                    value={detailRtl.contact.phoneTitle}
+                    onChange={(e) =>
+                      updateDetail('rtl', { contact: { phoneTitle: e.target.value } })
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Phone numbers (one per line, shared)</label>
+                <textarea
+                  rows={3}
+                  value={listToText(detailLtr.contact.phones)}
+                  onChange={(e) => {
+                    const phones = textToList(e.target.value);
+                    updateDetail('ltr', { contact: { phones } });
+                    updateDetail('rtl', { contact: { phones } });
+                  }}
+                />
+              </div>
+
+              <div className="form-row-bilingual">
+                <div className="form-group">
+                  <label>Email title</label>
+                  <input
+                    type="text"
+                    value={detailLtr.contact.emailTitle}
+                    onChange={(e) =>
+                      updateDetail('ltr', { contact: { emailTitle: e.target.value } })
+                    }
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Email title</label>
+                  <input
+                    type="text"
+                    dir="rtl"
+                    value={detailRtl.contact.emailTitle}
+                    onChange={(e) =>
+                      updateDetail('rtl', { contact: { emailTitle: e.target.value } })
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label>Emails (one per line, shared)</label>
+                <textarea
+                  rows={3}
+                  value={listToText(detailLtr.contact.emails)}
+                  onChange={(e) => {
+                    const emails = textToList(e.target.value);
+                    updateDetail('ltr', { contact: { emails } });
+                    updateDetail('rtl', { contact: { emails } });
+                  }}
+                />
+              </div>
+
+              <div className="form-row-bilingual">
+                <div className="form-group">
+                  <label>CTA button label</label>
+                  <input
+                    type="text"
+                    value={detailLtr.contact.ctaLabel}
+                    onChange={(e) =>
+                      updateDetail('ltr', { contact: { ctaLabel: e.target.value } })
+                    }
+                  />
+                </div>
+                <div className="form-group">
+                  <label>CTA button label</label>
+                  <input
+                    type="text"
+                    dir="rtl"
+                    value={detailRtl.contact.ctaLabel}
+                    onChange={(e) =>
+                      updateDetail('rtl', { contact: { ctaLabel: e.target.value } })
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="form-row-bilingual">
+                <div className="form-group">
+                  <label>CTA link</label>
+                  <input
+                    type="text"
+                    value={detailLtr.contact.ctaHref}
+                    onChange={(e) =>
+                      updateDetail('ltr', { contact: { ctaHref: e.target.value } })
+                    }
+                  />
+                </div>
+                <div className="form-group">
+                  <label>CTA link</label>
+                  <input
+                    type="text"
+                    dir="rtl"
+                    value={detailRtl.contact.ctaHref}
+                    onChange={(e) =>
+                      updateDetail('rtl', { contact: { ctaHref: e.target.value } })
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="form-actions">
+                <button
+                  className="button button-primary"
+                  onClick={() => handleSaveSection('detailPage')}
+                  disabled={saving === 'detailPage'}
+                >
+                  {saving === 'detailPage' ? 'Saving...' : 'Save Detail Page'}
+                </button>
+                <button
+                  className="admin-btn admin-btn-edit"
+                  onClick={() => setSelectedSection(null)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      }
       default:
         return null;
     }
@@ -460,6 +875,9 @@ export default function SolutionsManager() {
               } else if (section.id === 'header') {
                 titleEn = contentLtr?.header?.title || '-';
                 titleAr = contentRtl?.header?.title || '-';
+              } else if (section.id === 'detailPage') {
+                titleEn = contentLtr?.detailPage?.contact?.title || '-';
+                titleAr = contentRtl?.detailPage?.contact?.title || '-';
               }
               return (
                 <tr key={section.id} className={isEditing ? 'admin-table-row-active' : ''}>

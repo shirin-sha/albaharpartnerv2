@@ -4,9 +4,7 @@ import { siteFontVariablesClassName } from "@/lib/fonts";
 
 import GlobalEffectsProvider from "@/components/common/GlobalEffectsProvider";
 import ScrollTop from "@/components/common/ScrollTop";
-import Context from "@/context/Context";
 import { rtlInitScript } from "@/lib/rtl-init";
-import DeferredGlobalOverlays from "@/components/common/DeferredGlobalOverlays";
 import DeferredMobileMenu from "@/components/common/DeferredMobileMenu";
 
 import { Metadata } from "next";
@@ -35,13 +33,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </head>
       <body className={`counter-scroll popup-loader`}>
         <div className="wrapper">
-          <Context>
-            <RtlToggler />
-            <main id="main-content">{children}</main>
-            <DeferredMobileMenu />
-            <DeferredGlobalOverlays />
-            <ScrollTop />{" "}
-          </Context>
+          <RtlToggler />
+          <main id="main-content">{children}</main>
+          <DeferredMobileMenu />
+          <ScrollTop />
           <GlobalEffectsProvider />
         </div>
       </body>

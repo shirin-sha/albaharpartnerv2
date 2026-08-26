@@ -17,7 +17,7 @@ export type CccSectionId = (typeof CCC_SECTION_IDS)[number];
 
 export const CCC_SECTION_LABELS: Record<CccSectionId, string> = {
   meta: 'SEO Meta',
-  header: 'Hero / Page Header',
+  header: 'Page Header',
   infoBar: 'Info Bar',
   overview: 'Overview',
   services: 'Support Services',
@@ -29,7 +29,7 @@ export const CCC_SECTION_LABELS: Record<CccSectionId, string> = {
 
 export const CCC_SECTION_DESCRIPTIONS: Record<CccSectionId, string> = {
   meta: 'Page title, description, and keywords',
-  header: 'Hero image, tag, title, subtitle, breadcrumb',
+  header: 'Breadcrumb, title, subtitle, background image',
   infoBar: 'Call, email, hours, and location strip',
   overview: 'Overview text and image',
   services: 'Six support service cards',

@@ -1,7 +1,6 @@
 import React from "react";
-import Image from "next/image";
 import { Metadata } from "next";
-import Breadcumb from "@/components/common/Breadcumb";
+import PageTitleBanner from "@/components/common/PageTitleBanner";
 import CustomerCareCMS from "@/components/otherPages/CustomerCareCMS";
 import { getCustomerCareContent } from "@/lib/data-fetch";
 
@@ -26,41 +25,24 @@ export const revalidate = 3600;
 
 export default async function CustomerCareCenterPage() {
   const content = await getCustomerCareContent("ltr");
-  const header = content?.header;
+  const headerData = content?.header || {
+    breadcrumb: "Customer Care Center",
+    title: "Al-Bahar Customer Care Center",
+    subtitle:
+      "Dedicated support for your BPC solutions: fast, reliable and always by your side.",
+    imagePath: "",
+    isActive: true,
+  };
 
   return (
     <>
-      {header?.isActive !== false && (
-        <div className="ccc-hero">
-          {header?.imagePath && (
-            <Image
-              src={header.imagePath}
-              alt={header.title || "Customer Care Center"}
-              fill
-              priority
-              quality={75}
-              sizes="100vw"
-              className="ccc-hero-image"
-              style={{ objectFit: "cover" }}
-            />
-          )}
-          <div className="ccc-hero-overlay" aria-hidden="true" />
-          <div className="tf-container ccc-hero-inner">
-            <div className="ccc-hero-content">
-              <Breadcumb pageName={header?.breadcrumb || "Customer Care Center"} />
-              {header?.tag && (
-                <span className="ccc-hero-tag text-btn-uppercase">{header.tag}</span>
-              )}
-              <h1 className="ccc-hero-title">
-                {header?.title || "Al-Bahar Customer Care Center"}
-              </h1>
-              {header?.subtitle && (
-                <p className="ccc-hero-subtitle body-2">{header.subtitle}</p>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+      <PageTitleBanner
+        breadcrumb={headerData.breadcrumb}
+        title={headerData.title}
+        subtitle={headerData.subtitle}
+        imagePath={headerData.imagePath}
+        isActive={headerData.isActive !== false}
+      />
       <div className="main-content">
         {content ? (
           <CustomerCareCMS data={content} language="ltr" />

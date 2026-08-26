@@ -7,9 +7,44 @@ import { getSolutionsContent } from "@/lib/data-fetch";
 import Contact from "@/components/services/Contact";
 import CmsRichText from "@/components/common/CmsRichText";
 import { getPageTitleBg } from "@/components/common/PageTitleBanner";
+import { defaultSolutionsDetailPage } from "@/types/solutions";
 
 interface PageProps {
   params: Promise<{ id: string }>;
+}
+
+function BreadcrumbArrow() {
+  return (
+    <span className="arrow-svg">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width={20}
+        height={20}
+        viewBox="0 0 20 20"
+        fill="none"
+      >
+        <g clipPath="url(#clip0_solutions_detail_crumb)">
+          <path
+            d="M3.125 10H16.875"
+            stroke="#A2A3AB"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+          <path
+            d="M11.25 4.375L16.875 10L11.25 15.625"
+            stroke="#A2A3AB"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </g>
+        <defs>
+          <clipPath id="clip0_solutions_detail_crumb">
+            <rect width={20} height={20} fill="white" />
+          </clipPath>
+        </defs>
+      </svg>
+    </span>
+  );
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -36,79 +71,25 @@ export default async function ServiceDetailsPage({ params }: PageProps) {
     notFound();
   }
 
+  const detailPage = content?.detailPage || defaultSolutionsDetailPage("ltr");
+  const bannerImage =
+    detailPage.imagePath?.trim() || content?.header?.imagePath || "";
+
   return (
     <>
-      <div {...getPageTitleBg(content?.header?.imagePath)}>
+      <div {...getPageTitleBg(bannerImage)}>
         <div className="tf-container">
           <div className="page-title-content">
             <div className="breadkcum">
-              <Link href={`/`} className="caption-1 home">
-                Homepage
+              <Link href="/" className="caption-1 home">
+                {detailPage.homeBreadcrumb}
               </Link>{" "}
-              <span className="arrow-svg">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width={20}
-                  height={20}
-                  viewBox="0 0 20 20"
-                  fill="none"
-                >
-                  <g clipPath="url(#clip0_9360_28061)">
-                    <path
-                      d="M3.125 10H16.875"
-                      stroke="#A2A3AB"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M11.25 4.375L16.875 10L11.25 15.625"
-                      stroke="#A2A3AB"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </g>
-                  <defs>
-                    <clipPath>
-                      <rect width={20} height={20} fill="white" />
-                    </clipPath>
-                  </defs>
-                </svg>
-              </span>{" "}
+              <BreadcrumbArrow />{" "}
               <Link href="/solutions" className="caption-1 home">
-                Solutions
+                {detailPage.solutionsBreadcrumb}
               </Link>{" "}
-              <span className="arrow-svg">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width={20}
-                  height={20}
-                  viewBox="0 0 20 20"
-                  fill="none"
-                >
-                  <g clipPath="url(#clip0_9360_28061)">
-                    <path
-                      d="M3.125 10H16.875"
-                      stroke="#A2A3AB"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                    <path
-                      d="M11.25 4.375L16.875 10L11.25 15.625"
-                      stroke="#A2A3AB"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </g>
-                  <defs>
-                    <clipPath>
-                      <rect width={20} height={20} fill="white" />
-                    </clipPath>
-                  </defs>
-                </svg>
-              </span>{" "}
-              <span className="caption-1 page-breadkcum">
-                {service.title}
-              </span>
+              <BreadcrumbArrow />{" "}
+              <span className="caption-1 page-breadkcum">{service.title}</span>
             </div>
             <h2 className="title-page-title">{service.title}</h2>
           </div>
@@ -178,7 +159,7 @@ export default async function ServiceDetailsPage({ params }: PageProps) {
                     })}
                   </ul>
                 </div>
-                <Contact />
+                <Contact data={detailPage.contact} />
               </div>
             </div>
           </div>

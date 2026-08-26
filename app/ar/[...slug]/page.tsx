@@ -2,13 +2,14 @@ import { notFound, redirect } from 'next/navigation';
 import FooterCMS from "@/components/footers/FooterCMS";
 import HeaderCMS from "@/components/headers/HeaderCMS";
 import Header7 from "@/components/headers/Header7";
+import Topbar1 from "@/components/headers/Topbar1";
 import React from "react";
 import { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { getHeaderContent, getFooterContent, getAboutUsContent, getSolutionsContent, getContactUsContent, getSupportContent, getCareersContent, getCustomerStoriesContent, getNewsUpdatesContent, getBrandsContent, getCustomerCareContent } from "@/lib/data-fetch";
 import Breadcumb from "@/components/common/Breadcumb";
-import PageTitleBanner from "@/components/common/PageTitleBanner";
+import PageTitleBanner, { getPageTitleBg } from "@/components/common/PageTitleBanner";
 import AboutAlBaharCMS from "@/components/otherPages/AboutAlBaharCMS";
 import VisionMissionValuesCMS from "@/components/otherPages/VisionMissionValuesCMS";
 import HeritageCMS from "@/components/otherPages/HeritageCMS";
@@ -27,6 +28,7 @@ import NewsUpdatesCMS from "@/components/blogs/NewsUpdatesCMS";
 import BrandsCMS from "@/components/case-studies/BrandsCMS";
 import Contact from "@/components/services/Contact";
 import CmsRichText from "@/components/common/CmsRichText";
+import { defaultSolutionsDetailPage } from "@/types/solutions";
 
 interface PageProps {
   params: Promise<{
@@ -115,19 +117,13 @@ export default async function ArabicPage({ params, searchParams }: PageProps) {
       };
       pageContent = (
         <>
-          {headerData.isActive && (
-            <div className="page-title style-1 bg-img-8">
-              <div className="tf-container">
-                <div className="page-title-content">
-                  <Breadcumb pageName={headerData.breadcrumb} />
-                  <h2 className="title-page-title">{headerData.title}</h2>
-                  {headerData.subtitle && (
-                    <div className="sub-title body-2" dangerouslySetInnerHTML={{ __html: headerData.subtitle }} />
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
+          <PageTitleBanner
+            breadcrumb={headerData.breadcrumb}
+            title={headerData.title}
+            subtitle={headerData.subtitle}
+            imagePath={headerData.imagePath}
+            isActive={headerData.isActive}
+          />
           <div className="main-content">
             {content && <ServicesCMS data={content} language={language} />}
           </div>
@@ -171,13 +167,19 @@ export default async function ArabicPage({ params, searchParams }: PageProps) {
         break;
       }
 
+      const detailPage = content?.detailPage || defaultSolutionsDetailPage("rtl");
+      const bannerImage =
+        detailPage.imagePath?.trim() || content?.header?.imagePath || "";
+
       pageContent = (
         <>
-          <div className="page-title style-1 bg-img-8">
+          <div {...getPageTitleBg(bannerImage)}>
             <div className="tf-container">
               <div className="page-title-content">
                 <div className="breadkcum">
-                  <Link href="/ar" className="caption-1 home">الرئيسية</Link>{" "}
+                  <Link href="/ar" className="caption-1 home">
+                    {detailPage.homeBreadcrumb}
+                  </Link>{" "}
                   <span className="arrow-svg">
                     <svg xmlns="http://www.w3.org/2000/svg" width={20} height={20} viewBox="0 0 20 20" fill="none">
                       <g clipPath="url(#clip0_9360_28061)">
@@ -187,7 +189,9 @@ export default async function ArabicPage({ params, searchParams }: PageProps) {
                       <defs><clipPath><rect width={20} height={20} fill="white" /></clipPath></defs>
                     </svg>
                   </span>{" "}
-                  <Link href="/ar/solutions" className="caption-1 home">الحلول</Link>{" "}
+                  <Link href="/ar/solutions" className="caption-1 home">
+                    {detailPage.solutionsBreadcrumb}
+                  </Link>{" "}
                   <span className="arrow-svg">
                     <svg xmlns="http://www.w3.org/2000/svg" width={20} height={20} viewBox="0 0 20 20" fill="none">
                       <g clipPath="url(#clip0_9360_28061)">
@@ -258,7 +262,7 @@ export default async function ArabicPage({ params, searchParams }: PageProps) {
                         })}
                       </ul>
                     </div>
-                    <Contact />
+                    <Contact data={detailPage.contact} />
                   </div>
                 </div>
               </div>
@@ -345,24 +349,22 @@ export default async function ArabicPage({ params, searchParams }: PageProps) {
 
     case 'customer-care-center': {
       const content = await getCustomerCareContent(language);
-      const header = content?.header;
+      const headerData = content?.header || {
+        breadcrumb: "مركز خدمة العملاء",
+        title: "مركز خدمة العملاء لدى البحر",
+        subtitle: "",
+        imagePath: "",
+        isActive: true,
+      };
       pageContent = (
         <>
-          {header?.isActive !== false && (
-            <div className="page-title style-1 bg-img-8">
-              <div className="tf-container">
-                <div className="page-title-content">
-                  <Breadcumb pageName={header?.breadcrumb || "مركز خدمة العملاء"} />
-                  <h2 className="title-page-title">
-                    {header?.title || "مركز خدمة العملاء لدى البحر"}
-                  </h2>
-                  {header?.subtitle && (
-                    <div className="sub-title body-2">{header.subtitle}</div>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
+          <PageTitleBanner
+            breadcrumb={headerData.breadcrumb}
+            title={headerData.title}
+            subtitle={headerData.subtitle}
+            imagePath={headerData.imagePath}
+            isActive={headerData.isActive !== false}
+          />
           <div className="main-content">
             {content && <CustomerCareCMS data={content} language="rtl" />}
           </div>
@@ -499,7 +501,7 @@ export default async function ArabicPage({ params, searchParams }: PageProps) {
 
   return (
     <>
-      <div className="mb-20" />
+      <Topbar1 />
       {headerContent ? <HeaderCMS data={headerContent} /> : <Header7 />}
       {pageContent}
       {footerContent && <FooterCMS data={footerContent} />}

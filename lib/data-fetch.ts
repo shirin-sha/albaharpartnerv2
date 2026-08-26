@@ -10,7 +10,7 @@ import { HeaderContent } from '@/types/header';
 import { FooterContent } from '@/types/footer';
 import { NewsUpdatesContent } from '@/types/news-updates';
 import { CustomerStoriesContent } from '@/types/customer-stories';
-import { SolutionsContent } from '@/types/solutions';
+import { SolutionsContent, defaultSolutionsDetailPage } from '@/types/solutions';
 import { AboutUsContent } from '@/types/aboutus';
 import { ContactUsContent } from '@/types/contact-us';
 import { SupportContent } from '@/types/support';
@@ -257,6 +257,7 @@ export async function getSolutionsContent(language: 'ltr' | 'rtl' = 'ltr'): Prom
         
         return {
           ...content,
+          detailPage: content.detailPage || defaultSolutionsDetailPage(language),
           solutions: localizedSolutions,
           _id: content._id?.toString(),
         } as SolutionsContent;

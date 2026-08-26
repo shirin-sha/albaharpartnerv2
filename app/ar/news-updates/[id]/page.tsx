@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import FooterCMS from "@/components/footers/FooterCMS";
 import HeaderCMS from "@/components/headers/HeaderCMS";
 import Header7 from "@/components/headers/Header7";
+import Topbar1 from "@/components/headers/Topbar1";
 import { getHeaderContent, getFooterContent, getNewsUpdatesContent } from "@/lib/data-fetch";
 import { resolvePostById } from "@/lib/news-post-resolve";
 import NewsPostDetailView, { NewsPostNotFound } from "@/components/blogs/NewsPostDetailView";
@@ -67,7 +68,7 @@ export default async function ArabicNewsDetailsPage({ params }: PageProps) {
 
   return (
     <>
-      <div className="mb-20" />
+      <Topbar1 />
       {headerContent ? <HeaderCMS data={headerContent} /> : <Header7 />}
       {body}
       {footerContent && <FooterCMS data={footerContent} />}

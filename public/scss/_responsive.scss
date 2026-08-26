@@ -360,9 +360,24 @@
     }
   }
 
+  /* Keep journey timeline arrows usable — theme hid them under 1500px */
   .swiper-time-line {
+    margin-left: 0;
+    margin-right: 0;
+
     .tf-btn-arrow {
-      display: none;
+      display: flex !important;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 5;
+
+      &.arrow-left {
+        left: 8px;
+      }
+
+      &.arrow-right {
+        right: 8px;
+      }
     }
   }
 
@@ -1208,24 +1223,71 @@
     padding-bottom: 60px;
   }
 
-  h1 {
+  /* Global type scale — tablet */
+  h1,
+  .h1 {
     font-size: 50px !important;
     line-height: 55px !important;
   }
 
-  h2 {
+  h2,
+  .h2 {
     font-size: 45px !important;
     line-height: 50px !important;
   }
 
-  h3 {
+  h3,
+  .h3 {
     font-size: 40px !important;
     line-height: 45px !important;
   }
 
-  h4 {
+  h4,
+  .h4 {
     font-size: 30px !important;
     line-height: 35px !important;
+  }
+
+  h5,
+  .h5 {
+    font-size: 20px !important;
+    line-height: 28px !important;
+  }
+
+  h6,
+  .h6 {
+    font-size: 18px !important;
+    line-height: 26px !important;
+  }
+
+  .body-2,
+  .title {
+    font-size: 16px !important;
+    line-height: 26px !important;
+  }
+
+  .caption-1 {
+    font-size: 13px !important;
+    line-height: 20px !important;
+  }
+
+  .caption-2,
+  .label {
+    font-size: 11px !important;
+    line-height: 18px !important;
+  }
+
+  .text-btn {
+    font-size: 15px !important;
+    line-height: 22px !important;
+  }
+
+  .page-title.style-1 {
+    padding: 140px 0 80px;
+
+    .breadkcum {
+      padding-bottom: 28px;
+    }
   }
 
   .section-awards {
@@ -1444,8 +1506,6 @@
       }
 
       .about-albahar-title {
-        font-size: 28px !important;
-        line-height: 36px !important;
         padding-right: 0 !important;
         max-width: 100%;
         overflow-wrap: break-word;
@@ -1739,6 +1799,10 @@
     display: none;
   }
 
+  .swiper-time-line .tf-btn-arrow {
+    display: flex !important;
+  }
+
   .blog-details-2-content {
     padding: 60px 0 60px;
     margin-top: 0;
@@ -1833,6 +1897,77 @@
 }
 
 @media (max-width: 767px) {
+  /* Global type scale — mobile */
+  h1,
+  .h1 {
+    font-size: 40px !important;
+    line-height: 46px !important;
+  }
+
+  h2,
+  .h2 {
+    font-size: 32px !important;
+    line-height: 40px !important;
+  }
+
+  h3,
+  .h3 {
+    font-size: 28px !important;
+    line-height: 36px !important;
+  }
+
+  h4,
+  .h4 {
+    font-size: 24px !important;
+    line-height: 32px !important;
+  }
+
+  h5,
+  .h5 {
+    font-size: 18px !important;
+    line-height: 26px !important;
+  }
+
+  h6,
+  .h6 {
+    font-size: 16px !important;
+    line-height: 24px !important;
+  }
+
+  .body-2,
+  .title {
+    font-size: 15px !important;
+    line-height: 24px !important;
+  }
+
+  .caption-1 {
+    font-size: 12px !important;
+    line-height: 18px !important;
+  }
+
+  .caption-2,
+  .label {
+    font-size: 11px !important;
+    line-height: 16px !important;
+  }
+
+  .text-btn {
+    font-size: 14px !important;
+    line-height: 20px !important;
+  }
+
+  .page-title.style-1 {
+    padding: 120px 0 64px;
+
+    .breadkcum {
+      padding-bottom: 20px;
+    }
+
+    .title-page-title {
+      padding-bottom: 12px;
+    }
+  }
+
   .wg-tab {
     &.style-3 {
       .tab-product {
@@ -2095,6 +2230,62 @@
 }
 
 @media (max-width: 575px) {
+  .process-list {
+    .process-item {
+      &.style-2 {
+        flex: 1 1 100%;
+        max-width: 100%;
+      }
+    }
+  }
+
+  /* Global type scale — small mobile */
+  h1,
+  .h1 {
+    font-size: 34px !important;
+    line-height: 40px !important;
+  }
+
+  h2,
+  .h2 {
+    font-size: 28px !important;
+    line-height: 34px !important;
+  }
+
+  h3,
+  .h3 {
+    font-size: 24px !important;
+    line-height: 30px !important;
+  }
+
+  h4,
+  .h4 {
+    font-size: 22px !important;
+    line-height: 28px !important;
+  }
+
+  h5,
+  .h5 {
+    font-size: 17px !important;
+    line-height: 24px !important;
+  }
+
+  h6,
+  .h6 {
+    font-size: 16px !important;
+    line-height: 22px !important;
+  }
+
+  .body-2,
+  .title {
+    font-size: 14px !important;
+    line-height: 22px !important;
+  }
+
+  .page-title.style-1 {
+    padding: 110px 0 56px;
+  }
+
   .time-line-content {
     margin-right: 0 !important;
     margin-left: 0 !important;

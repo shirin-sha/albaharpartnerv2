@@ -115,6 +115,73 @@
     unicode-bidi: plaintext;
   }
 
+  // Homepage Our Advantage: keep English visual positions (centered banner,
+  // same left-to-right column order). Arabic copy stays RTL inside each card.
+  .section-advantage {
+    .advantage-banner-content,
+    .advantage-banner-content .advantage-tag,
+    .advantage-banner-content .advantage-heading,
+    .advantage-banner-content .advantage-desc,
+    .advantage-banner-content .advantage-cta,
+    .advantage-banner-content .advantage-cta span {
+      text-align: center !important;
+    }
+
+    .advantage-features-grid {
+      direction: ltr;
+    }
+
+    .advantage-feature-title,
+    .advantage-feature-text,
+    .advantage-feature-text p {
+      direction: rtl;
+      unicode-bidi: plaintext;
+      text-align: right;
+    }
+  }
+
+  // Customer Care Support Services: keep English visual positions
+  // (centered heading/cards, same left-to-right card order).
+  .ccc-services {
+    .heading-section,
+    .heading-section .tag,
+    .heading-section .title-section {
+      text-align: center !important;
+    }
+
+    .row {
+      direction: ltr;
+    }
+
+    .ccc-service-title,
+    .ccc-service-desc {
+      direction: rtl;
+      unicode-bidi: plaintext;
+      text-align: center !important;
+    }
+  }
+
+  // Customer Care How Support Works: keep English visual positions
+  // (centered heading/steps, same left-to-right step order 1→5).
+  .ccc-process {
+    .heading-section,
+    .heading-section .tag,
+    .heading-section .title-section {
+      text-align: center !important;
+    }
+
+    .ccc-process-track {
+      direction: ltr;
+    }
+
+    .ccc-process-title,
+    .ccc-process-desc {
+      direction: rtl;
+      unicode-bidi: plaintext;
+      text-align: center !important;
+    }
+  }
+
   // Keep explicitly LTR fragments stable inside RTL text blocks
   [dir="ltr"],
   .ltr-inline {

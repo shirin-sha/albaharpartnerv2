@@ -48,7 +48,7 @@ export default function ProcessSection({
         />
         <div className="advantage-banner-overlay" aria-hidden="true" />
         <div className="tf-container advantage-banner-inner">
-          <div className="advantage-banner-content">
+          <div className="advantage-banner-content text-center">
             {content.tag && (
               <div className="advantage-tag-wrap">
                 <span className="advantage-tag text-btn-uppercase">

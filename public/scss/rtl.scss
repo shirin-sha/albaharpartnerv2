@@ -63,18 +63,54 @@
     text-align: center !important;
   }
 
-  // BiDi stabilization for Arabic content:
-  // keeps punctuation like "." from visually jumping in mixed-language strings.
+  // BiDi stabilization for Arabic content.
+  // Neutral Latin punctuation ( . , ? ! : ; ( ) " ' … — ) follows the
+  // element's direction. Keep Arabic copy in RTL so marks stay where typed.
+  // Use [dir="ltr"] / .ltr-inline for phones, emails, URLs, and numbers.
   .sub-title,
   .desc,
   .body-2,
   .caption-1,
+  .caption-2,
   .text,
+  .title,
   .title-desc,
   .name-post,
   .name-services,
   .title-post,
-  .rtl-copy {
+  .title-section,
+  .title-according,
+  .rtl-copy,
+  .text-anime-wave,
+  .text-anime-wave-1,
+  .text-anime-wave-2,
+  .text-anime-wave-3,
+  .advantage-heading,
+  .advantage-desc,
+  .post-content,
+  .tf-list-post-content,
+  .tf-post-grid-content,
+  .item-content,
+  .services-content,
+  .contact-footer-content,
+  .footer-content,
+  .footer-subscribe,
+  .new-letter-content,
+  .testimonial-content,
+  .info-content,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p,
+  li,
+  label,
+  blockquote,
+  figcaption,
+  td,
+  th {
     direction: rtl;
     unicode-bidi: plaintext;
   }
@@ -208,7 +244,8 @@
   }
 
   .text-color-change {
-    direction: ltr;
+    direction: rtl;
+    unicode-bidi: plaintext;
     text-align: end;
   }
 
@@ -239,8 +276,34 @@
   }
 
   .heading-section {
+    // Keep LTR for flex/margin layout helpers below, but force Arabic copy to RTL
+    // so sentence punctuation stays at the end of the sentence.
     direction: ltr;
     text-align: end;
+
+    .title-section,
+    .sub-title,
+    .title-desc,
+    .desc,
+    .body-2,
+    .caption-1,
+    .caption-2,
+    .text,
+    .text-anime-wave,
+    .text-anime-wave-1,
+    .text-anime-wave-2,
+    .text-anime-wave-3,
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    li {
+      direction: rtl;
+      unicode-bidi: plaintext;
+    }
 
     .tag {
       margin-right: 0;
@@ -282,7 +345,8 @@
 
   .according-item {
     .title-according {
-      direction: ltr;
+      direction: rtl;
+      unicode-bidi: plaintext;
       flex-direction: row-reverse;
     }
   }
@@ -1292,6 +1356,51 @@
         right: auto;
         left: 0;
       }
+    }
+  }
+
+  // Final BiDi pass: layout wrappers may stay LTR for flex, but nested Arabic
+  // copy must stay RTL so .,?!:;()"' and similar marks keep typed positions.
+  // Phones / emails / URLs stay LTR via [dir="ltr"] / .ltr-inline.
+  .heading-section,
+  .footer-content,
+  .contact-footer-content,
+  .footer-subscribe,
+  .new-letter-content,
+  .tf-post-list,
+  .tf-post-grid-content,
+  .item-content,
+  .services-content,
+  .cta-content,
+  .cta-inner,
+  .info-content,
+  .testimonial-content,
+  .testimonial-item,
+  .sw-new,
+  .benefit-items {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    p,
+    li,
+    label,
+    .title,
+    .title-section,
+    .sub-title,
+    .title-desc,
+    .desc,
+    .body-2,
+    .caption-1,
+    .caption-2,
+    .text,
+    .name-post,
+    .title-post,
+    .name-services {
+      direction: rtl;
+      unicode-bidi: plaintext;
     }
   }
 }

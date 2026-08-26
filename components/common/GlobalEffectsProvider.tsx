@@ -122,11 +122,11 @@ export default function GlobalEffectsProvider() {
     return true;
   };
 
-  // Load Bootstrap JS only once on client (idle — not needed for first paint)
+  // Load Bootstrap ASAP on mobile (hamburger needs Offcanvas); idle elsewhere
   useEffect(() => {
     if (typeof window === "undefined" || hasLoadedBootstrap.current) return;
 
-    return runWhenBrowserIdle(() => {
+    const loadBootstrap = () => {
       if (hasLoadedBootstrap.current) return;
       import("bootstrap/dist/js/bootstrap.esm")
         .then((module) => {
@@ -134,7 +134,14 @@ export default function GlobalEffectsProvider() {
           bootstrapRef.current = module;
         })
         .catch(() => {});
-    }, 3000);
+    };
+
+    if (isMobileViewport()) {
+      loadBootstrap();
+      return;
+    }
+
+    return runWhenBrowserIdle(loadBootstrap, 3000);
   }, []);
 
   // Close any open modals/offcanvas on route change

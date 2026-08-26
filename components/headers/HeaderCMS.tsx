@@ -29,6 +29,38 @@ export default function HeaderCMS({ data }: Props) {
     };
   }, []);
 
+  const closeMobileNav = () => {
+    const el = document.getElementById("canvasMobile");
+    if (!el) return;
+    el.classList.remove("show");
+    el.style.visibility = "";
+    el.style.transform = "";
+    el.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("overflow-hidden");
+    document.querySelectorAll(".mobile-nav-backdrop").forEach((b) => b.remove());
+  };
+
+  const openMobileNav = (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const el = document.getElementById("canvasMobile");
+    if (!el) return;
+
+    // Open without Bootstrap Offcanvas — avoids double backdrop / hide races
+    el.classList.add("show");
+    el.style.visibility = "visible";
+    el.style.transform = "none";
+    el.removeAttribute("aria-hidden");
+    document.body.classList.add("overflow-hidden");
+
+    if (!document.querySelector(".offcanvas-backdrop.mobile-nav-backdrop")) {
+      const backdrop = document.createElement("div");
+      backdrop.className = "offcanvas-backdrop fade show mobile-nav-backdrop";
+      backdrop.addEventListener("click", closeMobileNav);
+      document.body.appendChild(backdrop);
+    }
+  };
+
   if (!data.isActive) return null;
 
   const activeMenuItems = (data.menuItems || [])
@@ -226,12 +258,43 @@ export default function HeaderCMS({ data }: Props) {
                 )}
                 <div className="nav-icon">
                   <div className="mobile-button">
-                    <a href="#canvasMobile" data-bs-toggle="offcanvas" aria-label="Open mobile menu">
+                    <button
+                      type="button"
+                      aria-label="Open mobile menu"
+                      onClick={openMobileNav}
+                    >
                       <span className="visually-hidden">Open mobile menu</span>
-                      <span />
-                      <span />
-                      <span />
-                    </a>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width={24}
+                        height={24}
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M4 6H20.5"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M4 12H16"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M4 18L17.9647 18"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </button>
                   </div>
                 </div>
               </div>

@@ -15,6 +15,7 @@ export default function MobileMenu() {
   const pathname = usePathname();
   const language = getLanguageFromPathname(pathname);
   const [header, setHeader] = useState<HeaderContent | null>(null);
+  const [logoSrc, setLogoSrc] = useState("/image/logo/logo-2.png");
 
   useEffect(() => {
     let cancelled = false;
@@ -33,6 +34,10 @@ export default function MobileMenu() {
       cancelled = true;
     };
   }, [language]);
+
+  useEffect(() => {
+    setLogoSrc(header?.logo?.imagePath?.trim() || "/image/logo/logo-2.png");
+  }, [header?.logo?.imagePath]);
 
   const isItemActive = (href: string) => {
     const current = normalizePath(pathname || "/");
@@ -64,7 +69,6 @@ export default function MobileMenu() {
       : `${buttonLink}?download=1`
     : buttonLink;
 
-  const logoSrc = header?.logo?.imagePath || "/image/logo/logo-2.png";
   const logoAlt = header?.logo?.alt || "Al Bahar & Partners";
   const homeHref = addLanguagePrefix(header?.logo?.link || "/", pathname);
 
@@ -81,13 +85,34 @@ export default function MobileMenu() {
           <div className="logo-mobile">
             <Link href={homeHref}>
               <span className="visually-hidden">{`${logoAlt} — home`}</span>
-              <Image alt="" src={logoSrc} width={169} height={40} />
+              <Image
+                alt=""
+                src={logoSrc}
+                width={169}
+                height={40}
+                onError={() => {
+                  if (logoSrc !== "/image/logo/logo-2.png") {
+                    setLogoSrc("/image/logo/logo-2.png");
+                  }
+                }}
+              />
             </Link>
           </div>
           <button
             className="mobile-nav-close"
+            type="button"
             data-bs-dismiss="offcanvas"
             aria-label="Close"
+            onClick={() => {
+              const el = document.getElementById("canvasMobile");
+              el?.classList.remove("show");
+              if (el) {
+                el.style.visibility = "";
+                el.setAttribute("aria-hidden", "true");
+              }
+              document.body.classList.remove("overflow-hidden");
+              document.querySelectorAll(".mobile-nav-backdrop").forEach((b) => b.remove());
+            }}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

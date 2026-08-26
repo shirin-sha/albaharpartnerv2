@@ -415,7 +415,9 @@ export default function SolutionsManager() {
         const detailRtl = contentRtl.detailPage || defaultSolutionsDetailPage('rtl');
         const updateDetail = (
           lang: 'ltr' | 'rtl',
-          patch: Partial<typeof detailLtr> & { contact?: Partial<typeof detailLtr.contact> }
+          patch: Omit<Partial<typeof detailLtr>, 'contact'> & {
+            contact?: Partial<(typeof detailLtr)['contact']>;
+          }
         ) => {
           if (lang === 'ltr') {
             setContentLtr((prev) => {

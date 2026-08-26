@@ -8,27 +8,38 @@ $font-main6: var(--font-nunito), sans-serif;
 $font-main7: var(--font-archivo), sans-serif;
 $fontIcon: "icomoon";
 
+// Client brand palette (exact):
+// Primary CI Purple: #6D2C84
+// Dark Purple: #30113D
+// Dark Purple Hover: #542066
+// Light Purple Background: #F4EFF7
+// Very Light Purple Background: #FAF8FC
 :root {
     --primary: #6D2C84;
+    --dark-purple: #30113D;
+    --dark-purple-hover: #542066;
+    --light-purple-bg: #F4EFF7;
+    --very-light-purple-bg: #FAF8FC;
+
     --white: #ffffff;
     --black: #000000;
     --error: #C72929;
-    --on-suface-container: #2F123C;
+    --on-suface-container: #30113D;
     --on-suface-variant-1: #6B5474;
     --on-suface-variant-2: #A894B0;
-    --surface: #F7F2F9;
+    --surface: #F4EFF7;
     --outline: #E8DDEF;
     --line-1: #FFFFFF26;
     --bg-1: #FFFFFF26;
-    --bg-2: #EFE4F4;
-    --bg-3: rgba(47, 18, 60, 0.15);
+    --bg-2: #F4EFF7;
+    --bg-3: rgba(48, 17, 61, 0.15);
     --bg-4: #6d2c8466;
-    --bg-5: #2F123C1A;
-    --bg-6: #FBF8FC;
+    --bg-5: #30113D1A;
+    --bg-6: #FAF8FC;
     --color-text-1: #E8D4F2;
     --color-text-2: #6B5474;
     --color-text-3: #8C7396;
     --color-text-4: #;
-    --border-1: rgba(47, 18, 60, 0.18);
-    --overlay-dark: #2F123C;
+    --border-1: rgba(48, 17, 61, 0.18);
+    --overlay-dark: #30113D;
 }

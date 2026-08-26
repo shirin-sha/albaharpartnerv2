@@ -49,6 +49,7 @@ export default async function NewsDetailsPage({ params }: PageProps) {
       listingTitle={header?.title || "News & Updates"}
       recentPostsTitle="Recent posts"
       language="ltr"
+      imagePath={header?.imagePath}
     />
   );
 }

@@ -16,6 +16,8 @@ export interface CustomerStoriesHeader {
   breadcrumb: string;
   title: string;
   subtitle?: string;
+  /** Page-title / breadcrumb banner background */
+  imagePath?: string;
   language: 'ltr' | 'rtl';
   isActive: boolean;
 }

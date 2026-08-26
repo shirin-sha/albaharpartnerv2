@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { commitPendingUploads } from '@/lib/pending-uploads';
+import PageHeaderBackgroundField from '@/components/admin/PageHeaderBackgroundField';
 import Link from 'next/link';
 import { CustomerStoriesContent } from '@/types/customer-stories';
 
 const CUSTOMER_STORIES_SECTIONS = [
   { id: 'meta', label: 'Meta (SEO)', description: 'Title, description, keywords (English & Arabic)' },
-  { id: 'header', label: 'Page Header', description: 'Breadcrumb, title, subtitle' },
+  { id: 'header', label: 'Page Header', description: 'Breadcrumb, title, subtitle, background image' },
   { id: 'stories', label: 'Stories Section', description: 'Tag, heading, subheading' },
 ] as const;
 
@@ -17,7 +19,11 @@ export default function CustomerStoriesManager() {
   const [saving, setSaving] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [contentLtr, setContentLtr] = useState<CustomerStoriesContent | null>(null);
+  const contentLtrRef = useRef(contentLtr);
+  contentLtrRef.current = contentLtr;
   const [contentRtl, setContentRtl] = useState<CustomerStoriesContent | null>(null);
+  const contentRtlRef = useRef(contentRtl);
+  contentRtlRef.current = contentRtl;
   const [selectedSection, setSelectedSection] = useState<CustomerStoriesSectionId | null>(null);
 
   useEffect(() => {
@@ -83,9 +89,13 @@ export default function CustomerStoriesManager() {
   };
 
   const handleSaveSection = async (section: string) => {
-    if (!contentLtr || !contentRtl) return;
     setSaving(section);
     try {
+      await commitPendingUploads();
+      const contentLtr = contentLtrRef.current;
+      const contentRtl = contentRtlRef.current;
+      if (!contentLtr || !contentRtl) return;
+
       // Save both LTR and RTL in parallel
       const [ltrRes, rtlRes] = await Promise.all([
         fetch('/api/customer-stories', {
@@ -343,7 +353,21 @@ export default function CustomerStoriesManager() {
                   />
                 </div>
               </div>
-              <div className="form-actions">
+              
+              <PageHeaderBackgroundField
+                value={contentLtr.header.imagePath || contentRtl.header.imagePath || ''}
+                onChange={(value) => {
+                  setContentLtr({
+                    ...contentLtr,
+                    header: { ...contentLtr.header, imagePath: value },
+                  });
+                  setContentRtl({
+                    ...contentRtl,
+                    header: { ...contentRtl.header, imagePath: value },
+                  });
+                }}
+              />
+<div className="form-actions">
                 <button
                   className="button button-primary"
                   onClick={() => handleSaveSection('header')}

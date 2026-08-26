@@ -4,6 +4,7 @@ import { useState, useEffect, useRef} from 'react';
 import { commitPendingUploads, discardPendingUploads, queuePathForDelete } from '@/lib/pending-uploads';
 import { AboutUsContent } from '@/types/aboutus';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
+import PageHeaderBackgroundField from '@/components/admin/PageHeaderBackgroundField';
 import RichTextEditor from '@/components/admin/ui/RichTextEditor';
 import Link from 'next/link';
 import { toEditorHtml } from '@/lib/rich-text-utils';
@@ -99,6 +100,7 @@ export default function AboutUsManager() {
       breadcrumb: 'About Us',
       title: 'About Us',
       subtitle: 'Discover our mission to empower clients with expert solutions',
+      imagePath: '',
       language: lang,
       isActive: true,
     },
@@ -532,6 +534,19 @@ export default function AboutUsManager() {
                   </div>
                 </div>
               </div>
+              <PageHeaderBackgroundField
+                value={contentLtr.header.imagePath || contentRtl.header.imagePath || ''}
+                onChange={(value) => {
+                  setContentLtr({
+                    ...contentLtr,
+                    header: { ...contentLtr.header, imagePath: value },
+                  });
+                  setContentRtl({
+                    ...contentRtl,
+                    header: { ...contentRtl.header, imagePath: value },
+                  });
+                }}
+              />
               <div className="form-actions">
                 <button
                   className="button button-primary"

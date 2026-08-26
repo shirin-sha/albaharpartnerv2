@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { commitPendingUploads } from '@/lib/pending-uploads';
+import PageHeaderBackgroundField from '@/components/admin/PageHeaderBackgroundField';
 import Link from 'next/link';
 import { BrandsContent } from '@/types/brands';
 
 const BRANDS_SECTIONS = [
   { id: 'meta', label: 'Meta (SEO)', description: 'Title, description, keywords (English & Arabic)' },
-  { id: 'header', label: 'Page Header', description: 'Breadcrumb, title, subtitle' },
+  { id: 'header', label: 'Page Header', description: 'Breadcrumb, title, subtitle, background image' },
   { id: 'brands', label: 'Brands Section', description: 'Tag, heading, subheading' },
 ] as const;
 
@@ -17,7 +19,11 @@ export default function BrandsManager() {
   const [saving, setSaving] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [contentLtr, setContentLtr] = useState<BrandsContent | null>(null);
+  const contentLtrRef = useRef(contentLtr);
+  contentLtrRef.current = contentLtr;
   const [contentRtl, setContentRtl] = useState<BrandsContent | null>(null);
+  const contentRtlRef = useRef(contentRtl);
+  contentRtlRef.current = contentRtl;
   const [selectedSection, setSelectedSection] = useState<BrandsSectionId | null>(null);
 
   useEffect(() => {
@@ -68,6 +74,7 @@ export default function BrandsManager() {
       breadcrumb: 'Brands',
       title: 'Brands',
       subtitle: '',
+      imagePath: '',
       language: lang,
       isActive: true,
     },
@@ -83,9 +90,13 @@ export default function BrandsManager() {
   };
 
   const handleSaveSection = async (section: string) => {
-    if (!contentLtr || !contentRtl) return;
     setSaving(section);
     try {
+      await commitPendingUploads();
+      const contentLtr = contentLtrRef.current;
+      const contentRtl = contentRtlRef.current;
+      if (!contentLtr || !contentRtl) return;
+
       // Save both LTR and RTL in parallel
       const [ltrRes, rtlRes] = await Promise.all([
         fetch('/api/brands', {
@@ -347,7 +358,21 @@ export default function BrandsManager() {
                   />
                 </div>
               </div>
-              <div className="form-actions">
+              
+              <PageHeaderBackgroundField
+                value={contentLtr.header.imagePath || contentRtl.header.imagePath || ''}
+                onChange={(value) => {
+                  setContentLtr({
+                    ...contentLtr,
+                    header: { ...contentLtr.header, imagePath: value },
+                  });
+                  setContentRtl({
+                    ...contentRtl,
+                    header: { ...contentRtl.header, imagePath: value },
+                  });
+                }}
+              />
+<div className="form-actions">
                 <button
                   className="button button-primary"
                   onClick={() => handleSaveSection('header')}

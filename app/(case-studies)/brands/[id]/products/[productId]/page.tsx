@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { getBrandsContent } from "@/lib/data-fetch";
 import ProductDetail from "@/components/case-studies/ProductDetail";
 import { BrandProduct } from "@/types/brands";
+import { getPageTitleBg } from "@/components/common/PageTitleBanner";
 
 export async function generateMetadata({
   params,
@@ -100,7 +101,7 @@ export default async function ProductDetailPage({
   return (
     <>
       {headerData.isActive && (
-        <div className="page-title style-1 bg-img-11">
+        <div {...getPageTitleBg(headerData.imagePath, "bg-img-11")}>
           <div className="tf-container">
             <div className="page-title-content">
               <div className="breadkcum">

@@ -156,9 +156,9 @@
     pointer-events: none;
     background: linear-gradient(
       90deg,
-      rgba(47, 18, 60, 0.88) 0%,
-      rgba(47, 18, 60, 0.42) 48%,
-      rgba(47, 18, 60, 0.06) 100%
+      rgba(48, 17, 61, 0.88) 0%,
+      rgba(48, 17, 61, 0.42) 48%,
+      rgba(48, 17, 61, 0.06) 100%
     );
   }
 
@@ -227,6 +227,14 @@
     &::before {
       background-image: url(/image/page-title/page-title-9.jpg);
       opacity: 0.5;
+    }
+  }
+
+  /* CMS-managed page header background (via --page-title-bg) */
+  &.has-cms-bg {
+    &::before {
+      background-image: var(--page-title-bg);
+      opacity: 0.55;
     }
   }
 
@@ -550,9 +558,9 @@
         height: 100%;
         background: linear-gradient(
           90deg,
-          rgba(47, 18, 60, 0.82) 0%,
-          rgba(47, 18, 60, 0.28) 55%,
-          rgba(47, 18, 60, 0.04) 100%
+          rgba(48, 17, 61, 0.82) 0%,
+          rgba(48, 17, 61, 0.28) 55%,
+          rgba(48, 17, 61, 0.04) 100%
         );
       }
     }
@@ -618,9 +626,9 @@
         bottom: 0;
         background: linear-gradient(
           90deg,
-          rgba(47, 18, 60, 0.82) 0%,
-          rgba(47, 18, 60, 0.32) 48%,
-          rgba(47, 18, 60, 0.04) 100%
+          rgba(48, 17, 61, 0.82) 0%,
+          rgba(48, 17, 61, 0.32) 48%,
+          rgba(48, 17, 61, 0.04) 100%
         );
         z-index: 1;
       }
@@ -2928,9 +2936,9 @@
     pointer-events: none;
     background: radial-gradient(
       ellipse 80% 85% at 50% 48%,
-      rgba(47, 18, 60, 0.82) 0%,
+      rgba(48, 17, 61, 0.82) 0%,
       rgba(109, 44, 132, 0.52) 46%,
-      rgba(47, 18, 60, 0.22) 100%
+      rgba(48, 17, 61, 0.22) 100%
     );
   }
 
@@ -3143,9 +3151,9 @@
   pointer-events: none;
   background: linear-gradient(
     90deg,
-    rgba(47, 18, 60, 0.88) 0%,
+    rgba(48, 17, 61, 0.88) 0%,
     rgba(109, 44, 132, 0.55) 48%,
-    rgba(47, 18, 60, 0.28) 100%
+    rgba(48, 17, 61, 0.28) 100%
   );
 }
 
@@ -3474,7 +3482,7 @@
     background-color: var(--primary);
     padding: 64px 0;
 
-    // Solid buttons on primary bg: white default, dark hover (not primary — would blend)
+    // Solid buttons on primary bg: white default, dark-purple-hover on press
     .tf-btn.bg-white {
       color: var(--on-suface-container);
 
@@ -3483,13 +3491,13 @@
       }
 
       &::before {
-        background-color: var(--on-suface-container);
+        background-color: var(--dark-purple-hover);
       }
 
       &:hover,
       &:focus-visible {
-        background-color: var(--on-suface-container) !important;
-        border-color: var(--on-suface-container) !important;
+        background-color: var(--dark-purple-hover) !important;
+        border-color: var(--dark-purple-hover) !important;
         color: var(--white) !important;
 
         span {
@@ -3497,7 +3505,7 @@
         }
 
         &::before {
-          background-color: var(--on-suface-container);
+          background-color: var(--dark-purple-hover);
         }
       }
     }
@@ -3616,8 +3624,8 @@
   .ccc-hero-overlay {
     background: linear-gradient(
       180deg,
-      rgba(47, 18, 60, 0.75) 0%,
-      rgba(47, 18, 60, 0.88) 100%
+      rgba(48, 17, 61, 0.75) 0%,
+      rgba(48, 17, 61, 0.88) 100%
     );
   }
 

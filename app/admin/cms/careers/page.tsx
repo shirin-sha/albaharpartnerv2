@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { commitPendingUploads } from '@/lib/pending-uploads';
+import PageHeaderBackgroundField from '@/components/admin/PageHeaderBackgroundField';
 import Link from 'next/link';
 import { CareersContent } from '@/types/careers';
 
 const CAREERS_SECTIONS = [
   { id: 'meta', label: 'Meta (SEO)', description: 'Title, description, keywords (English & Arabic)' },
-  { id: 'header', label: 'Page Header', description: 'Breadcrumb, title, subtitle' },
+  { id: 'header', label: 'Page Header', description: 'Breadcrumb, title, subtitle, background image' },
   { id: 'careers', label: 'Careers Section', description: 'Tag, heading, subheading' },
 ] as const;
 
@@ -17,7 +19,11 @@ export default function CareersManager() {
   const [saving, setSaving] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [contentLtr, setContentLtr] = useState<CareersContent | null>(null);
+  const contentLtrRef = useRef(contentLtr);
+  contentLtrRef.current = contentLtr;
   const [contentRtl, setContentRtl] = useState<CareersContent | null>(null);
+  const contentRtlRef = useRef(contentRtl);
+  contentRtlRef.current = contentRtl;
   const [selectedSection, setSelectedSection] = useState<CareersSectionId | null>(null);
 
   useEffect(() => {
@@ -68,6 +74,7 @@ export default function CareersManager() {
       breadcrumb: 'Careers',
       title: 'Careers',
       subtitle: 'Join our team of industry experts and make a meaningful impact. Discover opportunities to grow your career with us in a dynamic & rewarding environment.',
+      imagePath: '',
       language: lang,
       isActive: true,
     },
@@ -83,9 +90,14 @@ export default function CareersManager() {
   };
 
   const handleSaveSection = async (section: string) => {
-    if (!contentLtr || !contentRtl) return;
     setSaving(section);
     try {
+      await commitPendingUploads();
+      // Read latest state after uploads apply paths via flushSync
+      const contentLtr = contentLtrRef.current;
+      const contentRtl = contentRtlRef.current;
+      if (!contentLtr || !contentRtl) return;
+
       // Save both LTR and RTL in parallel
       const [ltrRes, rtlRes] = await Promise.all([
         fetch('/api/careers', {
@@ -343,7 +355,21 @@ export default function CareersManager() {
                   />
                 </div>
               </div>
-              <div className="form-actions">
+              
+              <PageHeaderBackgroundField
+                value={contentLtr.header.imagePath || contentRtl.header.imagePath || ''}
+                onChange={(value) => {
+                  setContentLtr({
+                    ...contentLtr,
+                    header: { ...contentLtr.header, imagePath: value },
+                  });
+                  setContentRtl({
+                    ...contentRtl,
+                    header: { ...contentRtl.header, imagePath: value },
+                  });
+                }}
+              />
+<div className="form-actions">
                 <button
                   className="button button-primary"
                   onClick={() => handleSaveSection('header')}

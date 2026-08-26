@@ -1,5 +1,5 @@
 import React from "react";
-import Breadcumb from "@/components/common/Breadcumb";
+import PageTitleBanner from "@/components/common/PageTitleBanner";
 import { Metadata } from "next";
 import BrandsCMS from "@/components/case-studies/BrandsCMS";
 import { BrandsContent } from "@/types/brands";
@@ -41,17 +41,13 @@ export default async function BrandsPage() {
   return (
     <>
       {headerData.isActive && (
-        <div className="page-title style-1 bg-img-8">
-          <div className="tf-container">
-            <div className="page-title-content">
-              <Breadcumb pageName={headerData.breadcrumb} />
-              <h2 className="title-page-title">{headerData.title}</h2>
-              {headerData.subtitle && (
-                <div className="sub-title body-2" dangerouslySetInnerHTML={{ __html: headerData.subtitle }} />
-              )}
-            </div>
-          </div>
-        </div>
+        <PageTitleBanner
+          breadcrumb={headerData.breadcrumb}
+          title={headerData.title}
+          subtitle={headerData.subtitle}
+          imagePath={headerData.imagePath}
+          isActive={headerData.isActive}
+        />
       )}
       <div className="main-content">
         {content && <BrandsCMS data={content} />}

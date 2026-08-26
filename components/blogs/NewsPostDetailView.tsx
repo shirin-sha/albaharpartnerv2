@@ -3,7 +3,7 @@ import Image from "next/image";
 import React from "react";
 import type { NewsPost } from "@/types/news-updates";
 import { newsMainImageSrc } from "@/lib/news-post-images";
-import Breadcumb from "@/components/common/Breadcumb";
+import PageTitleBanner from "@/components/common/PageTitleBanner";
 import CmsRichText from "@/components/common/CmsRichText";
 
 function formatDate(p: { dateIso?: string; date: { day: string; month: string } }) {
@@ -47,6 +47,8 @@ export interface NewsPostDetailViewProps {
   listingTitle: string;
   recentPostsTitle: string;
   language?: "ltr" | "rtl";
+  /** CMS page-header / breadcrumb background from News & Updates CMS */
+  imagePath?: string;
 }
 
 export default function NewsPostDetailView({
@@ -57,19 +59,17 @@ export default function NewsPostDetailView({
   listingTitle,
   recentPostsTitle,
   language = "ltr",
+  imagePath,
 }: NewsPostDetailViewProps) {
   const detailHeroSrc = newsMainImageSrc(post);
 
   return (
     <>
-      <div className="page-title style-1 bg-img-8">
-        <div className="tf-container">
-          <div className="page-title-content">
-            <Breadcumb pageName={breadcrumbPageName} />
-            <h2 className="title-page-title">{listingTitle}</h2>
-          </div>
-        </div>
-      </div>
+      <PageTitleBanner
+        breadcrumb={breadcrumbPageName}
+        title={listingTitle}
+        imagePath={imagePath}
+      />
 
       <div className="main-content tf-spacing-2" dir={language}>
         <div className="tf-container tf-spacing-3">

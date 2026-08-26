@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { commitPendingUploads } from '@/lib/pending-uploads';
+import PageHeaderBackgroundField from '@/components/admin/PageHeaderBackgroundField';
 import { ContactUsContent } from '@/types/contact-us';
 import { toGoogleMapsEmbedUrl } from '@/lib/google-maps';
 
 const CONTACT_US_SECTIONS = [
   { id: 'meta', label: 'Meta (SEO)', description: 'Title, description, keywords (English & Arabic)' },
-  { id: 'header', label: 'Page Header', description: 'Breadcrumb, title, subtitle' },
+  { id: 'header', label: 'Page Header', description: 'Breadcrumb, title, subtitle, background image' },
   { id: 'contact', label: 'Contact Section', description: 'Tag, heading, subheading, address, phone, email' },
   { id: 'map', label: 'Map Section', description: 'Google Maps embed URL' },
 ] as const;
@@ -18,7 +20,11 @@ export default function ContactUsManager() {
   const [saving, setSaving] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [contentLtr, setContentLtr] = useState<ContactUsContent | null>(null);
+  const contentLtrRef = useRef(contentLtr);
+  contentLtrRef.current = contentLtr;
   const [contentRtl, setContentRtl] = useState<ContactUsContent | null>(null);
+  const contentRtlRef = useRef(contentRtl);
+  contentRtlRef.current = contentRtl;
   const [selectedSection, setSelectedSection] = useState<ContactUsSectionId | null>(null);
 
   useEffect(() => {
@@ -88,6 +94,7 @@ export default function ContactUsManager() {
       breadcrumb: 'Contact Us',
       title: 'Contact Us',
       subtitle: 'Explore success stories from businesses that achieved growth through our tailored strategies and solutions.',
+      imagePath: '',
       language: lang,
       isActive: true,
     },
@@ -118,9 +125,13 @@ export default function ContactUsManager() {
   };
 
   const handleSaveSection = async (section: string) => {
-    if (!contentLtr || !contentRtl) return;
     setSaving(section);
     try {
+      await commitPendingUploads();
+      const contentLtr = contentLtrRef.current;
+      const contentRtl = contentRtlRef.current;
+      if (!contentLtr || !contentRtl) return;
+
       let ltrPayload = { ...contentLtr, language: 'ltr' as const };
       let rtlPayload = { ...contentRtl, language: 'rtl' as const };
 
@@ -301,6 +312,19 @@ export default function ContactUsManager() {
                 />
               </div>
             </div>
+              <PageHeaderBackgroundField
+                value={contentLtr.header.imagePath || contentRtl.header.imagePath || ''}
+                onChange={(value) => {
+                  setContentLtr({
+                    ...contentLtr,
+                    header: { ...contentLtr.header, imagePath: value },
+                  });
+                  setContentRtl({
+                    ...contentRtl,
+                    header: { ...contentRtl.header, imagePath: value },
+                  });
+                }}
+              />
               <div className="form-actions">
                 <button
                   className="button button-primary"

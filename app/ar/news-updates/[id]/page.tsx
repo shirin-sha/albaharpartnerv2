@@ -60,6 +60,7 @@ export default async function ArabicNewsDetailsPage({ params }: PageProps) {
         listingTitle={header?.title || "الأخبار والتحديثات"}
         recentPostsTitle="مقالات حديثة"
         language="rtl"
+        imagePath={header?.imagePath}
       />
     );
   }

@@ -6,6 +6,7 @@ import { notFound } from "next/navigation";
 import { getSolutionsContent } from "@/lib/data-fetch";
 import Contact from "@/components/services/Contact";
 import CmsRichText from "@/components/common/CmsRichText";
+import { getPageTitleBg } from "@/components/common/PageTitleBanner";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -37,7 +38,7 @@ export default async function ServiceDetailsPage({ params }: PageProps) {
 
   return (
     <>
-      <div className="page-title style-1 bg-img-8">
+      <div {...getPageTitleBg(content?.header?.imagePath)}>
         <div className="tf-container">
           <div className="page-title-content">
             <div className="breadkcum">

@@ -1,5 +1,5 @@
 import React from "react";
-import Breadcumb from "@/components/common/Breadcumb";
+import PageTitleBanner from "@/components/common/PageTitleBanner";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getBrandsContent } from "@/lib/data-fetch";
@@ -64,14 +64,12 @@ export default async function BrandDetailPage({
   return (
     <>
       {headerData.isActive && (
-        <div className="page-title style-1 bg-img-8">
-          <div className="tf-container">
-            <div className="page-title-content">
-              <Breadcumb pageName={headerData.breadcrumb} />
-              <h2 className="title-page-title">{brand.name}</h2>
-            </div>
-          </div>
-        </div>
+        <PageTitleBanner
+          breadcrumb={headerData.breadcrumb}
+          title={brand.name}
+          imagePath={headerData.imagePath}
+          isActive={headerData.isActive}
+        />
       )}
       <div className="main-content">
         <BrandDetail brand={brand} />

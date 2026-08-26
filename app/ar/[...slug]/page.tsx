@@ -8,6 +8,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { getHeaderContent, getFooterContent, getAboutUsContent, getSolutionsContent, getContactUsContent, getSupportContent, getCareersContent, getCustomerStoriesContent, getNewsUpdatesContent, getBrandsContent, getCustomerCareContent } from "@/lib/data-fetch";
 import Breadcumb from "@/components/common/Breadcumb";
+import PageTitleBanner from "@/components/common/PageTitleBanner";
 import AboutAlBaharCMS from "@/components/otherPages/AboutAlBaharCMS";
 import VisionMissionValuesCMS from "@/components/otherPages/VisionMissionValuesCMS";
 import HeritageCMS from "@/components/otherPages/HeritageCMS";
@@ -348,31 +349,15 @@ export default async function ArabicPage({ params, searchParams }: PageProps) {
       pageContent = (
         <>
           {header?.isActive !== false && (
-            <div className="ccc-hero">
-              {header?.imagePath && (
-                <Image
-                  src={header.imagePath}
-                  alt={header.title || "Customer Care Center"}
-                  fill
-                  priority
-                  quality={75}
-                  sizes="100vw"
-                  className="ccc-hero-image"
-                  style={{ objectFit: "cover" }}
-                />
-              )}
-              <div className="ccc-hero-overlay" aria-hidden="true" />
-              <div className="tf-container ccc-hero-inner">
-                <div className="ccc-hero-content">
+            <div className="page-title style-1 bg-img-8">
+              <div className="tf-container">
+                <div className="page-title-content">
                   <Breadcumb pageName={header?.breadcrumb || "مركز خدمة العملاء"} />
-                  {header?.tag && (
-                    <span className="ccc-hero-tag text-btn-uppercase">{header.tag}</span>
-                  )}
-                  <h1 className="ccc-hero-title">
+                  <h2 className="title-page-title">
                     {header?.title || "مركز خدمة العملاء لدى البحر"}
-                  </h1>
+                  </h2>
                   {header?.subtitle && (
-                    <p className="ccc-hero-subtitle body-2">{header.subtitle}</p>
+                    <div className="sub-title body-2">{header.subtitle}</div>
                   )}
                 </div>
               </div>
@@ -397,19 +382,13 @@ export default async function ArabicPage({ params, searchParams }: PageProps) {
       };
       pageContent = (
         <>
-          {headerData.isActive && (
-            <div className="page-title style-1 bg-img-8">
-              <div className="tf-container">
-                <div className="page-title-content">
-                  <Breadcumb pageName={headerData.breadcrumb} />
-                  <h2 className="title-page-title">{headerData.title}</h2>
-                  {headerData.subtitle && (
-                    <div className="sub-title body-2" dangerouslySetInnerHTML={{ __html: headerData.subtitle.replace(/\n/g, '<br />') }} />
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
+          <PageTitleBanner
+            breadcrumb={headerData.breadcrumb}
+            title={headerData.title}
+            subtitle={headerData.subtitle}
+            imagePath={headerData.imagePath}
+            isActive={headerData.isActive}
+          />
           <div className="main-content">
             {content && <CareerCMS data={content} />}
           </div>

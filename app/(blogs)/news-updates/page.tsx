@@ -1,8 +1,7 @@
 import React from "react";
-import Breadcumb from "@/components/common/Breadcumb";
+import PageTitleBanner from "@/components/common/PageTitleBanner";
 import { Metadata } from "next";
 import NewsUpdatesCMS from "@/components/blogs/NewsUpdatesCMS";
-import { NewsUpdatesContent } from "@/types/news-updates";
 import { getNewsUpdatesContent } from "@/lib/data-fetch";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -21,15 +20,11 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-// Static generation with on-demand revalidation (triggered from admin panel)
-// Pages are pre-generated at build time and regenerate when admin updates content via revalidatePath
-// Using ISR with long revalidate time - pages stay static until admin triggers regeneration
-export const revalidate = 3600; // ISR: Regenerates after 1 hour OR immediately when admin calls revalidatePath
+export const revalidate = 3600;
 
 export default async function NewsUpdatesPage() {
   const content = await getNewsUpdatesContent();
 
-  // Fallback content if CMS data is not available
   const headerData = content?.header || {
     breadcrumb: "News & Updates",
     title: "News & Updates",
@@ -41,21 +36,13 @@ export default async function NewsUpdatesPage() {
   return (
     <>
       {headerData.isActive && (
-        <div className="page-title style-1 bg-img-8">
-          <div className="tf-container">
-            <div className="row">
-              <div className="col-12">
-                <div className="page-title-content">
-                  <Breadcumb pageName={headerData.breadcrumb} />
-                  <h2 className="title-page-title">{headerData.title}</h2>
-                  {headerData.subtitle && (
-                    <div className="sub-title body-2" dangerouslySetInnerHTML={{ __html: headerData.subtitle.replace(/\n/g, '<br />') }} />
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <PageTitleBanner
+          breadcrumb={headerData.breadcrumb}
+          title={headerData.title}
+          subtitle={headerData.subtitle}
+          imagePath={headerData.imagePath}
+          isActive={headerData.isActive}
+        />
       )}
       <div className="main-content tf-spacing-2">
         {content && <NewsUpdatesCMS data={content} />}
@@ -63,21 +50,3 @@ export default async function NewsUpdatesPage() {
     </>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

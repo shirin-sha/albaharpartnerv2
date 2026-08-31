@@ -9,7 +9,7 @@ import { toGoogleMapsEmbedUrl } from '@/lib/google-maps';
 const CONTACT_US_SECTIONS = [
   { id: 'meta', label: 'Meta (SEO)', description: 'Title, description, keywords (English & Arabic)' },
   { id: 'header', label: 'Page Header', description: 'Breadcrumb, title, subtitle, background image' },
-  { id: 'contact', label: 'Contact Section', description: 'Tag, heading, subheading, address, phone, email' },
+  { id: 'contact', label: 'Contact Section', description: 'Tag, heading, subheading, benefits, address, phone, email' },
   { id: 'map', label: 'Map Section', description: 'Google Maps embed URL' },
 ] as const;
 
@@ -41,6 +41,9 @@ export default function ContactUsManager() {
       ...content,
       contactSection: {
         ...content.contactSection,
+        benefits: Array.isArray(content.contactSection.benefits)
+          ? content.contactSection.benefits
+          : [],
         contactInfoLabels: {
           address: content.contactSection.contactInfoLabels?.address || defaults.address,
           phone: content.contactSection.contactInfoLabels?.phone || defaults.phone,
@@ -443,6 +446,125 @@ export default function ContactUsManager() {
                   }
                   rows={3}
                 />
+              </div>
+            </div>
+
+            <div className="form-group">
+              <label>Benefits</label>
+              <div style={{ fontSize: 13, opacity: 0.8, marginBottom: 12 }}>
+                Checklist items shown under the heading on the Contact Us page. Add, edit, or remove in English and Arabic.
+              </div>
+              <div className="hero-slides-container">
+                {Array.from({
+                  length: Math.max(
+                    contentLtr.contactSection.benefits?.length || 0,
+                    contentRtl.contactSection.benefits?.length || 0
+                  ),
+                }).map((_, index) => {
+                  const ltrBenefit = contentLtr.contactSection.benefits?.[index] || { text: '' };
+                  const rtlBenefit = contentRtl.contactSection.benefits?.[index] || { text: '' };
+
+                  return (
+                    <div key={index} className="hero-slide-card">
+                      <div className="hero-slide-header">
+                        <h4 style={{ margin: 0 }}>Benefit {index + 1}</h4>
+                        <button
+                          type="button"
+                          className="hero-slide-remove"
+                          onClick={() => {
+                            setContentLtr({
+                              ...contentLtr,
+                              contactSection: {
+                                ...contentLtr.contactSection,
+                                benefits: (contentLtr.contactSection.benefits || []).filter(
+                                  (_item, i) => i !== index
+                                ),
+                              },
+                            });
+                            setContentRtl({
+                              ...contentRtl,
+                              contactSection: {
+                                ...contentRtl.contactSection,
+                                benefits: (contentRtl.contactSection.benefits || []).filter(
+                                  (_item, i) => i !== index
+                                ),
+                              },
+                            });
+                          }}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                      <div className="form-row-bilingual-header">
+                        <div className="form-label-header">English</div>
+                        <div className="form-label-header">Arabic</div>
+                      </div>
+                      <div className="form-row-bilingual">
+                        <div className="form-group">
+                          <label>Text</label>
+                          <input
+                            type="text"
+                            value={ltrBenefit.text}
+                            onChange={(e) => {
+                              const next = [...(contentLtr.contactSection.benefits || [])];
+                              while (next.length <= index) next.push({ text: '' });
+                              next[index] = { text: e.target.value };
+                              setContentLtr({
+                                ...contentLtr,
+                                contactSection: {
+                                  ...contentLtr.contactSection,
+                                  benefits: next,
+                                },
+                              });
+                            }}
+                          />
+                        </div>
+                        <div className="form-group">
+                          <label>Text</label>
+                          <input
+                            type="text"
+                            dir="rtl"
+                            value={rtlBenefit.text}
+                            onChange={(e) => {
+                              const next = [...(contentRtl.contactSection.benefits || [])];
+                              while (next.length <= index) next.push({ text: '' });
+                              next[index] = { text: e.target.value };
+                              setContentRtl({
+                                ...contentRtl,
+                                contactSection: {
+                                  ...contentRtl.contactSection,
+                                  benefits: next,
+                                },
+                              });
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+                <button
+                  type="button"
+                  className="hero-add-slide-button"
+                  onClick={() => {
+                    setContentLtr({
+                      ...contentLtr,
+                      contactSection: {
+                        ...contentLtr.contactSection,
+                        benefits: [...(contentLtr.contactSection.benefits || []), { text: '' }],
+                      },
+                    });
+                    setContentRtl({
+                      ...contentRtl,
+                      contactSection: {
+                        ...contentRtl.contactSection,
+                        benefits: [...(contentRtl.contactSection.benefits || []), { text: '' }],
+                      },
+                    });
+                  }}
+                >
+                  + Add Benefit
+                </button>
               </div>
             </div>
 

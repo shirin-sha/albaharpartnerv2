@@ -36,8 +36,8 @@ export default function ServicesCMS({ data, language = 'ltr' }: Props) {
                         src={solution.imgSrc}
                         alt={solution.title}
                         className="lazyload"
-                        width={solution.imgWidth || 640}
-                        height={solution.imgHeight || 400}
+                        fill
+                        sizes="(max-width: 767px) 100vw, (max-width: 991px) 50vw, 33vw"
                       />
                     </div>
                     <div className="solution-grid-body">

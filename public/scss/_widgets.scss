@@ -2504,6 +2504,7 @@
   position: relative;
   padding: 33px 32px 30px;
   overflow: hidden;
+  color: var(--white);
 
   &::before {
     content: "";
@@ -2528,6 +2529,26 @@
     .content {
       max-width: calc(100% - 72px);
     }
+
+    .title-section-contact {
+      color: var(--color-text-1);
+    }
+
+    .text,
+    .text a,
+    .text span,
+    a:not(.tf-btn) {
+      color: var(--white);
+    }
+
+    a:not(.tf-btn):hover,
+    .text a:hover {
+      color: var(--color-text-1);
+    }
+  }
+
+  .tf-btn.bg-white span {
+    color: var(--on-suface-container);
   }
 }
 

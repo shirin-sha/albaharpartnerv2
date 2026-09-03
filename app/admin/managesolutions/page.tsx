@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { commitPendingUploads, discardPendingUploads } from '@/lib/pending-uploads';
+import { saveWithPendingUploads, discardPendingUploads } from '@/lib/pending-uploads';
 import { SolutionItem } from '@/types/solutions';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
 import RichTextEditor from '@/components/admin/ui/RichTextEditor';
@@ -86,70 +86,70 @@ export default function SolutionsManagePage() {
     e.preventDefault();
     setSaving(true);
     try {
-      await commitPendingUploads();
-    } catch (uploadErr) {
-      console.error('Upload error:', uploadErr);
-      showMessage('error', uploadErr instanceof Error ? uploadErr.message : 'Failed to upload files');
-      setSaving(false);
-      return;
-    }
-    const formData = formDataRef.current;
-    if (!formData.title.trim()) {
-      showMessage('error', 'Title (English) is required');
-      setSaving(false);
-      return;
-    }
-    if (!formData.id.trim()) {
-      showMessage('error', 'ID is required');
-      setSaving(false);
-      return;
-    }
+      let errorMessage = 'Failed to save';
+      const saved = await saveWithPendingUploads(async () => {
+        const formData = formDataRef.current;
+        if (!formData.title.trim()) {
+          errorMessage = 'Title (English) is required';
+          return false;
+        }
+        if (!formData.id.trim()) {
+          errorMessage = 'ID is required';
+          return false;
+        }
 
-    try {
-      const isNew = editingIndex === null;
-      const index = isNew ? solutionsLtr.length : editingIndex!;
+        const isNew = editingIndex === null;
+        const index = isNew ? solutionsLtr.length : editingIndex!;
 
-      const solution: SolutionItem = {
-        id: formData.id,
-        tabTitle: formData.tabTitle,
-        tabTitleAr: formData.tabTitleAr || formData.tabTitle,
-        title: formData.title,
-        titleAr: formData.titleAr || formData.title,
-        description: formData.description,
-        descriptionAr: formData.descriptionAr || formData.description,
-        detailDescription: formData.detailDescription,
-        detailDescriptionAr: formData.detailDescriptionAr || formData.detailDescription,
-        benefits: formData.benefits,
-        benefitsAr: formData.benefitsAr.length > 0 ? formData.benefitsAr : formData.benefits,
-        imgSrc: formData.imgSrc,
-        detailImgSrc: formData.detailImgSrc,
-        imgWidth: formData.imgWidth,
-        imgHeight: formData.imgHeight,
-        detailImgWidth: formData.detailImgWidth,
-        detailImgHeight: formData.detailImgHeight,
-        isActive: formData.isActive,
-      };
+        const solution: SolutionItem = {
+          id: formData.id,
+          tabTitle: formData.tabTitle,
+          tabTitleAr: formData.tabTitleAr || formData.tabTitle,
+          title: formData.title,
+          titleAr: formData.titleAr || formData.title,
+          description: formData.description,
+          descriptionAr: formData.descriptionAr || formData.description,
+          detailDescription: formData.detailDescription,
+          detailDescriptionAr: formData.detailDescriptionAr || formData.detailDescription,
+          benefits: formData.benefits,
+          benefitsAr: formData.benefitsAr.length > 0 ? formData.benefitsAr : formData.benefits,
+          imgSrc: formData.imgSrc,
+          detailImgSrc: formData.detailImgSrc,
+          imgWidth: formData.imgWidth,
+          imgHeight: formData.imgHeight,
+          detailImgWidth: formData.detailImgWidth,
+          detailImgHeight: formData.detailImgHeight,
+          isActive: formData.isActive,
+        };
 
-      const res = await fetch(isNew ? '/api/solutions/add' : '/api/solutions/update', {
-        method: isNew ? 'POST' : 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          language: 'ltr',
-          solutionIndex: index,
-          solution,
-        }),
+        const res = await fetch(isNew ? '/api/solutions/add' : '/api/solutions/update', {
+          method: isNew ? 'POST' : 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            language: 'ltr',
+            solutionIndex: index,
+            solution,
+          }),
+        });
+        const result = await res.json();
+        if (!result.success) {
+          errorMessage = result.message || 'Failed to save';
+          return false;
+        }
+        return true;
       });
-      const result = await res.json();
-      if (result.success) {
+
+      if (saved) {
+        const isNew = editingIndex === null;
         showMessage('success', isNew ? 'Solution added successfully!' : 'Solution updated successfully!');
         await loadSolutions();
         resetForm();
       } else {
-        showMessage('error', result.message || 'Failed to save');
+        showMessage('error', errorMessage);
       }
     } catch (error) {
       console.error('Error saving:', error);
-      showMessage('error', 'Failed to save');
+      showMessage('error', error instanceof Error ? error.message : 'Failed to save');
     } finally {
       setSaving(false);
     }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { FooterContent } from '@/types/footer';
 import { revalidatePath } from 'next/cache';
+import { deleteUnusedManagedUploads } from '@/lib/image-utils';
 
 const DB_NAME = 'albaharpartners1';
 const COLLECTION_NAME = 'footer';
@@ -139,6 +140,7 @@ export async function PUT(request: NextRequest) {
       updatedAt: new Date(),
     };
 
+    const oldDocument = await collection.findOne({ language: sanitizedBody.language });
     const result = await collection.findOneAndUpdate(
       { language: sanitizedBody.language },
       { $set: updatedContent },
@@ -151,6 +153,9 @@ export async function PUT(request: NextRequest) {
         message: 'Failed to update Footer content',
       }, { status: 500 });
     }
+
+    const siblings = await collection.find({ language: { $ne: sanitizedBody.language } }).toArray();
+    await deleteUnusedManagedUploads(oldDocument, updateData, siblings);
 
     // Revalidate homepage (footer affects all pages)
     revalidatePath('/', 'layout');

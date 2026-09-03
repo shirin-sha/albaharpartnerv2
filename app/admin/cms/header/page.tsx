@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef} from 'react';
-import { commitPendingUploads, discardPendingUploads } from '@/lib/pending-uploads';
+import { saveWithPendingUploads, bilingualSaveOutcome, discardPendingUploads } from '@/lib/pending-uploads';
 import { HeaderContent, MenuItem } from '@/types/header';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
 import DocumentUpload from '@/components/admin/ui/DocumentUpload';
@@ -528,38 +528,36 @@ export default function HeaderManager() {
   const handleSaveSection = async (section: string) => {
     setSaving(section);
     try {
-      await commitPendingUploads();
-      const contentLtr = contentLtrRef.current;
-      const contentRtl = contentRtlRef.current;
-      if (!contentLtr || !contentRtl) return;
-      if (section === 'logo') {
-        const method = contentLtr._id ? 'PUT' : 'POST';
-        // Logo is shared, so save using LTR content
-        const [ltrRes, rtlRes] = await Promise.all([
-          fetch('/api/header', {
-            method,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...contentLtr, language: 'ltr' }),
-          }),
-          fetch('/api/header', {
-            method: contentRtl._id ? 'PUT' : 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              ...contentRtl,
-              logo: contentLtr.logo,
-              language: 'rtl',
+      let errorMessage = 'Failed to save';
+      const saved = await saveWithPendingUploads(async () => {
+        const contentLtr = contentLtrRef.current;
+        const contentRtl = contentRtlRef.current;
+        if (!contentLtr || !contentRtl) return false;
+        if (section === 'logo') {
+          const method = contentLtr._id ? 'PUT' : 'POST';
+          const [ltrRes, rtlRes] = await Promise.all([
+            fetch('/api/header', {
+              method,
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ ...contentLtr, language: 'ltr' }),
             }),
-          }),
-        ]);
-        const [ltrResult, rtlResult] = await Promise.all([ltrRes.json(), rtlRes.json()]);
-        if (ltrResult.success && rtlResult.success) {
-          showMessage('success', `${section} saved successfully!`);
-          await loadContent();
-        } else {
-          showMessage('error', ltrResult.message || rtlResult.message || 'Failed to save');
+            fetch('/api/header', {
+              method: contentRtl._id ? 'PUT' : 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                ...contentRtl,
+                logo: contentLtr.logo,
+                language: 'rtl',
+              }),
+            }),
+          ]);
+          const [ltrResult, rtlResult] = await Promise.all([ltrRes.json(), rtlRes.json()]);
+          if (!(ltrResult.success && rtlResult.success)) {
+            errorMessage = ltrResult.message || rtlResult.message || 'Failed to save';
+          }
+          return bilingualSaveOutcome(ltrResult.success, rtlResult.success);
         }
-      } else {
-        // Save both LTR and RTL in parallel
+
         const [ltrRes, rtlRes] = await Promise.all([
           fetch('/api/header', {
             method: contentLtr._id ? 'PUT' : 'POST',
@@ -573,12 +571,17 @@ export default function HeaderManager() {
           }),
         ]);
         const [ltrResult, rtlResult] = await Promise.all([ltrRes.json(), rtlRes.json()]);
-        if (ltrResult.success && rtlResult.success) {
-          showMessage('success', `${section} saved successfully!`);
-          await loadContent();
-        } else {
-          showMessage('error', ltrResult.message || rtlResult.message || 'Failed to save');
+        if (!(ltrResult.success && rtlResult.success)) {
+          errorMessage = ltrResult.message || rtlResult.message || 'Failed to save';
         }
+        return bilingualSaveOutcome(ltrResult.success, rtlResult.success);
+      });
+
+      if (saved) {
+        showMessage('success', `${section} saved successfully!`);
+        await loadContent();
+      } else {
+        showMessage('error', errorMessage);
       }
     } catch (error) {
       console.error('Error saving:', error);

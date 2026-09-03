@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { CustomerCareContent } from '@/types/customer-care-center';
 import { revalidatePath, revalidateTag } from 'next/cache';
+import { deleteUnusedManagedUploads } from '@/lib/image-utils';
 
 const DB_NAME = 'albaharpartners1';
 const COLLECTION_NAME = 'customer-care-center';
@@ -101,6 +102,7 @@ export async function PUT(request: NextRequest) {
     const collection = db.collection(COLLECTION_NAME);
     const { _id, ...bodyWithoutId } = body;
 
+    const oldDocument = await collection.findOne({ language: body.language });
     const result = await collection.updateOne(
       { language: body.language },
       {
@@ -111,6 +113,9 @@ export async function PUT(request: NextRequest) {
       },
       { upsert: true }
     );
+
+    const siblings = await collection.find({ language: { $ne: body.language } }).toArray();
+    await deleteUnusedManagedUploads(oldDocument, bodyWithoutId, siblings);
 
     revalidatePages();
 

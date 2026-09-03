@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef} from 'react';
-import { commitPendingUploads, discardPendingUploads, queuePathForDelete } from '@/lib/pending-uploads';
+import { saveWithPendingUploads, bilingualSaveOutcome, discardPendingUploads, queuePathForDelete } from '@/lib/pending-uploads';
 import { AboutUsContent } from '@/types/aboutus';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
 import PageHeaderBackgroundField from '@/components/admin/PageHeaderBackgroundField';
@@ -189,46 +189,51 @@ export default function AboutUsManager() {
   const handleSaveSection = async (section: string) => {
     setSaving(section);
     try {
-      await commitPendingUploads();
-      const contentLtr = contentLtrRef.current;
-      const contentRtl = contentRtlRef.current;
-      if (!contentLtr || !contentRtl) return;
-      const normalizeAboutBPC = (content: AboutUsContent) => ({
-        ...content,
-        aboutBPC: {
-          tag: content.aboutBPC?.tag || '',
-          heading: content.aboutBPC?.heading || '',
-          imagePath: content.aboutBPC?.imagePath || '',
-          description: content.aboutBPC?.description || '',
-          language: content.language,
-          isActive: content.aboutBPC?.isActive ?? true,
-        },
+      let errorMessage = 'Failed to save';
+      const saved = await saveWithPendingUploads(async () => {
+        const contentLtr = contentLtrRef.current;
+        const contentRtl = contentRtlRef.current;
+        if (!contentLtr || !contentRtl) return false;
+        const normalizeAboutBPC = (content: AboutUsContent) => ({
+          ...content,
+          aboutBPC: {
+            tag: content.aboutBPC?.tag || '',
+            heading: content.aboutBPC?.heading || '',
+            imagePath: content.aboutBPC?.imagePath || '',
+            description: content.aboutBPC?.description || '',
+            language: content.language,
+            isActive: content.aboutBPC?.isActive ?? true,
+          },
+        });
+
+        const ltrPayload = normalizeAboutBPC(contentLtr);
+        const rtlPayload = normalizeAboutBPC(contentRtl);
+
+        const [ltrRes, rtlRes] = await Promise.all([
+          fetch('/api/aboutus', {
+            method: contentLtr._id ? 'PUT' : 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...ltrPayload, language: 'ltr' }),
+          }),
+          fetch('/api/aboutus', {
+            method: contentRtl._id ? 'PUT' : 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...rtlPayload, language: 'rtl' }),
+          }),
+        ]);
+
+        const [ltrResult, rtlResult] = await Promise.all([ltrRes.json(), rtlRes.json()]);
+        if (!(ltrResult.success && rtlResult.success)) {
+          errorMessage = ltrResult.message || rtlResult.message || 'Failed to save';
+        }
+        return bilingualSaveOutcome(ltrResult.success, rtlResult.success);
       });
 
-      const ltrPayload = normalizeAboutBPC(contentLtr);
-      const rtlPayload = normalizeAboutBPC(contentRtl);
-
-      // Save both LTR and RTL in parallel
-      const [ltrRes, rtlRes] = await Promise.all([
-        fetch('/api/aboutus', {
-          method: contentLtr._id ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...ltrPayload, language: 'ltr' }),
-        }),
-        fetch('/api/aboutus', {
-          method: contentRtl._id ? 'PUT' : 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...rtlPayload, language: 'rtl' }),
-        }),
-      ]);
-      
-      const [ltrResult, rtlResult] = await Promise.all([ltrRes.json(), rtlRes.json()]);
-      
-      if (ltrResult.success && rtlResult.success) {
+      if (saved) {
         showMessage('success', `${section} saved successfully!`);
         await loadContent();
       } else {
-        showMessage('error', ltrResult.message || rtlResult.message || 'Failed to save');
+        showMessage('error', errorMessage);
       }
     } catch (error) {
       console.error('Error saving:', error);
@@ -282,6 +287,11 @@ export default function AboutUsManager() {
 
   const removeVisionMissionItem = (index: number) => {
     if (!contentLtr || !contentRtl) return;
+
+    const removedLtr = (contentLtr.visionMissionValues.items || [])[index];
+    const removedRtl = (contentRtl.visionMissionValues.items || [])[index];
+    if (removedLtr?.imagePath) queuePathForDelete(removedLtr.imagePath);
+    if (removedRtl?.imagePath) queuePathForDelete(removedRtl.imagePath);
 
     setContentLtr({
       ...contentLtr,

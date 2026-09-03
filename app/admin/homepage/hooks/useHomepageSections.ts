@@ -264,11 +264,11 @@ export function useHomepageSections() {
           setSelectedSection(null);
           alert(`${sectionId} saved successfully (English & Arabic)!`);
         } else {
-          alert(`Failed to save: ${ltrSaveResult.message || rtlSaveResult.message}`);
+          throw new Error(ltrSaveResult.message || rtlSaveResult.message || 'Failed to save');
         }
       } catch (error) {
         console.error('Error saving section:', error);
-        alert('Failed to save section');
+        throw error instanceof Error ? error : new Error('Failed to save section');
       }
     },
     [cachedLtrContent, cachedRtlContent]

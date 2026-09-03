@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { SolutionItem } from '@/types/solutions';
 import { revalidatePath } from 'next/cache';
+import { deleteReferencedUploads } from '@/lib/image-utils';
 
 const DB_NAME = 'albaharpartners1';
 const COLLECTION_NAME = 'solutions';
@@ -221,6 +222,7 @@ export async function DELETE(
     revalidatePath('/solutions');
     revalidatePath('/');
     revalidatePath('/services-details-1');
+    await deleteReferencedUploads(solutionToDelete);
 
     return NextResponse.json({
       success: true,

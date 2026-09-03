@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { commitPendingUploads } from '@/lib/pending-uploads';
+import { saveWithPendingUploads, bilingualSaveOutcome } from '@/lib/pending-uploads';
 import PageHeaderBackgroundField from '@/components/admin/PageHeaderBackgroundField';
 import Link from 'next/link';
 import { CareersContent } from '@/types/careers';
@@ -92,33 +92,37 @@ export default function CareersManager() {
   const handleSaveSection = async (section: string) => {
     setSaving(section);
     try {
-      await commitPendingUploads();
-      // Read latest state after uploads apply paths via flushSync
-      const contentLtr = contentLtrRef.current;
-      const contentRtl = contentRtlRef.current;
-      if (!contentLtr || !contentRtl) return;
+      let errorMessage = 'Failed to save';
+      const saved = await saveWithPendingUploads(async () => {
+        const contentLtr = contentLtrRef.current;
+        const contentRtl = contentRtlRef.current;
+        if (!contentLtr || !contentRtl) return false;
 
-      // Save both LTR and RTL in parallel
-      const [ltrRes, rtlRes] = await Promise.all([
-        fetch('/api/careers', {
-          method: contentLtr._id ? 'PUT' : 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...contentLtr, language: 'ltr' }),
-        }),
-        fetch('/api/careers', {
-          method: contentRtl._id ? 'PUT' : 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...contentRtl, language: 'rtl' }),
-        }),
-      ]);
-      
-      const [ltrResult, rtlResult] = await Promise.all([ltrRes.json(), rtlRes.json()]);
-      
-      if (ltrResult.success && rtlResult.success) {
+        const [ltrRes, rtlRes] = await Promise.all([
+          fetch('/api/careers', {
+            method: contentLtr._id ? 'PUT' : 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...contentLtr, language: 'ltr' }),
+          }),
+          fetch('/api/careers', {
+            method: contentRtl._id ? 'PUT' : 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...contentRtl, language: 'rtl' }),
+          }),
+        ]);
+
+        const [ltrResult, rtlResult] = await Promise.all([ltrRes.json(), rtlRes.json()]);
+        if (!(ltrResult.success && rtlResult.success)) {
+          errorMessage = ltrResult.message || rtlResult.message || 'Failed to save';
+        }
+        return bilingualSaveOutcome(ltrResult.success, rtlResult.success);
+      });
+
+      if (saved) {
         showMessage('success', `${section} saved successfully!`);
         await loadContent();
       } else {
-        showMessage('error', ltrResult.message || rtlResult.message || 'Failed to save');
+        showMessage('error', errorMessage);
       }
     } catch (error) {
       console.error('Error saving:', error);

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { commitPendingUploads } from '@/lib/pending-uploads';
+import { saveWithPendingUploads, bilingualSaveOutcome } from '@/lib/pending-uploads';
 import PageHeaderBackgroundField from '@/components/admin/PageHeaderBackgroundField';
 import { ContactUsContent } from '@/types/contact-us';
 import { toGoogleMapsEmbedUrl } from '@/lib/google-maps';
@@ -130,50 +130,55 @@ export default function ContactUsManager() {
   const handleSaveSection = async (section: string) => {
     setSaving(section);
     try {
-      await commitPendingUploads();
-      const contentLtr = contentLtrRef.current;
-      const contentRtl = contentRtlRef.current;
-      if (!contentLtr || !contentRtl) return;
+      let errorMessage = 'Failed to save';
+      const saved = await saveWithPendingUploads(async () => {
+        const contentLtr = contentLtrRef.current;
+        const contentRtl = contentRtlRef.current;
+        if (!contentLtr || !contentRtl) return false;
 
-      let ltrPayload = { ...contentLtr, language: 'ltr' as const };
-      let rtlPayload = { ...contentRtl, language: 'rtl' as const };
+        let ltrPayload = { ...contentLtr, language: 'ltr' as const };
+        let rtlPayload = { ...contentRtl, language: 'rtl' as const };
 
-      // Convert place/share links to iframe-safe embed URLs before saving
-      if (section === 'map') {
-        const embedUrl = toGoogleMapsEmbedUrl(contentLtr.mapSection.mapUrl);
-        ltrPayload = {
-          ...ltrPayload,
-          mapSection: { ...ltrPayload.mapSection, mapUrl: embedUrl },
-        };
-        rtlPayload = {
-          ...rtlPayload,
-          mapSection: { ...rtlPayload.mapSection, mapUrl: embedUrl },
-        };
-        setContentLtr({ ...contentLtr, mapSection: { ...contentLtr.mapSection, mapUrl: embedUrl } });
-        setContentRtl({ ...contentRtl, mapSection: { ...contentRtl.mapSection, mapUrl: embedUrl } });
-      }
+        // Convert place/share links to iframe-safe embed URLs before saving
+        if (section === 'map') {
+          const embedUrl = toGoogleMapsEmbedUrl(contentLtr.mapSection.mapUrl);
+          ltrPayload = {
+            ...ltrPayload,
+            mapSection: { ...ltrPayload.mapSection, mapUrl: embedUrl },
+          };
+          rtlPayload = {
+            ...rtlPayload,
+            mapSection: { ...rtlPayload.mapSection, mapUrl: embedUrl },
+          };
+          setContentLtr({ ...contentLtr, mapSection: { ...contentLtr.mapSection, mapUrl: embedUrl } });
+          setContentRtl({ ...contentRtl, mapSection: { ...contentRtl.mapSection, mapUrl: embedUrl } });
+        }
 
-      // Save both LTR and RTL in parallel
-      const [ltrRes, rtlRes] = await Promise.all([
-        fetch('/api/contact-us', {
-          method: contentLtr._id ? 'PUT' : 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(ltrPayload),
-        }),
-        fetch('/api/contact-us', {
-          method: contentRtl._id ? 'PUT' : 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(rtlPayload),
-        }),
-      ]);
-      
-      const [ltrResult, rtlResult] = await Promise.all([ltrRes.json(), rtlRes.json()]);
-      
-      if (ltrResult.success && rtlResult.success) {
+        const [ltrRes, rtlRes] = await Promise.all([
+          fetch('/api/contact-us', {
+            method: contentLtr._id ? 'PUT' : 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(ltrPayload),
+          }),
+          fetch('/api/contact-us', {
+            method: contentRtl._id ? 'PUT' : 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(rtlPayload),
+          }),
+        ]);
+
+        const [ltrResult, rtlResult] = await Promise.all([ltrRes.json(), rtlRes.json()]);
+        if (!(ltrResult.success && rtlResult.success)) {
+          errorMessage = ltrResult.message || rtlResult.message || 'Failed to save';
+        }
+        return bilingualSaveOutcome(ltrResult.success, rtlResult.success);
+      });
+
+      if (saved) {
         showMessage('success', `${section} saved successfully!`);
         await loadContent();
       } else {
-        showMessage('error', ltrResult.message || rtlResult.message || 'Failed to save');
+        showMessage('error', errorMessage);
       }
     } catch (error) {
       console.error('Error saving:', error);

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { CustomerStory } from '@/types/customer-stories';
 import { revalidatePath } from 'next/cache';
+import { deleteReferencedUploads } from '@/lib/image-utils';
 
 const DB_NAME = 'albaharpartners1';
 const COLLECTION_NAME = 'customerstories';
@@ -215,6 +216,7 @@ export async function DELETE(
 
     revalidatePath('/customer-stories');
     revalidatePath('/');
+    await deleteReferencedUploads(storyToDelete);
 
     return NextResponse.json({
       success: true,

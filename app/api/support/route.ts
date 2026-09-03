@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { SupportContent } from '@/types/support';
 import { revalidatePath } from 'next/cache';
+import { deleteUnusedManagedUploads } from '@/lib/image-utils';
 
 const DB_NAME = 'albaharpartners1';
 const COLLECTION_NAME = 'support';
@@ -114,6 +115,7 @@ export async function PUT(request: NextRequest) {
       updatedAt: new Date(),
     };
 
+    const oldDocument = await collection.findOne({ language: body.language });
     const result = await collection.findOneAndUpdate(
       { language: body.language },
       { $set: updatedContent },
@@ -126,6 +128,9 @@ export async function PUT(request: NextRequest) {
         message: 'Failed to update Support content',
       }, { status: 500 });
     }
+
+    const siblings = await collection.find({ language: { $ne: body.language } }).toArray();
+    await deleteUnusedManagedUploads(oldDocument, updateData, siblings);
 
     // Revalidate support page
     revalidatePath('/support');

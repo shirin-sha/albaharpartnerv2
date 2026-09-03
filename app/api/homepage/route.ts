@@ -3,7 +3,7 @@ import { getDatabase } from '@/lib/mongodb';
 import { HomepageContent } from '@/types/homepage';
 import { ObjectId } from 'mongodb';
 import { revalidatePath } from 'next/cache';
-import { extractImagePaths, deleteImageFiles } from '@/lib/image-utils';
+import { deleteUnusedManagedUploads, deleteReferencedUploads } from '@/lib/image-utils';
 
 // GET - Fetch homepage content
 export async function GET(request: NextRequest) {
@@ -157,20 +157,8 @@ export async function PUT(request: NextRequest) {
       );
     }
     
-    // Clean up old images that are no longer used
-    if (oldDocument) {
-      const oldImagePaths = extractImagePaths(oldDocument);
-      const newImagePaths = extractImagePaths(updateData);
-      
-      // Find images that were in old but not in new
-      const imagesToDelete = Array.from(oldImagePaths).filter(
-        oldPath => !newImagePaths.has(oldPath) && !newImagePaths.has(oldPath.replace(/^\//, ''))
-      );
-      
-      if (imagesToDelete.length > 0) {
-        await deleteImageFiles(Array.from(imagesToDelete));
-      }
-    }
+    const siblings = await collection.find({ _id: { $ne: objectId as any } }).toArray();
+    await deleteUnusedManagedUploads(oldDocument, updateData, siblings);
     
     // Revalidate homepage after updating content
     revalidatePath('/');
@@ -228,12 +216,8 @@ export async function DELETE(request: NextRequest) {
       );
     }
     
-    // Clean up images from deleted document
     if (documentToDelete) {
-      const imagePaths = extractImagePaths(documentToDelete);
-      if (imagePaths.size > 0) {
-        await deleteImageFiles(Array.from(imagePaths));
-      }
+      await deleteReferencedUploads(documentToDelete);
     }
     
     // Revalidate homepage after deleting content

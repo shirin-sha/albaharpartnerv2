@@ -1,72 +1,69 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllImageFiles, extractImagePaths, deleteImageFiles } from '@/lib/image-utils';
+import {
+  extractImagePaths,
+  deleteImageFiles,
+  getAllManagedUploadFiles,
+  findOrphanedUploads,
+} from '@/lib/image-utils';
 import { getDatabase } from '@/lib/mongodb';
-import path from 'path';
+
+const CMS_COLLECTIONS = [
+  'homepage',
+  'newsupdates',
+  'aboutus',
+  'solutions',
+  'customerstories',
+  'brands',
+  'contactus',
+  'support',
+  'careers',
+  'header',
+  'footer',
+  'customer-care-center',
+  'career_applications',
+];
 
 /**
  * POST /api/images/cleanup
- * Find and optionally delete orphaned images (images not referenced in database)
+ * Find and optionally delete orphaned CMS uploads (not referenced in the database).
  * Query params:
  *   - dryRun: if true, only report orphaned images without deleting (default: true)
  */
 export async function POST(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const dryRun = searchParams.get('dryRun') !== 'false'; // Default to true for safety
+    const dryRun = searchParams.get('dryRun') !== 'false';
 
-    // Get all image files from filesystem
-    const imagesDir = path.join(process.cwd(), 'public', 'image');
-    const allImageFiles = await getAllImageFiles(imagesDir);
+    const allManagedFiles = await getAllManagedUploadFiles();
 
-    // Get all image paths from database
     const db = await getDatabase();
     const usedImagePaths = new Set<string>();
 
-    // Collect images from all collections
-    const collections = [
-      'homepage',
-      'newsupdates',
-      'aboutus',
-      'solutions',
-      'customerstories',
-      'brands',
-      'contactus',
-      'support',
-      'careers',
-      'header',
-      'footer',
-      // Add other collections that might contain images
-    ];
-
-    for (const collectionName of collections) {
+    for (const collectionName of CMS_COLLECTIONS) {
       try {
         const collection = db.collection(collectionName);
         const documents = await collection.find({}).toArray();
-        
-        documents.forEach(doc => {
+
+        documents.forEach((doc) => {
           const imagePaths = extractImagePaths(doc);
-          imagePaths.forEach(imgPath => usedImagePaths.add(imgPath));
+          imagePaths.forEach((imgPath) => usedImagePaths.add(imgPath));
         });
       } catch (error) {
         console.error(`Error reading collection ${collectionName}:`, error);
       }
     }
 
-    // Find orphaned images
-    const orphanedImages = allImageFiles.filter(
-      imgPath => !usedImagePaths.has(imgPath) && !usedImagePaths.has(imgPath.replace(/^\//, ''))
-    );
+    const orphanedImages = findOrphanedUploads(allManagedFiles, usedImagePaths);
 
     let deleteResults = null;
     if (!dryRun && orphanedImages.length > 0) {
-      // Actually delete the orphaned images
       deleteResults = await deleteImageFiles(orphanedImages);
     }
 
     return NextResponse.json({
       success: true,
       dryRun,
-      totalImages: allImageFiles.length,
+      totalImages: allManagedFiles.length,
       usedImages: usedImagePaths.size,
       orphanedImages: orphanedImages.length,
       orphanedImagePaths: orphanedImages,
@@ -93,8 +90,6 @@ export async function POST(request: NextRequest) {
  * Get report of orphaned images without deleting
  */
 export async function GET(request: NextRequest) {
-  const response = await POST(
-    new NextRequest(request.url, { method: 'POST' })
-  );
+  const response = await POST(new NextRequest(request.url, { method: 'POST' }));
   return response;
 }

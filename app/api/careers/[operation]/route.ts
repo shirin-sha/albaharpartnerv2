@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import clientPromise from '@/lib/mongodb';
 import { Job } from '@/types/careers';
 import { revalidatePath } from 'next/cache';
+import { deleteReferencedUploads } from '@/lib/image-utils';
 
 const DB_NAME = 'albaharpartners1';
 const COLLECTION_NAME = 'careers';
@@ -213,6 +214,7 @@ export async function DELETE(
     );
 
     revalidatePath('/career');
+    await deleteReferencedUploads(jobToDelete);
 
     return NextResponse.json({
       success: true,

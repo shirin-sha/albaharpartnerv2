@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import type { CccSectionData, CccSectionEditorProps, CccSectionFormData } from '@/app/admin/cms/customer-care-center/types';
 import { CCC_SECTION_LABELS, type CccSectionId } from '@/app/admin/cms/customer-care-center/constants';
 import { CCC_SECTION_FIELD_RENDERERS } from './customer-care-section-fields';
-import { commitPendingUploads, discardPendingUploads } from '@/lib/pending-uploads';
+import { saveWithPendingUploads, discardPendingUploads } from '@/lib/pending-uploads';
 
 function emptyForSection(sectionId: string, lang: 'ltr' | 'rtl'): Record<string, unknown> {
   switch (sectionId) {
@@ -98,15 +98,17 @@ export default function CustomerCareSectionEditor({
     e.preventDefault();
     setSaving(true);
     try {
-      await commitPendingUploads();
-      const latest = formDataRef.current;
-      const updateData: Partial<CccSectionData> = {
-        enabled: section?.enabled ?? true,
-        order: section?.order ?? 0,
-        ltr: latest.ltr,
-        rtl: latest.rtl,
-      };
-      await onSave(sectionId, updateData);
+      await saveWithPendingUploads(async () => {
+        const latest = formDataRef.current;
+        const updateData: Partial<CccSectionData> = {
+          enabled: section?.enabled ?? true,
+          order: section?.order ?? 0,
+          ltr: latest.ltr,
+          rtl: latest.rtl,
+        };
+        await onSave(sectionId, updateData);
+        return true;
+      });
     } catch (err) {
       console.error('Failed to save customer care section:', err);
       alert(err instanceof Error ? err.message : 'Failed to save');

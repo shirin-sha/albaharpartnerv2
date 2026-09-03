@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { commitPendingUploads, discardPendingUploads } from '@/lib/pending-uploads';
+import { saveWithPendingUploads, discardPendingUploads, queuePathForDelete } from '@/lib/pending-uploads';
 import { Brand } from '@/types/brands';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
 
@@ -117,60 +117,60 @@ export default function BrandsManagePage() {
     e.preventDefault();
     setSaving(true);
     try {
-      await commitPendingUploads();
-    } catch (uploadErr) {
-      console.error('Upload error:', uploadErr);
-      showMessage('error', uploadErr instanceof Error ? uploadErr.message : 'Failed to upload files');
-      setSaving(false);
-      return;
-    }
-    const formData = formDataRef.current;
-    if (!formData.name.trim()) {
-      showMessage('error', 'Brand name (English) is required');
-      setSaving(false);
-      return;
-    }
-    if (!formData.imagePath.trim()) {
-      showMessage('error', 'Brand image is required');
-      setSaving(false);
-      return;
-    }
+      let errorMessage = 'Failed to save';
+      const saved = await saveWithPendingUploads(async () => {
+        const formData = formDataRef.current;
+        if (!formData.name.trim()) {
+          errorMessage = 'Brand name (English) is required';
+          return false;
+        }
+        if (!formData.imagePath.trim()) {
+          errorMessage = 'Brand image is required';
+          return false;
+        }
 
-    try {
-      const isNew = editingIndex === null;
-      const index = isNew ? brandsLtr.length : editingIndex!;
+        const isNew = editingIndex === null;
+        const index = isNew ? brandsLtr.length : editingIndex!;
 
-      const brand: Brand = {
-        name: formData.name,
-        nameAr: formData.nameAr || formData.name,
-        imagePath: formData.imagePath,
-        link: formData.link,
-        description: formData.description,
-        descriptionAr: formData.descriptionAr || formData.description,
-        products: formData.products,
-        isActive: formData.isActive,
-      };
+        const brand: Brand = {
+          name: formData.name,
+          nameAr: formData.nameAr || formData.name,
+          imagePath: formData.imagePath,
+          link: formData.link,
+          description: formData.description,
+          descriptionAr: formData.descriptionAr || formData.description,
+          products: formData.products,
+          isActive: formData.isActive,
+        };
 
-      const res = await fetch(isNew ? '/api/brands/add' : '/api/brands/update', {
-        method: isNew ? 'POST' : 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          language: 'ltr',
-          brandIndex: index,
-          brand,
-        }),
+        const res = await fetch(isNew ? '/api/brands/add' : '/api/brands/update', {
+          method: isNew ? 'POST' : 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            language: 'ltr',
+            brandIndex: index,
+            brand,
+          }),
+        });
+        const result = await res.json();
+        if (!result.success) {
+          errorMessage = result.message || 'Failed to save';
+          return false;
+        }
+        return true;
       });
-      const result = await res.json();
-      if (result.success) {
+
+      if (saved) {
+        const isNew = editingIndex === null;
         showMessage('success', isNew ? 'Brand added successfully!' : 'Brand updated successfully!');
         await loadBrands();
         resetForm();
       } else {
-        showMessage('error', result.message || 'Failed to save');
+        showMessage('error', errorMessage);
       }
     } catch (error) {
       console.error('Error saving:', error);
-      showMessage('error', 'Failed to save');
+      showMessage('error', error instanceof Error ? error.message : 'Failed to save');
     } finally {
       setSaving(false);
     }
@@ -394,6 +394,8 @@ export default function BrandsManagePage() {
                           type="button"
                           className="hero-slide-remove"
                           onClick={() => {
+                            const removed = formData.products[index];
+                            if (removed?.imagePath) queuePathForDelete(removed.imagePath);
                             const newProducts = formData.products.filter((_: any, i: number) => i !== index);
                             setFormData({ ...formData, products: newProducts });
                           }}

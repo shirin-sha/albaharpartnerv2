@@ -3,6 +3,7 @@ import clientPromise from '@/lib/mongodb';
 import { Brand } from '@/types/brands';
 import { revalidatePath } from 'next/cache';
 import { ObjectId } from 'mongodb';
+import { deleteReferencedUploads } from '@/lib/image-utils';
 
 const DB_NAME = 'albaharpartners1';
 const COLLECTION_NAME = 'brands';
@@ -270,6 +271,7 @@ export async function DELETE(
 
     revalidatePath('/brands');
     revalidatePath('/');
+    await deleteReferencedUploads(brandToDelete);
 
     return NextResponse.json({
       success: true,

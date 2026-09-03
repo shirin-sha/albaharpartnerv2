@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { commitPendingUploads, discardPendingUploads } from '@/lib/pending-uploads';
+import { saveWithPendingUploads, discardPendingUploads } from '@/lib/pending-uploads';
 import { NewsPost } from '@/types/news-updates';
 import { newsMainImageSrc } from '@/lib/news-post-images';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
@@ -118,70 +118,70 @@ export default function NewsManagePage() {
     e.preventDefault();
     setSaving(true);
     try {
-      await commitPendingUploads();
-    } catch (uploadErr) {
-      console.error('Upload error:', uploadErr);
-      showMessage('error', uploadErr instanceof Error ? uploadErr.message : 'Failed to upload files');
-      setSaving(false);
-      return;
-    }
-    const formData = formDataRef.current;
-    if (!formData.title.trim()) {
-      showMessage('error', 'Title (English) is required');
-      setSaving(false);
-      return;
-    }
-      const dateParts = parseDateValueToParts(formData.dateValue);
-      if (!dateParts) {
-        showMessage('error', 'Valid date is required');
-        setSaving(false);
-        return;
-      }
+      let errorMessage = 'Failed to save';
+      const saved = await saveWithPendingUploads(async () => {
+        const formData = formDataRef.current;
+        if (!formData.title.trim()) {
+          errorMessage = 'Title (English) is required';
+          return false;
+        }
+        const dateParts = parseDateValueToParts(formData.dateValue);
+        if (!dateParts) {
+          errorMessage = 'Valid date is required';
+          return false;
+        }
 
-    try {
-      const isNew = editingIndex === null;
-      const index = isNew ? postsLtr.length : editingIndex!;
+        const isNew = editingIndex === null;
+        const index = isNew ? postsLtr.length : editingIndex!;
 
-      const post: NewsPost = {
-        title: formData.title,
-        titleAr: formData.titleAr || formData.title,
-        category: formData.category,
-        categoryAr: formData.categoryAr || formData.category,
-        shortDescription: formData.shortDescription,
-        shortDescriptionAr: formData.shortDescriptionAr || formData.shortDescription,
-        longDescription: formData.longDescription,
-        longDescriptionAr: formData.longDescriptionAr || formData.longDescription,
-        imagePath: formData.imagePath,
-        detailImagePath: formData.detailImagePath,
-        dateIso: formData.dateValue,
-        imgWidth: formData.imgWidth,
-        imgHeight: formData.imgHeight,
-        date: dateParts,
-        link: '#',
-        isActive: true,
-        isFeatured: formData.isFeatured,
-      };
+        const post: NewsPost = {
+          title: formData.title,
+          titleAr: formData.titleAr || formData.title,
+          category: formData.category,
+          categoryAr: formData.categoryAr || formData.category,
+          shortDescription: formData.shortDescription,
+          shortDescriptionAr: formData.shortDescriptionAr || formData.shortDescription,
+          longDescription: formData.longDescription,
+          longDescriptionAr: formData.longDescriptionAr || formData.longDescription,
+          imagePath: formData.imagePath,
+          detailImagePath: formData.detailImagePath,
+          dateIso: formData.dateValue,
+          imgWidth: formData.imgWidth,
+          imgHeight: formData.imgHeight,
+          date: dateParts,
+          link: '#',
+          isActive: true,
+          isFeatured: formData.isFeatured,
+        };
 
-      const res = await fetch(isNew ? '/api/news-updates/add' : '/api/news-updates/update', {
-        method: isNew ? 'POST' : 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          language: 'ltr',
-          postIndex: index,
-          post,
-        }),
+        const res = await fetch(isNew ? '/api/news-updates/add' : '/api/news-updates/update', {
+          method: isNew ? 'POST' : 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            language: 'ltr',
+            postIndex: index,
+            post,
+          }),
+        });
+        const result = await res.json();
+        if (!result.success) {
+          errorMessage = result.message || 'Failed to save';
+          return false;
+        }
+        return true;
       });
-      const result = await res.json();
-      if (result.success) {
+
+      if (saved) {
+        const isNew = editingIndex === null;
         showMessage('success', isNew ? 'Post added successfully!' : 'Post updated successfully!');
         await loadPosts();
         resetForm();
       } else {
-        showMessage('error', result.message || 'Failed to save');
+        showMessage('error', errorMessage);
       }
     } catch (error) {
       console.error('Error saving:', error);
-      showMessage('error', 'Failed to save');
+      showMessage('error', error instanceof Error ? error.message : 'Failed to save');
     } finally {
       setSaving(false);
     }

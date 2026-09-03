@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import type { SectionData, SectionEditorProps, SectionFormData } from '@/app/admin/homepage/types';
 import { SECTION_FIELD_RENDERERS } from './homepage-section-fields';
-import { commitPendingUploads, discardPendingUploads } from '@/lib/pending-uploads';
+import { saveWithPendingUploads, discardPendingUploads } from '@/lib/pending-uploads';
 
 export default function HomepageSectionEditor({
   sectionId,
@@ -109,15 +109,17 @@ export default function HomepageSectionEditor({
     e.preventDefault();
     setSaving(true);
     try {
-      await commitPendingUploads();
-      const latest = formDataRef.current;
-      const updateData: Partial<SectionData> = {
-        enabled: section?.enabled ?? true,
-        order: section?.order ?? 0,
-        ltr: latest.ltr,
-        rtl: latest.rtl,
-      };
-      await onSave(sectionId, updateData);
+      await saveWithPendingUploads(async () => {
+        const latest = formDataRef.current;
+        const updateData: Partial<SectionData> = {
+          enabled: section?.enabled ?? true,
+          order: section?.order ?? 0,
+          ltr: latest.ltr,
+          rtl: latest.rtl,
+        };
+        await onSave(sectionId, updateData);
+        return true;
+      });
     } catch (err) {
       console.error('Failed to upload pending images:', err);
       alert(err instanceof Error ? err.message : 'Failed to upload images');

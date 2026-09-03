@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef} from 'react';
-import { commitPendingUploads, discardPendingUploads } from '@/lib/pending-uploads';
+import { saveWithPendingUploads, discardPendingUploads, deleteManagedUpload } from '@/lib/pending-uploads';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
 import { AboutUsContent, TeamMember } from '@/types/aboutus';
 
@@ -178,53 +178,60 @@ export default function TeamManagePage() {
 
   const handleDelete = async (index: number) => {
     if (!confirm('Are you sure you want to delete this team member?')) return;
+    const removed = membersLtr[index];
     const nextMembersLtr = membersLtr.filter((_, i) => i !== index);
     const nextMembersRtl = membersRtl.filter((_, i) => i !== index);
-    await saveMembers(nextMembersLtr, nextMembersRtl);
+    const ok = await saveMembers(nextMembersLtr, nextMembersRtl);
+    if (ok) {
+      await deleteManagedUpload(removed?.imgSrc || '');
+      if (membersRtl[index]?.imgSrc && membersRtl[index].imgSrc !== removed?.imgSrc) {
+        await deleteManagedUpload(membersRtl[index].imgSrc);
+      }
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     try {
-      await commitPendingUploads();
-    } catch (uploadErr) {
-      console.error('Upload error:', uploadErr);
-      showToast('error', uploadErr instanceof Error ? uploadErr.message : 'Failed to upload files');
+      const ok = await saveWithPendingUploads(async () => {
+        const formData = formDataRef.current;
+        if (!formData.name.trim()) {
+          showToast('error', 'Name (English) is required');
+          return false;
+        }
+
+        const memberLtr: TeamMember = {
+          imgSrc: formData.imgSrc,
+          name: formData.name,
+          position: formData.position,
+        };
+        const memberRtl: TeamMember = {
+          imgSrc: formData.imgSrc,
+          name: formData.nameAr || formData.name,
+          position: formData.positionAr || formData.position,
+        };
+
+        const nextMembersLtr = [...membersLtr];
+        const nextMembersRtl = [...membersRtl];
+
+        if (editingIndex === null) {
+          nextMembersLtr.push(memberLtr);
+          nextMembersRtl.push(memberRtl);
+        } else {
+          nextMembersLtr[editingIndex] = memberLtr;
+          nextMembersRtl[editingIndex] = memberRtl;
+        }
+
+        return await saveMembers(nextMembersLtr, nextMembersRtl);
+      });
+      if (ok) resetForm();
+    } catch (err) {
+      console.error('Upload error:', err);
+      showToast('error', err instanceof Error ? err.message : 'Failed to upload files');
+    } finally {
       setSaving(false);
-      return;
     }
-    const formData = formDataRef.current;
-    if (!formData.name.trim()) {
-      showToast('error', 'Name (English) is required');
-      setSaving(false);
-      return;
-    }
-
-    const memberLtr: TeamMember = {
-      imgSrc: formData.imgSrc,
-      name: formData.name,
-      position: formData.position,
-    };
-    const memberRtl: TeamMember = {
-      imgSrc: formData.imgSrc,
-      name: formData.nameAr || formData.name,
-      position: formData.positionAr || formData.position,
-    };
-
-    const nextMembersLtr = [...membersLtr];
-    const nextMembersRtl = [...membersRtl];
-
-    if (editingIndex === null) {
-      nextMembersLtr.push(memberLtr);
-      nextMembersRtl.push(memberRtl);
-    } else {
-      nextMembersLtr[editingIndex] = memberLtr;
-      nextMembersRtl[editingIndex] = memberRtl;
-    }
-
-    const ok = await saveMembers(nextMembersLtr, nextMembersRtl);
-    if (ok) resetForm();
   };
 
   if (loading) {

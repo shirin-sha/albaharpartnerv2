@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef} from 'react';
-import { commitPendingUploads, discardPendingUploads } from '@/lib/pending-uploads';
+import { saveWithPendingUploads, bilingualSaveOutcome, discardPendingUploads } from '@/lib/pending-uploads';
 import { FooterContent } from '@/types/footer';
 import ImageUpload from '@/components/admin/ui/ImageUpload';
 
@@ -290,31 +290,37 @@ export default function FooterManager() {
   const handleSaveSection = async (section: string) => {
     setSaving(section);
     try {
-      await commitPendingUploads();
-      const contentLtr = contentLtrRef.current;
-      const contentRtl = contentRtlRef.current;
-      if (!contentLtr || !contentRtl) return;
-      // Save both LTR and RTL in parallel
-      const [ltrRes, rtlRes] = await Promise.all([
-        fetch('/api/footer', {
-          method: contentLtr._id ? 'PUT' : 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...contentLtr, language: 'ltr' }),
-        }),
-        fetch('/api/footer', {
-          method: contentRtl._id ? 'PUT' : 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...contentRtl, language: 'rtl' }),
-        }),
-      ]);
-      
-      const [ltrResult, rtlResult] = await Promise.all([ltrRes.json(), rtlRes.json()]);
-      
-      if (ltrResult.success && rtlResult.success) {
+      let errorMessage = 'Failed to save';
+      const saved = await saveWithPendingUploads(async () => {
+        const contentLtr = contentLtrRef.current;
+        const contentRtl = contentRtlRef.current;
+        if (!contentLtr || !contentRtl) return false;
+
+        const [ltrRes, rtlRes] = await Promise.all([
+          fetch('/api/footer', {
+            method: contentLtr._id ? 'PUT' : 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...contentLtr, language: 'ltr' }),
+          }),
+          fetch('/api/footer', {
+            method: contentRtl._id ? 'PUT' : 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...contentRtl, language: 'rtl' }),
+          }),
+        ]);
+
+        const [ltrResult, rtlResult] = await Promise.all([ltrRes.json(), rtlRes.json()]);
+        if (!(ltrResult.success && rtlResult.success)) {
+          errorMessage = ltrResult.message || rtlResult.message || 'Failed to save';
+        }
+        return bilingualSaveOutcome(ltrResult.success, rtlResult.success);
+      });
+
+      if (saved) {
         showMessage('success', `${section} saved successfully!`);
         await loadContent();
       } else {
-        showMessage('error', ltrResult.message || rtlResult.message || 'Failed to save');
+        showMessage('error', errorMessage);
       }
     } catch (error) {
       console.error('Error saving:', error);

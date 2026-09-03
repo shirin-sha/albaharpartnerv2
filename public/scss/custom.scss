@@ -530,27 +530,6 @@
   margin-bottom: 8px;
 }
 
-html[dir="rtl"] {
-  .page-title-home.h-7 .hero-overlay,
-  .page-title-home.h-5 .page-title-inner::after {
-    background: linear-gradient(
-      270deg,
-      rgba(48, 17, 61, 0.82) 0%,
-      rgba(48, 17, 61, 0.32) 48%,
-      rgba(48, 17, 61, 0.04) 100%
-    );
-  }
-}
-
-.page-title-home[dir="rtl"] .hero-overlay {
-  background: linear-gradient(
-    270deg,
-    rgba(48, 17, 61, 0.82) 0%,
-    rgba(48, 17, 61, 0.32) 48%,
-    rgba(48, 17, 61, 0.04) 100%
-  );
-}
-
 /* Restore theme-scale header + hero on mobile (undo oversized custom sizes) */
 @media (max-width: 1199px) {
   .header.header-centered-nav {

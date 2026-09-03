@@ -46,7 +46,6 @@ export default function ProcessSection({
           sizes="100vw"
           style={{ objectFit: "cover" }}
         />
-        <div className="advantage-banner-overlay" aria-hidden="true" />
         <div className="tf-container advantage-banner-inner">
           <div className="advantage-banner-content text-center">
             {content.tag && (

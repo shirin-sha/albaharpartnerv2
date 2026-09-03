@@ -605,21 +605,6 @@
         object-fit: cover;
       }
       
-      .hero-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(
-          90deg,
-          rgba(48, 17, 61, 0.82) 0%,
-          rgba(48, 17, 61, 0.32) 48%,
-          rgba(48, 17, 61, 0.04) 100%
-        );
-        z-index: 1;
-      }
-      
       .hero-container {
         position: relative;
         z-index: 2;
@@ -2914,19 +2899,6 @@
 
   .advantage-banner-image {
     z-index: 0;
-  }
-
-  .advantage-banner-overlay {
-    position: absolute;
-    inset: 0;
-    z-index: 1;
-    pointer-events: none;
-    background: radial-gradient(
-      ellipse 80% 85% at 50% 48%,
-      rgba(48, 17, 61, 0.82) 0%,
-      rgba(109, 44, 132, 0.52) 46%,
-      rgba(48, 17, 61, 0.22) 100%
-    );
   }
 
   .advantage-banner-inner {

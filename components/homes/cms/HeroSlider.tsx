@@ -69,7 +69,6 @@ export default function HeroSlider({ slides, language = 'ltr' }: HeroSliderProps
               sizes="100vw"
               style={{ objectFit: "cover" }}
             />
-            <div className="hero-overlay" />
             <div className="tf-container hero-container">
               <div className="row hero-row">
                 <div className="col-12 hero-col">

@@ -6,6 +6,7 @@ import React from "react";
 import { HeaderContent } from "@/types/header";
 import { usePathname } from "next/navigation";
 import { addLanguagePrefix } from "@/lib/language-utils";
+import { closeMobileNav } from "@/components/modals/closeMobileNav";
 
 interface Props {
   data: HeaderContent;
@@ -28,17 +29,6 @@ export default function HeaderCMS({ data }: Props) {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
-
-  const closeMobileNav = () => {
-    const el = document.getElementById("canvasMobile");
-    if (!el) return;
-    el.classList.remove("show");
-    el.style.visibility = "";
-    el.style.transform = "";
-    el.setAttribute("aria-hidden", "true");
-    document.body.classList.remove("overflow-hidden");
-    document.querySelectorAll(".mobile-nav-backdrop").forEach((b) => b.remove());
-  };
 
   const openMobileNav = (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
     e.preventDefault();

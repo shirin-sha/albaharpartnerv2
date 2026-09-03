@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import React, { useEffect, useRef } from "react";
 import { loadAnimateCss, loadTextAnimationCss } from "@/lib/plugin-styles";
+import { closeMobileNav } from "@/components/modals/closeMobileNav";
 
 function runWhenBrowserIdle(callback: () => void, timeout = 2500) {
   if (typeof window === "undefined") return () => {};
@@ -146,6 +147,8 @@ export default function GlobalEffectsProvider() {
 
   // Close any open modals/offcanvas on route change
   useEffect(() => {
+    closeMobileNav();
+
     if (!hasLoadedBootstrap.current || !bootstrapRef.current) return;
 
     const bootstrap = bootstrapRef.current;
@@ -156,6 +159,7 @@ export default function GlobalEffectsProvider() {
     });
 
     document.querySelectorAll(".offcanvas.show").forEach((offcanvas) => {
+      if (offcanvas.id === "canvasMobile") return;
       const instance = bootstrap.Offcanvas.getOrCreateInstance(offcanvas);
       if (instance) instance.hide();
     });

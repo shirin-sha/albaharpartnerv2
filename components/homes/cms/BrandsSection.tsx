@@ -7,11 +7,29 @@ interface BrandsSectionProps {
   language?: 'ltr' | 'rtl';
 }
 
+function isSvgPath(src: string) {
+  return src.split("?")[0].toLowerCase().endsWith(".svg");
+}
+
 function BrandLogo({
   brand,
 }: {
   brand: BrandsSectionType['brands'][number];
 }) {
+  const image = (
+    <Image
+      alt={brand.name}
+      src={brand.imagePath}
+      width={200}
+      height={100}
+      className="brand-marquee-img"
+      loading="lazy"
+      quality={70}
+      sizes="(max-width: 767px) 112px, (max-width: 991px) 150px, 200px"
+      unoptimized={isSvgPath(brand.imagePath)}
+    />
+  );
+
   if (brand.link && brand.link !== "#") {
     return (
       <a
@@ -22,34 +40,12 @@ function BrandLogo({
         aria-label={brand.name}
       >
         <span className="visually-hidden">{`Visit ${brand.name}`}</span>
-        <Image
-          alt=""
-          src={brand.imagePath}
-          width={200}
-          height={100}
-          className="brand-marquee-img"
-          loading="lazy"
-          quality={70}
-          sizes="200px"
-        />
+        {image}
       </a>
     );
   }
 
-  return (
-    <span className="brand-item">
-      <Image
-        alt={brand.name}
-        src={brand.imagePath}
-        width={200}
-        height={100}
-        className="brand-marquee-img"
-        loading="lazy"
-        quality={70}
-        sizes="200px"
-      />
-    </span>
-  );
+  return <span className="brand-item">{image}</span>;
 }
 
 export default function BrandsSection({ content, language = 'ltr' }: BrandsSectionProps) {

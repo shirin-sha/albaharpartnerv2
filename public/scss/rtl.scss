@@ -976,6 +976,20 @@
     animation: brandsMarqueeScroll 90s linear infinite !important;
   }
 
+  @media (max-width: 991px) {
+    .section-brand .brands-marquee .brands-marquee-track,
+    .section-brand .marquee-wrapper.brands-marquee-track {
+      animation-duration: 55s !important;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .section-brand .brands-marquee .brands-marquee-track,
+    .section-brand .marquee-wrapper.brands-marquee-track {
+      animation-duration: 36s !important;
+    }
+  }
+
   .section-why-choose {
     .progress-box {
       right: auto !important;

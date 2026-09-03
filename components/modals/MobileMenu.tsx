@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { HeaderContent, MenuItem } from "@/types/header";
 import { addLanguagePrefix, getLanguageFromPathname } from "@/lib/language-utils";
+import { closeMobileNav, closeMobileNavSoon } from "@/components/modals/closeMobileNav";
 
 function normalizePath(path: string) {
   return path.replace(/^\/ar/, "") || "/";
@@ -38,6 +39,10 @@ export default function MobileMenu() {
   useEffect(() => {
     setLogoSrc(header?.logo?.imagePath?.trim() || "/image/logo/logo-2.png");
   }, [header?.logo?.imagePath]);
+
+  useEffect(() => {
+    closeMobileNav();
+  }, [pathname]);
 
   const isItemActive = (href: string) => {
     const current = normalizePath(pathname || "/");
@@ -83,7 +88,7 @@ export default function MobileMenu() {
       <div className="inner-mobile-nav">
         <div className="top-header-mobi">
           <div className="logo-mobile">
-            <Link href={homeHref}>
+            <Link href={homeHref} onClick={closeMobileNavSoon}>
               <span className="visually-hidden">{`${logoAlt} — home`}</span>
               <Image
                 alt=""
@@ -101,18 +106,8 @@ export default function MobileMenu() {
           <button
             className="mobile-nav-close"
             type="button"
-            data-bs-dismiss="offcanvas"
             aria-label="Close"
-            onClick={() => {
-              const el = document.getElementById("canvasMobile");
-              el?.classList.remove("show");
-              if (el) {
-                el.style.visibility = "";
-                el.setAttribute("aria-hidden", "true");
-              }
-              document.body.classList.remove("overflow-hidden");
-              document.querySelectorAll(".mobile-nav-backdrop").forEach((b) => b.remove());
-            }}
+            onClick={closeMobileNav}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -170,6 +165,7 @@ export default function MobileMenu() {
                             <Link
                               href={addLanguagePrefix(sub.href, pathname)}
                               prefetch={true}
+                              onClick={closeMobileNavSoon}
                             >
                               {sub.title}
                             </Link>
@@ -188,7 +184,7 @@ export default function MobileMenu() {
                     isItemActive(item.href) ? "current-menu-mobile-item" : ""
                   }`}
                 >
-                  <Link href={itemHref} prefetch={true}>
+                  <Link href={itemHref} prefetch={true} onClick={closeMobileNavSoon}>
                     {item.title}
                   </Link>
                 </li>
@@ -233,6 +229,7 @@ export default function MobileMenu() {
                 <Link
                   href={addLanguagePrefix(buttonLink, pathname)}
                   className="tf-btn style-1 bg-color-primary"
+                  onClick={closeMobileNavSoon}
                 >
                   <span>{buttonText}</span>
                 </Link>
